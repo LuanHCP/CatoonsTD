@@ -1,99 +1,147 @@
-# Catoons TD
+# 🐱 Catoons TD
 
-Catoons TD é um jogo de **Tower Defense** com temática de gatos, desenvolvido com foco em **gameplay estratégico, progressão do jogador e identidade própria**.  
-O projeto começou como uma ideia inspirada no gênero Tower Defense, mas foi evoluindo para incluir **heróis únicos, maestria, sinergias, inimigos especiais, desbloqueios secretos e progressão por dificuldades**, buscando se diferenciar e criar uma experiência original.
+[🇺🇸 English README](README_EN.md)
 
-## Sobre o projeto
+> **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-Neste jogo, o jogador precisa posicionar e evoluir seus **gatinhos defensores** para impedir que os inimigos atravessem o mapa.  
-Cada unidade possui características próprias, caminhos de upgrade, sinergias e funções específicas dentro da partida.
+**Status:** Beta de portfólio · **Build:** v0.27.1  
+**Plataformas:** Navegador moderno · Windows x64 via launcher local  
+**Idioma atual:** Português (Brasil)
 
-Além da jogabilidade principal, o projeto também explora:
+Catoons TD é um Tower Defense focado em **progressão, composição de equipes e leitura de combate**. O projeto começou como um protótipo simples e evoluiu para um jogo com mapas por tiers, dificuldades, caminhos de upgrade, heróis, maestria, unidades secretas, sinergias, inimigos especiais, poderes e modo infinito.
 
-- progressão entre partidas;
-- desbloqueios por desempenho;
-- balanceamento por dificuldade;
-- interface própria;
-- design voltado para publicação em portfólio;
-- uso de IA como apoio no processo de desenvolvimento.
+## 🎮 Jogar no navegador
 
-## Principais funcionalidades
+O repositório foi organizado para funcionar diretamente no **GitHub Pages**. Depois de publicar o projeto, o `index.html` na raiz já é o ponto de entrada do jogo.
 
-### Gameplay
-- Sistema de **Tower Defense** com múltiplos mapas;
-- Diferentes níveis de dificuldade:
-  - Iniciante
-  - Médio
-  - Difícil
-  - Impossível
-- Balanceamento de custo dos gatinhos conforme a dificuldade;
-- Sistema de buffs visuais durante a partida;
-- Orientação visual corrigida dos bonecos para melhorar a leitura em jogo;
-- Tutorial inicial para ajudar novos jogadores.
+Para testar localmente, você pode abrir `index.html` em Edge/Chrome. Para uma experiência mais consistente, prefira servir a pasta com um servidor HTTP local.
 
-### Gatinhos / Unidades
-- Várias unidades com papéis diferentes;
-- Caminhos de upgrade;
-- Unidades com focos distintos, como:
-  - dano
-  - controle
-  - alcance
-  - suporte
-  - farm
-- **Heróis Gatinhos** com colocação única e funções especiais;
-- **Gatinhos secretos** desbloqueáveis ao completar conjuntos de desafios.
+## ✨ Destaques do projeto
 
-### Progressão
-- Sistema de **maestria até o nível 50**;
-- Ganhos progressivos de atributos por faixa de nível;
-- Habilidades especiais ao atingir o nível máximo;
-- Recompensas de progressão, incluindo:
-  - melhorias visuais;
-  - skins especiais;
-  - moedas para a loja.
+- **13 mapas** organizados em 4 tiers: 6 Iniciantes, 4 Médios, 2 Difíceis e 1 Impossível.
+- **3 dificuldades por mapa**: Fácil, Normal e Difícil.
+- **13 gatinhos**, incluindo 3 personagens secretos descobertos apenas por conclusão completa de tiers.
+- **Árvores de upgrade** com caminhos e crosspath limitado em unidades específicas.
+- **Maestria até o nível 50**, com bônus permanentes, skin dourada e habilidade exclusiva no nível máximo.
+- **4 Heróis Gatinhos**, com evolução do nível 1 ao 10 dentro de cada partida e habilidades/ultimates próprias.
+- **8 sinergias** que alteram comportamento de combate quando combinações específicas estão em campo.
+- **5 inimigos especiais** com habilidades próprias: Curandeiro, Atrapalhão, Bobo da Corte, Anjo e Demônio.
+- **Economia e progressão persistente** com moedas, XP, estrelas, poderes consumíveis e saves locais.
+- **Campanha e modo Infinito**.
+- **Venda por 50% do investimento**, reposicionamento e estatísticas por torre.
+- **Tutorial guiado**, configurações, exportação/importação de save e painel de playtest por `F8`.
+- **Launcher Windows em Go**, sem embutir ou extrair o jogo: ele apenas abre a build local em modo app no Edge/Chrome.
 
-### Diferenciais
-- Sistema de **sinergia entre gatinhos**;
-- Inimigos especiais com mecânicas próprias;
-- Loja planejada para skins, poderes e conteúdo futuro;
-- Estrutura pensada para beta, testes e evolução contínua.
+## 🧠 Engenharia assistida por IA
 
-## Inimigos especiais
+A IA foi usada como **copiloto de desenvolvimento**, não como substituto da direção do projeto. O processo incluiu:
 
-O projeto já conta com inimigos diferenciados para fugir do básico e deixar a jogabilidade mais interessante, como por exemplo:
+1. definição de requisitos e decisões de gameplay pelo autor;
+2. decomposição das ideias em versões pequenas e testáveis;
+3. geração/refatoração de código com assistência de IA;
+4. testes manuais, identificação de bugs e ajustes de balanceamento;
+5. revisão de UX, responsividade, persistência e distribuição;
+6. documentação técnica e preparação para beta.
 
-- **Curandeiro**: regenera inimigos próximos;
-- **Atrapalhão**: causa efeitos negativos nas tropas ao interagir com outros inimigos;
-- **Bobo da Corte**: faz o jogador perder dinheiro ao ser atingido;
-- **Anjo**: aplica escudo em aliados;
-- **Demônio**: absorve proteção de inimigos próximos e se fortalece.
+Esse fluxo demonstra capacidade de **transformar requisitos em software funcional, revisar o resultado gerado, depurar problemas e iterar sobre um produto real**.
 
-Esses inimigos ajudam a criar partidas mais dinâmicas e exigem estratégias diferentes do jogador.
+Leia mais em [`docs/AI_ASSISTED_DEVELOPMENT.md`](docs/AI_ASSISTED_DEVELOPMENT.md).
 
-## Objetivo do projeto
+## 🏗️ Arquitetura
 
-Este projeto foi desenvolvido com os seguintes objetivos:
+```mermaid
+flowchart LR
+    U[Jogador] --> UI[index.html + style.css]
+    UI --> G[game.js]
+    G --> C[Combate e targeting]
+    G --> P[Progressão / Maestria]
+    G --> H[Heróis / Sinergias]
+    G --> M[Mapas / Waves / Inimigos]
+    G --> S[(localStorage)]
+    S --> G
+    L[Launcher Go - Windows] --> B[Edge / Chrome em modo app]
+    B --> UI
+```
 
-- praticar lógica de jogo e arquitetura de sistemas interativos;
-- evoluir habilidades de front-end e organização de projeto;
-- explorar criação de sistemas de progressão e balanceamento;
-- construir um projeto jogável para **portfólio**;
-- demonstrar capacidade de transformar ideias em produto;
-- mostrar como a **IA pode ser usada como apoio real no desenvolvimento**, sem substituir o raciocínio, testes e decisões do desenvolvedor.
+A build atual é **client-side e offline-first**. Não há backend obrigatório: o estado persistente do jogador é armazenado em `localStorage`, com suporte a exportação/importação manual do save.
 
-## Tecnologias utilizadas
+Mais detalhes: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-As tecnologias podem variar conforme a versão, mas a base do projeto utiliza:
+## 🧰 Tecnologias
 
-- **HTML**
-- **CSS**
-- **JavaScript**
+| Tecnologia | Uso no projeto |
+|---|---|
+| HTML5 | Estrutura das telas e HUD |
+| CSS3 | Interface, responsividade, animações e efeitos |
+| JavaScript | Loop do jogo, combate, economia, progressão e persistência |
+| Canvas 2D | Renderização do mapa, unidades, inimigos e efeitos |
+| LocalStorage | Save local do jogador |
+| Go | Launcher desktop Windows |
+| Git / GitHub | Versionamento, documentação, Issues e Releases |
+| GitHub Pages | Hospedagem da versão web do beta |
 
-Em algumas versões, o projeto também foi preparado para distribuição em formato jogável para desktop e apresentação em portfólio.
+## 📁 Estrutura do repositório
 
-## Como executar
+```text
+CatoonsTD/
+├─ index.html
+├─ src/
+│  ├─ game.js
+│  └─ style.css
+├─ desktop/
+│  └─ launcher.go
+├─ docs/
+│  ├─ ARCHITECTURE.md
+│  ├─ AI_ASSISTED_DEVELOPMENT.md
+│  ├─ BETA_TESTING.md
+│  ├─ DEPLOY_GITHUB.md
+│  └─ PORTFOLIO_TEXTS.md
+├─ screenshots/
+├─ .github/
+│  └─ ISSUE_TEMPLATE/
+├─ CHANGELOG.md
+├─ CONTRIBUTING.md
+├─ LICENSE
+└─ README.md
+```
 
-### Versão web
-1. Baixe ou clone este repositório:
-   ```bash
-   git clone https://github.com/SEU-USUARIO/CatoonsTD.git
+## 🧪 Qualidade e testes
+
+O repositório inclui uma workflow de CI em `.github/workflows/ci.yml` que valida a sintaxe do JavaScript e faz cross-build do launcher Windows a cada push/PR nas branches principais.
+
+A build v0.27.x entrou em uma fase específica de **playtest e balanceamento**. O jogo possui um painel de diagnóstico acionado por `F8`, mostrando FPS, inimigos, projéteis, efeitos, torres, economia, HP de bosses, herói e sinergias ativas.
+
+O checklist recomendado para o beta está em [`docs/BETA_TESTING.md`](docs/BETA_TESTING.md).
+
+## 🚀 Como publicar no GitHub Pages
+
+O projeto não precisa de build step. Após subir o repositório:
+
+1. abra **Settings → Pages**;
+2. selecione publicação a partir da branch principal;
+3. escolha a pasta raiz `/`;
+4. salve e aguarde o endereço do Pages ser criado.
+
+Veja o passo a passo completo em [`docs/DEPLOY_GITHUB.md`](docs/DEPLOY_GITHUB.md).
+
+## 🐞 Feedback do beta
+
+Encontrou um problema? Use **Issues** e escolha o template **Bug report**. O template pede mapa, dificuldade, wave, herói, resolução e informações do painel F8 para facilitar a reprodução.
+
+## 🗺️ Próximos passos antes do 1.0
+
+- balanceamento completo das unidades e heróis;
+- otimização de performance para ondas muito grandes;
+- revisão de acessibilidade e configurações gráficas;
+- sistema de backup automático de save;
+- testes externos do beta e correções orientadas por feedback;
+- assinatura/distribuição do executável Windows.
+
+## 👨‍💻 Autor
+
+**Luan Henrique Carvalho Pereira**  
+Projeto desenvolvido para estudo, portfólio e evolução prática em Engenharia de Software, desenvolvimento de jogos web e uso responsável de IA no ciclo de desenvolvimento.
+
+---
+
+> Este repositório é uma versão de portfólio. Consulte [`LICENSE`](LICENSE) antes de reutilizar ou redistribuir o projeto.

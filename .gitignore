@@ -1,0 +1,37 @@
+# Builds / executables
+*.exe
+*.msi
+*.zip
+*.7z
+*.rar
+build/
+dist/
+release/
+
+# Saves / local browser runtime
+Runtime/
+CatoonsTD/Runtime/
+*.save.json
+save*.json
+
+# OS / editors
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Logs / temporary files
+*.log
+*.tmp
+*.bak
+
+# Secrets / signing
+*.pfx
+*.p12
+*.pem
+*.key
+*.cer
+*.crt
+.env
+.env.*

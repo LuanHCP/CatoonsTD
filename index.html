@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#081017">
+  <title>Catoons TD</title>
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <main class="game-shell">
+    <header class="hero">
+      <div>
+        <span class="eyebrow">BETA • v0.27.1 PLAYTEST & BALANCE</span>
+        <h1>Catoons TD</h1>
+        <p>Escolha um lobby, evolua sua conta e monte sua defesa felina.</p>
+      </div>
+      <div class="profile-cluster">
+        <div class="profile-wallet">
+          <span>🎖️ Nível <b id="profile-level">1</b></span>
+          <span>🪙 <b id="profile-coins">0</b></span>
+          <span>⭐ <b id="profile-stars">0</b>/<b id="profile-stars-total">9</b></span>
+        </div>
+        <div class="mini-xp">
+          <div class="mini-xp-bar"><i id="header-xp-fill"></i></div>
+          <small id="header-xp-text">0/100 XP</small>
+        </div>
+      </div>
+    </header>
+
+    <nav class="main-tabs" aria-label="Lobbies">
+      <button type="button" class="active" data-screen="hub">🏠 Lobby</button>
+      <button type="button" data-screen="play">▶ Play</button>
+      <button type="button" data-screen="cats">🐱 Gatinhos</button>
+      <button type="button" data-screen="heroes">🦸 Heróis</button>
+      <button type="button" data-screen="powers">⚡ Poderes</button>
+      <button type="button" data-screen="tutorial">📖 Tutorial</button>
+      <button type="button" id="hub-settings-btn" class="settings-tab" title="Configurações de som">⚙️ Som</button>
+    </nav>
+
+    <section id="screen-hub" class="screen active">
+      <section class="lobby-hero panel">
+        <div class="lobby-copy">
+          <span class="eyebrow">CENTRAL FELINA</span>
+          <h2>Escolha para onde ir</h2>
+          <p>O progresso é salvo localmente. Vitórias rendem XP e moedas; cada dificuldade concluída acende uma estrela do mapa.</p>
+          <div class="level-card">
+            <div class="level-orb">🎖️ <b id="hub-level">1</b></div>
+            <div class="level-info">
+              <div><b id="hub-xp-text">0/100 XP</b><span id="hub-next-unlock">Próximo gatinho no nível 2</span></div>
+              <div class="xp-track"><i id="hub-xp-fill"></i></div>
+            </div>
+          </div>
+        </div>
+        <div class="hub-mascot" aria-hidden="true">
+          <div class="mascot-moon"></div>
+          <div class="mascot-cat">🐱</div>
+          <div class="mascot-stars">✦　·　✧　·　✦</div>
+        </div>
+      </section>
+
+      <section class="lobby-grid">
+        <button class="lobby-card play-card" type="button" data-go-screen="play">
+          <span class="lobby-icon">▶</span>
+          <span><b>Play</b><small>Campanha, modo infinito e dificuldades</small></span>
+        </button>
+        <button class="lobby-card cats-card" type="button" data-go-screen="cats">
+          <span class="lobby-icon">🐱</span>
+          <span><b>Gatinhos</b><small>Coleção e desbloqueios por nível</small></span>
+        </button>
+        <button class="lobby-card powers-card" type="button" data-go-screen="powers">
+          <span class="lobby-icon">⚡</span>
+          <span><b>Poderes</b><small>Comprar cargas com moedas</small></span>
+        </button>
+        <button class="lobby-card heroes-card" type="button" data-go-screen="heroes">
+          <span class="lobby-icon">🦸</span>
+          <span><b>Heróis</b><small>Escolha 1 Herói Gatinho para liderar cada partida</small></span>
+        </button>
+      </section>
+
+      <section class="panel hub-summary-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">RESUMO DA CONTA</span>
+            <h2>Seu progresso</h2>
+          </div>
+          <button type="button" id="reset-save" class="danger-button">Apagar progresso</button>
+        </div>
+        <div id="hub-summary" class="progress-summary"></div>
+      </section>
+    </section>
+
+    <section id="screen-play" class="screen">
+      <section class="panel play-lobby-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">PLAY LOBBY</span>
+            <h2>Escolha o mapa</h2>
+            <p>Escolha uma categoria de mapa, depois o mapa, o modo de jogo e a dificuldade. Iniciantes e Medianos ensinam o básico; Difíceis e Impossíveis trazem caminhos duplos e mais desafio.</p>
+          </div>
+          <div class="selected-badge" id="selected-map-badge">Bosque dos Gatinhos • Campanha • Fácil</div>
+        </div>
+
+        <div id="map-category-picker" class="map-category-picker" aria-label="Categorias de mapas"></div>
+        <div id="map-category-note" class="map-category-note"></div>
+        <div id="map-selection-grid" class="map-selection-grid"></div>
+
+        <div class="mode-strip">
+          <div>
+            <span class="eyebrow">MODO DE JOGO</span>
+            <p id="mode-description">Campanha: conclua a fase, derrube o dirigível boss final e conquiste a estrela da dificuldade.</p>
+          </div>
+          <div id="mode-picker" class="mode-picker">
+            <button type="button" class="selected" data-game-mode="campaign"><b>🏁 Campanha</b><small>Fases com dirigível boss 50×</small></button>
+            <button type="button" data-game-mode="infinite"><b>∞ Infinito</b><small>Sem rodada final • moedas a cada 10</small></button>
+          </div>
+          <div id="infinite-record" class="infinite-record" hidden>∞ Recorde: rodada <b>0</b></div>
+        </div>
+
+        <div class="hero-loadout-strip">
+          <div>
+            <span class="eyebrow">HERÓI EQUIPADO</span>
+            <div id="play-hero-summary" class="play-hero-summary"></div>
+          </div>
+          <button type="button" class="ghost" data-go-screen="heroes">🦸 Trocar herói</button>
+        </div>
+
+        <div class="difficulty-strip">
+          <div>
+            <span class="eyebrow">DIFICULDADE</span>
+            <p id="difficulty-description">Escolha a estrela que quer conquistar.</p>
+          </div>
+          <div id="difficulty-picker" class="difficulty-picker"></div>
+          <button type="button" id="play-enter" class="primary big-action">Entrar no mapa</button>
+        </div>
+      </section>
+
+    </section>
+
+    <section id="screen-game" class="screen game-screen">
+      <section id="game-area" class="panel game-panel">
+        <div class="panel-head td-head">
+          <div>
+            <span class="eyebrow game-eyebrow">EM CAMPO</span>
+            <h2 id="game-map-title">Bosque dos Gatinhos</h2>
+            <p id="game-difficulty-text">Campanha • Fácil • 1 estrela</p>
+          </div>
+          <div class="td-head-right">
+            <div class="td-stats">
+              <span>❤ <b id="td-lives">23</b></span>
+              <span>$ <b id="td-money">260</b></span>
+              <span>Rodada <b id="td-wave">0</b>/<b id="td-wave-max">15</b></span>
+              <span><b id="td-count">0</b> alvos</span>
+            </div>
+            <button type="button" id="td-exit" class="exit-button" title="Abrir menu da partida">☰ Menu</button>
+          </div>
+        </div>
+
+        <div class="td-game-layout">
+          <div class="td-field-column">
+            <div class="power-hotbar-wrap compact">
+              <div>
+                <span class="eyebrow">PODERES</span>
+                <p>Cargas da mochila.</p>
+              </div>
+              <div id="power-hotbar" class="power-hotbar"></div>
+            </div>
+            <div id="active-effects" class="active-effects" aria-live="polite"></div>
+
+            <div id="next-wave-alert" class="next-wave-alert" role="status" aria-live="polite">
+              <span class="next-wave-icon">🔎</span>
+              <div><b>Rodada 1</b><small>Carregando previsão...</small></div>
+            </div>
+
+            <div class="canvas-wrap">
+              <canvas id="personal-td-canvas" width="1100" height="620" aria-label="Catoons TD"></canvas>
+              <aside id="playtest-debug" class="playtest-debug" hidden aria-live="polite">
+                <div class="playtest-debug-head"><b>🧪 PLAYTEST</b><span>F8 fecha</span></div>
+                <div id="playtest-debug-body" class="playtest-debug-body">Aguardando métricas...</div>
+              </aside>
+            </div>
+
+            <div id="td-message" class="td-message" role="status">Clique em um gatinho na barra da direita; depois clique uma vez em um local válido para posicioná-lo.</div>
+          </div>
+
+          <aside id="td-side-dock" class="td-side-dock" aria-label="Barra de gatinhos, upgrades e controle de rodada">
+            <div class="td-dock-scroll">
+              <div id="td-side-label" class="td-side-label">GATINHOS • MÁX 4</div>
+              <section id="td-synergy-panel" class="td-synergy-panel" hidden aria-live="polite"></section>
+              <div class="td-tower-picker" aria-label="Escolha um gatinho">
+                <button type="button" data-td-tower="dart" aria-label="Dardo $70" title="Dardo • $70"><span class="tower-icon">🐱</span><small>$70</small></button>
+                <button type="button" data-td-tower="frost" aria-label="Gelinho $95" title="Gelinho • $95"><span class="tower-icon">❄️</span><small>$95</small></button>
+                <button type="button" data-td-tower="burst" aria-label="Bombinha $140" title="Bombinha • $140"><span class="tower-icon">💥</span><small>$140</small></button>
+                <button type="button" data-td-tower="laser" aria-label="Laser $175" title="Laser • $175"><span class="tower-icon">🔴</span><small>$175</small></button>
+                <button type="button" data-td-tower="ninja" aria-label="Ninja $210" title="Ninja • $210"><span class="tower-icon">🥷</span><small>$210</small></button>
+                <button type="button" data-td-tower="wizard" aria-label="Mago $260" title="Mago • $260"><span class="tower-icon">✨</span><small>$260</small></button>
+                <button type="button" data-td-tower="electric" aria-label="Volts $235" title="Volts • $235"><span class="tower-icon">⚡</span><small>$235</small></button>
+                <button type="button" data-td-tower="vine" aria-label="Cipó $225" title="Cipó • $225"><span class="tower-icon">🌿</span><small>$225</small></button>
+                <button type="button" data-td-tower="salmon" aria-label="Pescador de Salmão $180" title="Pescador de Salmão • $180"><span class="tower-icon">🎣</span><small>$180</small></button>
+                <button type="button" data-td-tower="sniper" aria-label="Sniper $320" title="Sniper • $320"><span class="tower-icon">🎯</span><small>$320</small></button>
+                <button type="button" data-td-tower="boomerang" aria-label="Gato Bumerangue" title="Gato Bumerangue" hidden><span class="tower-icon">🪃</span><small>$285</small></button>
+                <button type="button" data-td-tower="alchemist" aria-label="Gato Alquimista" title="Gato Alquimista" hidden><span class="tower-icon">🧪</span><small>$345</small></button>
+                <button type="button" data-td-tower="chronomancer" aria-label="Gato Cronomante" title="Gato Cronomante" hidden><span class="tower-icon">⏳</span><small>$515</small></button>
+              </div>
+
+              <section class="td-hero-slot" aria-label="Herói Gatinho da partida">
+                <span class="eyebrow">HERÓI • LIMITE 1</span>
+                <button type="button" id="td-hero-deploy" class="td-hero-deploy">
+                  <span id="td-hero-icon" class="hero-slot-icon">👑</span>
+                  <span><b id="td-hero-name">Rei Bigodes</b><small id="td-hero-state">$500 • pronto para entrar</small></span>
+                </button>
+                <div id="td-hero-progress" class="td-hero-progress" hidden>
+                  <div><b id="td-hero-level">Nv. 1</b><small id="td-hero-xp">0/45 XP</small></div>
+                  <div class="hero-xp-track"><i id="td-hero-xp-fill"></i></div>
+                  <small id="td-hero-passive">Passiva do herói</small>
+                  <button type="button" id="td-hero-buy-level" class="hero-buy-level" title="Gasta ouro da partida para completar o XP do nível atual na hora">💰 Upar com ouro • $180</button>
+                </div>
+                <div id="td-hero-actions" class="td-hero-actions" hidden>
+                  <button type="button" id="td-hero-skill" disabled>🔒 Habilidade Nv.5</button>
+                  <button type="button" id="td-hero-ultimate" class="hero-ultimate" disabled>🔒 Ultimate Nv.10</button>
+                </div>
+              </section>
+            </div>
+
+            <section id="td-upgrade-bar" class="td-upgrade-bar td-dock-upgrade" hidden aria-label="Upgrades do gatinho selecionado">
+              <div class="td-upgrade-dock-head">
+                <span class="eyebrow">UPGRADES</span>
+                <button type="button" id="td-upgrade-close" class="td-upgrade-close" aria-label="Fechar upgrades" title="Fechar upgrades">×</button>
+              </div>
+              <div class="td-upgrade-info">
+                <b id="td-selected-name">Gatinho selecionado</b>
+                <span id="td-selected-stats">Escolha um upgrade.</span>
+                <span id="td-selected-performance" class="td-selected-performance"></span>
+              </div>
+              <div id="td-priority-row" class="td-priority-row" hidden>
+                <label for="td-priority">🎯 Foco de ataque</label>
+                <select id="td-priority">
+                  <option value="first">Primeiro (padrão)</option>
+                  <option value="last">Último</option>
+                  <option value="strong">Mais forte</option>
+                  <option value="weak">Mais fraco</option>
+                  <option value="camo">Camuflado primeiro</option>
+                  <option value="armored">Blindado primeiro</option>
+                </select>
+              </div>
+              <div id="dart-upgrade-tree" class="dart-upgrade-tree" hidden></div>
+              <button type="button" id="td-upgrade" class="primary" disabled>Upgrade</button>
+              <div id="td-tower-actions" class="td-tower-actions" hidden>
+                <button type="button" id="td-mastery-ability" class="mastery-ability-button" hidden>⭐ Habilidade</button>
+                <button type="button" id="td-reposition" class="ghost">↔ Reposicionar</button>
+                <button type="button" id="td-sell" class="danger-button">💰 Vender</button>
+              </div>
+            </section>
+
+            <div class="td-side-controls">
+              <button id="td-start" class="primary td-wave-button" title="Chamar próxima rodada"><span class="wave-play-icon">▶</span><small>Rodada 1</small></button>
+              <div class="speed-controls" aria-label="Velocidade do jogo">
+                <button type="button" class="active" data-speed="1">1×</button>
+                <button type="button" data-speed="2">2×</button>
+                <button type="button" data-speed="3">3×</button>
+              </div>
+              <button id="td-pause" class="ghost td-pause-button" title="Pausar ou continuar">⏸</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </section>
+
+    <div id="match-tutorial" class="match-tutorial" hidden aria-live="polite">
+      <div class="match-tutorial-card">
+        <span class="match-tutorial-step" id="match-tutorial-step">1/5</span>
+        <p id="match-tutorial-text">Texto do passo.</p>
+        <small id="match-tutorial-task" class="match-tutorial-task">Ação do tutorial.</small>
+        <div class="match-tutorial-actions">
+          <button type="button" id="match-tutorial-skip" class="ghost">Pular tutorial</button>
+          <button type="button" id="match-tutorial-next" class="primary">Próximo →</button>
+        </div>
+      </div>
+    </div>
+
+    <section id="screen-heroes" class="screen">
+      <section class="panel heroes-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">LÍDER DA DEFESA</span>
+            <h2>Heróis Gatinhos</h2>
+            <p>Escolha <b>1 herói por partida</b>. O herói sobe do nível 1 ao 10 dentro do mapa, libera uma habilidade no nível 5 e uma Ultimate no nível 10.</p>
+          </div>
+          <div id="hero-equipped-chip" class="level-chip">🦸 Equipado: Rei Bigodes</div>
+        </div>
+        <div class="heroes-layout">
+          <div id="hero-collection" class="hero-collection"></div>
+          <aside class="hero-detail">
+            <canvas id="hero-preview-canvas" width="420" height="300" aria-label="Visualização do herói selecionado"></canvas>
+            <div id="hero-detail-info"></div>
+          </aside>
+        </div>
+      </section>
+    </section>
+
+    <section id="screen-cats" class="screen">
+      <section class="panel cats-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">COLEÇÃO</span>
+            <h2>Gatinhos</h2>
+            <p>Cada gatinho possui <b>Maestria própria até o nível 50</b>. Use-o nas partidas para ganhar XP, aumentar seus atributos e desbloquear uma habilidade exclusiva + skin dourada no nível máximo.</p>
+          </div>
+          <div class="level-chip">🎖️ Nível <b id="cats-level">1</b></div>
+        </div>
+        <div class="cats-mastery-layout">
+          <div id="cat-collection" class="cat-collection mastery-collection"></div>
+          <aside id="cat-mastery-detail" class="cat-mastery-detail">
+            <canvas id="cat-preview-canvas" width="360" height="260" aria-label="Visualização do gatinho selecionado"></canvas>
+            <div id="cat-mastery-info"></div>
+          </aside>
+        </div>
+      </section>
+    </section>
+
+    <section id="screen-powers" class="screen">
+      <section class="panel level-panel">
+        <div>
+          <span class="eyebrow">NÍVEL DA CONTA</span>
+          <h2>Experiência</h2>
+          <p>A cada nível, a experiência necessária aumenta em <b>30%</b>.</p>
+        </div>
+        <div class="level-progress-big">
+          <div class="level-number">Nível <b id="powers-level">1</b></div>
+          <div class="xp-track big"><i id="powers-xp-fill"></i></div>
+          <small id="powers-xp-text">0/100 XP</small>
+        </div>
+      </section>
+
+      <section class="panel shop-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">ARSENAL DE PODERES</span>
+            <h2>Poderes</h2>
+            <p>Moedas são permanentes. Comprar adiciona uma carga à mochila; usar durante a partida consome essa carga.</p>
+          </div>
+          <div class="shop-balance">🪙 <b id="shop-coins">0</b></div>
+        </div>
+        <div id="power-shop" class="power-shop"></div>
+      </section>
+    </section>
+
+    <section id="screen-tutorial" class="screen">
+      <section class="panel tutorial-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">GUIA RÁPIDO</span>
+            <h2>Gatinhos</h2>
+            <p>Cada gatinho tem um papel diferente. Os que têm árvore própria (🌳) podem investir em até 2 dos 3 caminhos: um vai até o T5, o outro para no T3.</p>
+          </div>
+        </div>
+        <div id="tutorial-towers" class="cat-collection tutorial-grid"></div>
+      </section>
+
+      <section class="panel tutorial-panel">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">GUIA RÁPIDO</span>
+            <h2>Balões</h2>
+            <p>Todo balão comum segue a mesma escala de cor: quanto mais escura, mais resistente. É a mesma cor que define quantas vidas você perde se ele escapar (Vermelho = 1 até Preto = 6). Alguns também têm um comportamento especial além da cor.</p>
+          </div>
+        </div>
+        <div id="tutorial-tiers" class="tier-legend"></div>
+        <div id="tutorial-balloons" class="cat-collection tutorial-grid"></div>
+      </section>
+    </section>
+  </main>
+
+  <div id="pause-menu" class="game-modal" aria-hidden="true">
+    <div class="game-modal-card pause-card">
+      <span class="eyebrow" id="menu-kicker">PARTIDA PAUSADA</span>
+      <h2 id="menu-title">Menu</h2>
+      <p id="menu-subtitle">Ajuste o som ou escolha o que fazer com a partida atual.</p>
+      <label class="volume-control" for="menu-volume">
+        <span>🔊 Efeitos <b id="menu-volume-value">65%</b></span>
+        <input id="menu-volume" type="range" min="0" max="100" step="1" value="65">
+      </label>
+      <label class="volume-control" for="menu-music">
+        <span>🎵 Música <b id="menu-music-value">35%</b></span>
+        <input id="menu-music" type="range" min="0" max="100" step="1" value="35">
+      </label>
+      <div class="settings-extra">
+        <label class="ui-scale-control" for="menu-ui-scale">
+          <span>🔍 Tamanho da interface</span>
+          <select id="menu-ui-scale">
+            <option value="0.8">Pequena — 80%</option>
+            <option value="0.9">Compacta — 90%</option>
+            <option value="1">Padrão — 100%</option>
+            <option value="1.1">Grande — 110%</option>
+            <option value="1.25">Extra grande — 125%</option>
+          </select>
+        </label>
+        <button type="button" id="menu-fullscreen" class="ghost">🖥️ Tela cheia</button>
+        <button type="button" id="menu-replay-tutorial" class="ghost">📖 Rever tutorial guiado</button>
+        <div class="settings-save-io">
+          <button type="button" id="menu-export-save" class="ghost" title="Baixa um arquivo .json com todo o seu progresso">⬇️ Exportar save</button>
+          <button type="button" id="menu-import-save" class="ghost" title="Carrega um arquivo .json de save exportado antes">⬆️ Importar save</button>
+          <input type="file" id="menu-import-save-input" accept="application/json,.json" hidden>
+        </div>
+        <small id="menu-save-io-status" class="modal-hint" hidden></small>
+      </div>
+      <details class="enemy-guide">
+        <summary>ℹ Guia dos inimigos</summary>
+        <div class="enemy-guide-grid">
+          <span>🔴 1 tiro</span><span>🔵 2 tiros</span><span>🟢 3 tiros</span><span>🟡 4 tiros</span>
+          <span>🩷 5 tiros</span><span>⚫ 6+ tiros</span><span>🥷 Camo: Sniper</span><span>🛡 Blindado: Bombinha</span>
+          <span>⚡ Rápido</span><span>➕ Regenerador</span><span>🛡🛡 Pesado</span><span>🎈 Dirigível Boss: 50×</span>
+          <span>🌳 Obstáculo: bloqueia visão</span><span>⚡ Volts: dano em cadeia</span><span>🌿 Cipó: imobiliza</span>
+        </div>
+        <p class="enemy-guide-note">Cada balão que escapa tira vidas conforme a cor dele no momento (Vermelho = 1 até Preto = 6). Se o Dirigível Boss escapar, ele tira TODAS as vidas restantes na hora.</p>
+      </details>
+      <details class="enemy-guide credits-details">
+        <summary>🎬 Créditos</summary>
+        <div class="credits-body">
+          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.27.0</span></p>
+          <p>Criado por <b>Luan</b>.</p>
+          <p>Trilha sonora, efeitos sonoros e toda a arte das torres, heróis e mapas são originais, feitos direto no jogo.</p>
+          <p class="credits-thanks">Obrigado por jogar! 🐾</p>
+        </div>
+      </details>
+      <div class="modal-actions vertical">
+        <button type="button" id="menu-resume" class="primary match-only-action">▶ Continuar</button>
+        <button type="button" id="menu-restart" class="match-only-action">↻ Reiniciar fase</button>
+        <button type="button" id="menu-lobby" class="danger-button match-only-action">⌂ Voltar para o lobby</button>
+        <button type="button" id="menu-close" class="settings-only-action">✕ Fechar</button>
+      </div>
+      <small class="modal-hint">Atalho: Esc abre e fecha este menu.</small>
+    </div>
+  </div>
+
+  <div id="confirm-delete-modal" class="game-modal" aria-hidden="true">
+    <div class="game-modal-card">
+      <span class="eyebrow">⚠️ Atenção</span>
+      <h2>Apagar todo o progresso?</h2>
+      <p>Isso apaga moedas, nível, XP, estrelas, vitórias, Maestria e poderes comprados desta conta. Essa ação não pode ser desfeita. Se quiser manter uma cópia, cancele e use "Exportar save" na tela de Configurações antes.</p>
+      <div class="modal-actions">
+        <button type="button" id="confirm-delete-cancel" class="ghost">Cancelar</button>
+        <button type="button" id="confirm-delete-ok" class="danger-button">Apagar tudo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="secret-unlock-modal" class="game-modal secret-unlock-modal" aria-hidden="true">
+    <div class="game-modal-card secret-unlock-card">
+      <span class="eyebrow">✨ SEGREDO DESCOBERTO</span>
+      <div id="secret-unlock-icon" class="secret-unlock-icon">🪃</div>
+      <h2 id="secret-unlock-name">Gatinho Secreto</h2>
+      <p id="secret-unlock-role" class="secret-unlock-role">Função especial</p>
+      <p id="secret-unlock-text">Um novo Gatinho Secreto foi descoberto.</p>
+      <div class="secret-unlock-stars">✦　★　✦</div>
+      <div class="modal-actions"><button type="button" id="secret-unlock-close" class="primary">Descobrir gatinho</button></div>
+    </div>
+  </div>
+
+  <div id="result-screen" class="game-modal result-modal" aria-hidden="true">
+    <div class="game-modal-card result-card">
+      <div id="result-icon" class="result-icon">🏆</div>
+      <span id="result-kicker" class="eyebrow">FASE CONCLUÍDA</span>
+      <h2 id="result-title">Vitória!</h2>
+      <p id="result-text">Você concluiu a fase.</p>
+      <div id="result-summary" class="result-summary"></div>
+      <div class="modal-actions">
+        <button type="button" id="result-next" class="primary">Próxima fase →</button>
+        <button type="button" id="result-retry">↻ Jogar novamente</button>
+        <button type="button" id="result-lobby">⌂ Lobby</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-screen" class="loading-screen" aria-hidden="true">
+    <div class="loading-card">
+      <div id="loading-preview" class="loading-preview preview-grove"></div>
+      <div class="loading-spinner"><span>🐱</span></div>
+      <h2 id="loading-map-name">Bosque dos Gatinhos</h2>
+      <p id="loading-diff-name">Fácil</p>
+      <div class="loading-bar-track"><i id="loading-bar-fill"></i></div>
+      <p id="loading-tip" class="loading-tip">Dica: gatinhos Sniper enxergam qualquer camuflado do mapa.</p>
+    </div>
+  </div>
+
+  <script src="src/game.js"></script>
+</body>
+</html>
