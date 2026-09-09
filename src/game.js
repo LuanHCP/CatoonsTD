@@ -3806,6 +3806,10 @@ function initPersonalTd(){
       t.masteryBuffTimer=10;state.pulses.push({x:t.x,y:t.y,range:110,life:.8,maxLife:.8,color:'#b7ff75'});
     }else if(t.type==='chronomancer'){
       alive.forEach(e=>{const seconds=e.kind==='boss'?3:5;e.d=Math.max(0,e.d-e.speed*seconds);e.temporalMark=null;});state.pulses.push({x:W/2,y:H/2,range:Math.max(W,H),life:1,maxLife:1,color:'#9de7ff'});
+    }else if(t.type==='demonking'){
+      applyDemonFear(t,{...st,fearRadius:Math.max(W,H)*2,fearBack:95,fearDuration:8,fearVuln:.25,shadowCap:Math.max(12,st.shadowCap||8),shadowDamageMult:(st.shadowDamageMult||1)*1.35},true);
+      alive.forEach(e=>{if(!e.dead)applyBurn(e,{damage:Math.max(2,st.damage*.28),interval:.8,ticks:6},{...st,detectsCamo:true,breaksArmor:true});});
+      state.pulses.push({x:W/2,y:H/2,range:Math.max(W,H),life:1.2,maxLife:1.2,color:'#7d2dc2'});
     }
     t.masteryAbilityCd=ab.cooldown;recordMastery(t.type,'actions',8);sfx('boss');setMsg(`${ab.icon} ${types[t.type].name}: ${ab.name} ativada!`);updateUpgradePanel();updateStats();
   }
@@ -4140,6 +4144,75 @@ function initPersonalTd(){
     }
   }
 
+  function applyDemonFear(t,st,global=false){
+    const radius=global?Math.max(W,H)*2:(st.fearRadius||158),duration=global?8:(st.fearDuration||5),back=global?95:(st.fearBack||52),vuln=global?.25:(st.fearVuln||.15);
+    let affected=0;
+    for(const enemy of state.enemies){
+      if(enemy.dead)continue;
+      const p=pointAt(enemy.d,enemy.path);
+      if(!global&&Math.hypot(p.x-t.x,p.y-t.y)>radius)continue;
+      const retreat=enemy.kind==='boss'?back*.28:back;
+      enemy.d=Math.max(0,enemy.d-retreat);
+      enemy.fearTimer=Math.max(enemy.fearTimer||0,duration);
+      enemy.fearBonus=Math.max(enemy.fearBonus||0,vuln);
+      enemy.fearSource={...st,sourceTowerId:t.id,sourceType:'demonking'};
+      affected++;
+      spawnFloatText(p.x,p.y-30,enemy.kind==='boss'?'😨 MEDO':'😨 MEDO','#d48cff');
+    }
+    if(affected){
+      state.pulses.push({x:t.x,y:t.y,range:radius,life:.75,maxLife:.75,color:'#a64dff'});
+      recordMastery('demonking','actions',affected);
+    }
+    return affected;
+  }
+
+  function summonShadowBalloon(enemy,source){
+    const cap=Math.max(1,source?.shadowCap||8);
+    if(state.shadowBloons.length>=cap)return;
+    const isBoss=enemy.kind==='boss',count=isBoss?Math.min(3,cap-state.shadowBloons.length):1;
+    for(let i=0;i<count;i++){
+      const baseHp=Math.max(1,enemy.maxHp||enemy.hp||1);
+      state.shadowBloons.push({
+        path:enemy.path||0,d:Math.max(0,pathTotal(enemy.path)-4-i*12),
+        hp:isBoss?6:Math.max(2,Math.min(6,2+Math.floor(baseHp/3))),
+        damage:(isBoss?8.5:Math.max(2,Math.min(8,1.6+baseHp*.34)))*(source?.shadowDamageMult||1),
+        speed:isBoss?105:92,cool:0,life:18,source:{...(source||types.demonking),sourceType:'demonking',isShadowSummon:true}
+      });
+    }
+    const p=pointAt(pathTotal(enemy.path),enemy.path);
+    spawnFloatText(p.x,p.y-26,isBoss?'🌑 ×3 SOMBRAS':'🌑 SOMBRA INVOCADA','#d48cff');
+  }
+
+  function updateShadowBloons(dt){
+    for(const s of state.shadowBloons){
+      s.life-=dt;s.cool=Math.max(0,(s.cool||0)-dt);s.d=Math.max(0,s.d-s.speed*dt);
+      if(s.cool>0||s.hp<=0)continue;
+      let target=null,best=Infinity;
+      for(const e of state.enemies){
+        if(e.dead||(e.path||0)!==(s.path||0))continue;
+        const gap=Math.abs(e.d-s.d);if(gap<=34&&gap<best){best=gap;target=e;}
+      }
+      if(target){
+        const hit=damageEnemy(target,s.damage,s.source);s.cool=.5;
+        if(hit){s.hp-=1;const p=pointAt(s.d,s.path);state.pulses.push({x:p.x,y:p.y,range:26,life:.24,maxLife:.24,color:'#7c39b8'});}
+      }
+    }
+    state.shadowBloons=state.shadowBloons.filter(s=>s.life>0&&s.hp>0&&s.d>0);
+  }
+
+  function drawShadowBloons(){
+    const now=performance.now()/1000;
+    for(const s of state.shadowBloons){
+      const p=pointAt(s.d,s.path),pulse=.85+.12*Math.sin(now*5+s.d*.02);
+      ctx.save();ctx.translate(p.x,p.y);ctx.globalAlpha=.92;
+      ctx.shadowColor='#a64dff';ctx.shadowBlur=12;
+      ctx.fillStyle='#17131f';ctx.beginPath();ctx.ellipse(0,0,13*pulse,16*pulse,0,0,Math.PI*2);ctx.fill();
+      ctx.shadowBlur=0;ctx.fillStyle='#d45cff';ctx.beginPath();ctx.ellipse(-4,-2,2.3,1.7,-.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(4,-2,2.3,1.7,.2,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#7e3ab8';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,15);ctx.quadraticCurveTo(-5,22,2,26);ctx.stroke();
+      ctx.restore();
+    }
+  }
+
   function damageEnemy(enemy,amount,sourceRef){
     if(!enemy||enemy.dead)return false;
     const source=typeof sourceRef==='string'?types[sourceRef]:(sourceRef||{});
@@ -4149,6 +4222,7 @@ function initPersonalTd(){
     if(enemy.kind==='boss'&&source.hunterBossBonus)dealt*=1+source.hunterBossBonus;
     else if(isSpecialEnemy(enemy)&&source.hunterSpecialBonus)dealt*=1+source.hunterSpecialBonus;
     if((enemy.markTimer||0)>0&&(enemy.markBonus||0)>0)dealt*=1+enemy.markBonus;
+    if((enemy.fearTimer||0)>0&&(enemy.fearBonus||0)>0)dealt*=1+enemy.fearBonus;
 
     if((enemy.divineShield||0)>0){
       enemy.divineShield=0;enemy.angelSlowFactor=1;
@@ -4186,10 +4260,12 @@ function initPersonalTd(){
     if(sourceHero)sourceHero.damageDealt=(sourceHero.damageDealt||0)+actual;
     if(source.sourceType==='burst'&&synergyActive('improvisedArtillery'))enemy.powderTimer=Math.max(enemy.powderTimer||0,4);
     if(enemy.hp<=0&&!enemy.dead){
+      const feared=(enemy.fearTimer||0)>0,fearSource=enemy.fearSource;
       enemy.dead=true;
       if(sourceTower){sourceTower.pops=(sourceTower.pops||0)+1;recordMastery(sourceTower.type,'pops',1);}
       if(sourceHero){sourceHero.pops=(sourceHero.pops||0)+1;grantHeroXp(enemy.kind==='boss'?75:(enemy.elite?5:2));}
       const p=pointAt(enemy.d,enemy.path);
+      if(feared&&!source.isShadowSummon&&fearSource)summonShadowBalloon(enemy,fearSource);
       if(enemy.kind==='boss'){
         sfx('boss');
         playMusicTheme(state.map);
@@ -4318,6 +4394,8 @@ function initPersonalTd(){
       e.markTimer=Math.max(0,(e.markTimer||0)-dt);
       if(e.markTimer<=0)e.markBonus=0;
       e.sniperMarkTimer=Math.max(0,(e.sniperMarkTimer||0)-dt);
+      e.fearTimer=Math.max(0,(e.fearTimer||0)-dt);
+      if(e.fearTimer<=0){e.fearBonus=0;e.fearSource=null;}
       e.powderTimer=Math.max(0,(e.powderTimer||0)-dt);
       e.frozenCircuitCd=Math.max(0,(e.frozenCircuitCd||0)-dt);
       e.arcaneBloomCd=Math.max(0,(e.arcaneBloomCd||0)-dt);
@@ -4356,6 +4434,7 @@ function initPersonalTd(){
       }
     });
     updateSpecialEnemies(dt);
+    updateShadowBloons(dt);
     state.enemies=state.enemies.filter(e=>{
       if(e.dead)return false;
       if(e.d>=pathTotal(e.path)){
@@ -4399,6 +4478,11 @@ function initPersonalTd(){
           const desired=Math.atan2(p.y-t.y,p.x-t.x);
           t.angle=stepAngleTowards(t.angle||0,desired,TOWER_TURN_RATE*dt);
         }
+      }
+
+      if(t.type==='demonking'&&state.waveActive){
+        t.fearCooldown=(Number.isFinite(t.fearCooldown)?t.fearCooldown:1.4)-dt;
+        if(t.fearCooldown<=0){applyDemonFear(t,st,false);t.fearCooldown=st.fearInterval||11;}
       }
 
       if(t.type==='sniper'&&st.airstrike&&state.waveActive){
@@ -4578,6 +4662,11 @@ function initPersonalTd(){
           if(hit&&s.sourceType==='chronomancer'){
             if(!target.temporalMark)target.temporalMark={timer:source.temporalDelay||3.2,snapshotD:target.d};if(!target.armored)applySlow(target,Math.max(1,source.slow||1.3),source.slowFactor||.72);const cp=pointAt(target.d,target.path);spawnFloatText(cp.x,cp.y-24,'⏳ MARCADO','#9de7ff');
           }
+          if(hit&&s.sourceType==='demonking'){
+            const dp=pointAt(target.d,target.path);
+            state.pulses.push({x:dp.x,y:dp.y,range:Math.max(48,s.splash||78),life:.38,maxLife:.38,color:'#7d2dc2'});
+            spawnFloatText(dp.x,dp.y-32,'🔥🌑 FOGO SOMBRIO','#d48cff');
+          }
           if(hit&&s.pierceTargets>1&&s.sourceType==='sniper'){
             const tower=state.towers.find(t=>t.id===s.towerId)||{x:s.x,y:s.y,type:'sniper'};
             const pierced=sniperPierceTargets(target,tower,source).slice(1),points=[pointAt(target.d,target.path)];
@@ -4598,9 +4687,12 @@ function initPersonalTd(){
           if(hit&&s.splash){
             const center=pointAt(target.d,target.path);
             state.enemies.forEach(e=>{
-              if(e===target)return;
+              if(e===target||e.dead)return;
               const a=pointAt(e.d,e.path);
-              if(Math.hypot(a.x-center.x,a.y-center.y)<=s.splash)damageEnemy(e,s.damage*.45,source);
+              if(Math.hypot(a.x-center.x,a.y-center.y)<=s.splash){
+                const splashHit=damageEnemy(e,s.damage*.45,source);
+                if(splashHit&&s.sourceType==='demonking'&&!e.dead)applyBurn(e,{damage:(source.burn?.damage||1.15)*.65,interval:1,ticks:3},source);
+              }
             });
           }
         }
