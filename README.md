@@ -12,9 +12,11 @@ Catoons TD é um Tower Defense focado em **progressão, composição de equipes 
 
 ## 🎮 Jogar no navegador
 
-O repositório foi organizado para funcionar diretamente no **GitHub Pages**. Depois de publicar o projeto, o `index.html` na raiz já é o ponto de entrada do jogo.
+### [▶️ Jogar Catoons TD no GitHub Pages](https://luanhcp.github.io/CatoonsTD/)
 
-Para testar localmente, você pode abrir `index.html` em Edge/Chrome. Para uma experiência mais consistente, prefira servir a pasta com um servidor HTTP local.
+O `index.html` na raiz é o ponto de entrada da versão web. O link acima abre a build publicada diretamente no navegador, sem instalação.
+
+Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Para uma experiência mais consistente, prefira servir a pasta com um servidor HTTP local.
 
 ## ✨ Destaques do projeto
 
