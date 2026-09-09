@@ -4924,7 +4924,7 @@ function drawTower(t){
     ctx.fillStyle=fur;ctx.strokeStyle='#0b0c12cc';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-3,r,0,Math.PI*2);ctx.fill();ctx.stroke();
     if(mastered){ctx.fillStyle='#d4af55';ctx.globalAlpha=.95;ctx.beginPath();ctx.moveTo(-r*.55,-9);ctx.lineTo(-r*.45,-r-2);ctx.lineTo(-r*.2,-r*.58);ctx.closePath();ctx.fill();ctx.beginPath();ctx.arc(r*.18,-r*.24,r*.42,-1.55,-.1);ctx.lineTo(r*.18,-r*.24);ctx.closePath();ctx.fill();ctx.globalAlpha=1;}
     ctx.fillStyle=t.type==='frost'?'#ffffff':'#fff2e6';ctx.globalAlpha=t.type==='frost' ? .92 : .72;ctx.beginPath();ctx.ellipse(0,4,r*.46,r*.31,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
-    ctx.fillStyle='#161720';ctx.beginPath();ctx.ellipse(-r*.34,-5,2.1,3.1,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(r*.34,-5,2.1,3.1,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=t.type==='demonking'?'#ff405d':'#161720';ctx.shadowColor=t.type==='demonking'?'#ff405d':'transparent';ctx.shadowBlur=t.type==='demonking'?6:0;ctx.beginPath();ctx.ellipse(-r*.34,-5,2.1,3.1,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(r*.34,-5,2.1,3.1,0,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
     ctx.fillStyle='#e88d94';ctx.beginPath();ctx.moveTo(-2,1);ctx.lineTo(2,1);ctx.lineTo(0,4);ctx.closePath();ctx.fill();
     ctx.strokeStyle='#3a2d31';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,4);ctx.quadraticCurveTo(-3,7,-6,6);ctx.moveTo(0,4);ctx.quadraticCurveTo(3,7,6,6);ctx.stroke();
     ctx.strokeStyle=t.type==='frost'?'#a7c4d2aa':'#f4eee8aa';ctx.lineWidth=.85;for(const yy of [2,5]){ctx.beginPath();ctx.moveTo(-5,yy);ctx.lineTo(-r*.82,yy-1);ctx.moveTo(5,yy);ctx.lineTo(r*.82,yy-1);ctx.stroke();}
@@ -5009,6 +5009,17 @@ function drawTower(t){
       if(sp[2]>=1){ctx.strokeStyle='#70caea';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(-5,-r-3);ctx.lineTo(-5,-r-14);ctx.stroke();ctx.fillStyle='#70caea';ctx.beginPath();ctx.arc(-5,-r-16,3,0,Math.PI*2);ctx.fill();}
       if(sp[2]>=2){ctx.strokeStyle='#70caea';ctx.globalAlpha=.75;ctx.beginPath();ctx.arc(-5,-r-16,7,-.7,.7);ctx.stroke();ctx.beginPath();ctx.arc(-5,-r-16,11,-.55,.55);ctx.stroke();ctx.globalAlpha=1;}
       if(sp[2]>=5){ctx.font='12px Segoe UI Emoji,Segoe UI Symbol';ctx.textAlign='center';ctx.fillText('✈️',r*.75,-r-10);}
+    }else if(t.type==='demonking'){
+      // Skin original "Rei Demônio da Academia": uniforme preto, carmesim e magia violeta.
+      ctx.fillStyle='#111019';ctx.strokeStyle='#5d263d';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(-r*.72,7,r*1.44,r*.92,5);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#731f3d';ctx.beginPath();ctx.moveTo(-r*.72,8);ctx.lineTo(-r-9,18);ctx.lineTo(-r*.55,23);ctx.closePath();ctx.fill();
+      ctx.beginPath();ctx.moveTo(r*.72,8);ctx.lineTo(r+9,18);ctx.lineTo(r*.55,23);ctx.closePath();ctx.fill();
+      ctx.strokeStyle='#d8b36a';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-5,8);ctx.lineTo(0,18);ctx.lineTo(5,8);ctx.stroke();
+      ctx.fillStyle='#d8b36a';ctx.beginPath();ctx.arc(0,15,2,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#d45cff';ctx.lineWidth=2;ctx.shadowColor='#a64dff';ctx.shadowBlur=7;
+      ctx.beginPath();ctx.arc(0,-3,r+8,now*.9,now*.9+Math.PI*1.55);ctx.stroke();ctx.shadowBlur=0;
+      ctx.fillStyle='#a64dff';ctx.globalAlpha=.88;ctx.beginPath();ctx.moveTo(r+10,-7);ctx.quadraticCurveTo(r+4,-20,r+12,-29);ctx.quadraticCurveTo(r+20,-18,r+13,-8);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
+      ctx.fillStyle='#d45cff';ctx.font='900 13px Segoe UI Symbol';ctx.textAlign='center';ctx.fillText('♛',0,-r-16);
     }
     ctx.restore();
     if(lv>=2){
@@ -5311,6 +5322,11 @@ function draw(){
   state.towers.forEach(drawTower);
   if(state.hero)drawHero(state.hero);
   state.enemies.forEach(e=>{if(!e.dead)drawEnemy(e);});
+  drawShadowBloons();
+  state.enemies.forEach(e=>{
+    if(e.dead||(e.fearTimer||0)<=0)return;
+    const p=pointAt(e.d,e.path);ctx.save();ctx.translate(p.x,p.y);ctx.globalAlpha=.82;ctx.strokeStyle='#c56bff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,e.kind==='boss'?32:23,0,Math.PI*2);ctx.stroke();ctx.font='13px Segoe UI Emoji';ctx.textAlign='center';ctx.fillText('😨',0,e.kind==='boss'?-38:-28);ctx.restore();
+  });
   state.enemies.forEach(e=>{
     if(e.dead||(e.markTimer||0)<=0)return;
     const p=pointAt(e.d,e.path);
