@@ -3318,7 +3318,7 @@ function initPersonalTd(){
     state.lives=Math.max(1,map.lives+diff.extraLives);
     state.wave=0;state.lastClearedWave=0;state.lastFarmPaidWave=0;state.selected=null;state.selectedTower=null;state.selectedHero=false;state.repositionTower=null;state.hero=null;state.nextTowerId=1;state.nextEnemyId=1;
     state.paused=false;state.menuOpen=false;state.defeatShown=false;state.waveActive=false;state.completed=false;state.rewardGranted=false;state.masteryXpGranted=false;state.masterySession=Object.fromEntries(Object.keys(types).map(id=>[id,{used:false,damage:0,pops:0,income:0,actions:0}]));
-    state.enemies=[];state.towers=[];state.shots=[];state.spawn=[];state.pulses=[];state.lightning=[];state.airstrikes=[];state.bombs=[];state.floatTexts=[];state.particles=[];state.impactFx=[];state.muzzleFx=[];state.screenShake=0;state.particleTimer=0;state.last=0;
+    state.enemies=[];state.towers=[];state.shots=[];state.spawn=[];state.shadowBloons=[];state.pulses=[];state.lightning=[];state.airstrikes=[];state.bombs=[];state.floatTexts=[];state.particles=[];state.impactFx=[];state.muzzleFx=[];state.screenShake=0;state.particleTimer=0;state.last=0;
     state.pendingClearCash=0;state.pendingWaveXp=0;state.paidMilestones=new Set();
     state.effects={frenzy:0,focus:0,blizzard:0};state.powerUiClock=0;
     configurePath();syncPlacementUi();updateUpgradePanel();
