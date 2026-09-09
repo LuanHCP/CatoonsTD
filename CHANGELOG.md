@@ -2,6 +2,14 @@
 
 Este arquivo resume os principais marcos do Catoons TD. Nem todo hotfix intermediário está listado.
 
+## v0.27.2 — Gatinho Rei Demônio
+- novo secreto do tier Impossível: Gatinho Rei Demônio;
+- Fogo Sombrio com dano em área e queimadura;
+- pulso periódico de Medo: recuo na rota + vulnerabilidade temporária;
+- inimigos que morrem com Medo geram Balões Sombrios aliados que percorrem a pista ao contrário e atacam;
+- skin original “Rei Demônio da Academia”, com uniforme preto/carmesim, olhos vermelhos e magia violeta;
+- limite de 1 Rei Demônio por partida.
+
 ## v0.27.1 — Playtest & viewport fix
 - painel de diagnóstico por `F8` para FPS, entidades, economia e sinergias;
 - fase de playtest/balanceamento;
