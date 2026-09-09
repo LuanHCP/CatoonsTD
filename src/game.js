@@ -1,4 +1,4 @@
-// Catoons TD — Beta portfolio build v0.27.1
+// Catoons TD — Beta portfolio build v0.27.2
 'use strict';
 
 const $ = selector => document.querySelector(selector);
@@ -184,7 +184,8 @@ const MAP_CATEGORIES=[
 const SECRET_TOWER_RULES={
   boomerang:'beginner',
   alchemist:'medium',
-  chronomancer:'hardmaps'
+  chronomancer:'hardmaps',
+  demonking:'impossible'
 };
 function categoryMasteredForProfile(p,categoryId){
   const category=MAP_CATEGORIES.find(c=>c.id===categoryId);if(!category)return false;
@@ -224,7 +225,8 @@ const types = {
   sniper: {name:'Gato Sniper', icon:'🎯', role:'Especialista / 3 caminhos', special:'Possui árvore própria: Atirador de Elite, Caçador ou Observador. O Sniper sempre enxerga Camo para si; revelar Camo para TODA a defesa passa a ser função do caminho Observador.', cost:320, unlockLevel:1, range:285, rate:1.72, damage:9.40, globalRange:true, color:'#8fe7a8', fur:'#a79072', accent:'#8fe7a8', shot:'sniper', detectsCamo:true},
   boomerang:{name:'Gato Bumerangue',icon:'🪃',role:'Perfuração / retorno',special:'Gatinho secreto. O bumerangue atravessa vários inimigos e volta causando um segundo impacto. Quanto mais evoluído, mais alvos alcança e mais forte fica o retorno.',cost:285,unlockLevel:1,secret:true,range:158,rate:.78,damage:4.15,color:'#e6a95d',fur:'#b77849',accent:'#f3c168',shot:'boomerang',boomerangTargets:3,returnMultiplier:.58},
   alchemist:{name:'Gato Alquimista',icon:'🧪',role:'Combos / dano contínuo',special:'Gatinho secreto. Alterna Veneno → Fraqueza → Explosão no mesmo alvo. No terceiro estágio detona uma área e reinicia o ciclo.',cost:345,unlockLevel:1,secret:true,range:154,rate:1.02,damage:3.35,splash:58,color:'#8be07b',fur:'#806aa2',accent:'#b7ff75',shot:'alchemist',alchemyPoison:.65,alchemyMark:.14,alchemyExplosion:1.45},
-  chronomancer:{name:'Gato Cronomante',icon:'⏳',role:'Controle temporal',special:'Gatinho secreto. Marca o inimigo no tempo e, após alguns segundos, o devolve à posição em que estava. Chefões sofrem um retorno reduzido.',cost:515,unlockLevel:1,secret:true,range:176,rate:1.18,damage:5.10,slow:1.3,color:'#7fd8ff',fur:'#5d638c',accent:'#b7ecff',shot:'chronomancer',temporalDelay:3.2,slowFactor:.72}
+  chronomancer:{name:'Gato Cronomante',icon:'⏳',role:'Controle temporal',special:'Gatinho secreto. Marca o inimigo no tempo e, após alguns segundos, o devolve à posição em que estava. Chefões sofrem um retorno reduzido.',cost:515,unlockLevel:1,secret:true,range:176,rate:1.18,damage:5.10,slow:1.3,color:'#7fd8ff',fur:'#5d638c',accent:'#b7ecff',shot:'chronomancer',temporalDelay:3.2,slowFactor:.72},
+  demonking:{name:'Gatinho Rei Demônio',icon:'👑',role:'Área / Medo / Invocação',special:'Secreto do modo Impossível. Dispara Fogo Sombrio em área; sua aura causa Medo periodicamente, recua inimigos e aumenta o dano que recebem. Inimigos que morrem amedrontados renascem como Balões Sombrios aliados.',cost:650,unlockLevel:1,secret:true,limit:1,range:168,rate:1.05,damage:6.20,splash:78,color:'#a64dff',fur:'#211b2b',accent:'#d45cff',shot:'demonking',burn:{damage:1.15,interval:1,ticks:4},fearInterval:11,fearRadius:158,fearBack:52,fearVuln:.15,fearDuration:5,shadowCap:8,shadowDamageMult:1}
 };
 
 const HEROES = {
@@ -625,17 +627,17 @@ const powers = {
 };
 
 const DEFAULT_PROFILE = {
-  version:14,
+  version:15,
   coins:250,
   selectedHero:'king',
-  secretUnlocks:{boomerang:false,alchemist:false,chronomancer:false},
+  secretUnlocks:{boomerang:false,alchemist:false,chronomancer:false,demonking:false},
   level:1,
   xp:0,
   mastery:{
     dart:{level:1,xp:0,maxRewardClaimed:false}, frost:{level:1,xp:0,maxRewardClaimed:false}, burst:{level:1,xp:0,maxRewardClaimed:false},
     laser:{level:1,xp:0,maxRewardClaimed:false}, ninja:{level:1,xp:0,maxRewardClaimed:false}, wizard:{level:1,xp:0,maxRewardClaimed:false},
     electric:{level:1,xp:0,maxRewardClaimed:false}, vine:{level:1,xp:0,maxRewardClaimed:false}, salmon:{level:1,xp:0,maxRewardClaimed:false}, sniper:{level:1,xp:0,maxRewardClaimed:false},
-    boomerang:{level:1,xp:0,maxRewardClaimed:false}, alchemist:{level:1,xp:0,maxRewardClaimed:false}, chronomancer:{level:1,xp:0,maxRewardClaimed:false}
+    boomerang:{level:1,xp:0,maxRewardClaimed:false}, alchemist:{level:1,xp:0,maxRewardClaimed:false}, chronomancer:{level:1,xp:0,maxRewardClaimed:false}, demonking:{level:1,xp:0,maxRewardClaimed:false}
   },
   maps:Object.fromEntries(Object.keys(maps).map(id=>[id,{cleared:{easy:false,normal:false,hard:false},wins:0}])),
   inventory:{frenzy:1,focus:0,blizzard:0,cash:0,heal:0},
@@ -749,7 +751,8 @@ const MASTERY_ABILITIES={
   laser:{name:'Sobrecarga',icon:'🔴',cooldown:40,description:'Por 8s, dobra a cadência do Laser e faz seus disparos saltarem entre mais inimigos.'},
   boomerang:{name:'Tornado de Bumerangues',icon:'🪃',cooldown:45,description:'Uma tempestade de bumerangues atravessa o mapa em 5 rajadas, atingindo todos os inimigos.'},
   alchemist:{name:'Pedra Filosofal',icon:'⚗️',cooldown:50,description:'Por 10s, cada ataque aplica Veneno, Fraqueza e Explosão de uma vez.'},
-  chronomancer:{name:'Reverter o Tempo',icon:'⏰',cooldown:60,description:'Todos os inimigos voltam aproximadamente 5 segundos na rota; chefões voltam menos.'}
+  chronomancer:{name:'Reverter o Tempo',icon:'⏰',cooldown:60,description:'Todos os inimigos voltam aproximadamente 5 segundos na rota; chefões voltam menos.'},
+  demonking:{name:'Reino do Rei Demônio',icon:'🌑',cooldown:70,description:'Espalha Medo por todo o mapa, intensifica o Fogo Sombrio e fortalece temporariamente o exército de sombras.'}
 };
 function requiredMasteryXp(level){
   if(level>=MASTERY_MAX_LEVEL)return 0;
@@ -1001,7 +1004,7 @@ function totalStars(){ return Object.keys(maps).reduce((sum,id)=>sum+mapStars(id
 function totalWins(){ return Object.values(profile.maps).reduce((sum,m)=>sum+(m.wins||0),0); }
 function isTowerUnlocked(id){ const t=types[id];if(!t)return false;if(t.secret&&!profile.secretUnlocks?.[id])return false;return profile.level>=t.unlockLevel; }
 function discoverSecretUnlocks(){
-  if(!profile.secretUnlocks)profile.secretUnlocks={boomerang:false,alchemist:false,chronomancer:false};
+  if(!profile.secretUnlocks)profile.secretUnlocks={boomerang:false,alchemist:false,chronomancer:false,demonking:false};
   const unlocked=[];
   for(const [id,categoryId] of Object.entries(SECRET_TOWER_RULES)){
     if(profile.secretUnlocks[id])continue;
@@ -1388,17 +1391,17 @@ function renderUnlocks(){
     const id=btn.dataset.tdTower,unlocked=isTowerUnlocked(id),t=types[id],price=towerPrice(id,mapId);
     btn.hidden=Boolean(t.secret&&!unlocked);
     const placed=personalTd&&personalTd.towerCount?personalTd.towerCount(id):0;
-    const maxed=placed>=TOWER_LIMIT_PER_TYPE;
+    const limit=t.limit||TOWER_LIMIT_PER_TYPE,maxed=placed>=limit;
     btn.disabled=!unlocked||maxed;
     btn.classList.toggle('locked',!unlocked);
     btn.classList.toggle('maxed',maxed);
     const small=btn.querySelector('small');
-    if(small)small.innerHTML=`$${price}<span class="tower-count">${placed}/${TOWER_LIMIT_PER_TYPE}</span>`;
+    if(small)small.innerHTML=`${price}<span class="tower-count">${placed}/${limit}</span>`;
     btn.title=!unlocked
       ?`Bloqueado: ${t.name} libera no nível ${t.unlockLevel}.`
       :maxed
-        ?`${t.name}: limite de ${TOWER_LIMIT_PER_TYPE} unidades atingido.`
-        :`${t.name} • $${price} (${category.name}) • ${placed}/${TOWER_LIMIT_PER_TYPE} no mapa • ${t.special}`;
+        ?`${t.name}: limite de ${limit} unidade${limit===1?'':'s'} atingido.`
+        :`${t.name} • ${price} (${category.name}) • ${placed}/${limit} no mapa • ${t.special}`;
   });
 }
 
@@ -1632,7 +1635,7 @@ function initPersonalTd(){
   const state={
     map:'grove',difficulty:'easy',mode:'campaign',money:720,lives:25,wave:0,lastClearedWave:0,lastFarmPaidWave:0,selected:null,selectedTower:null,selectedHero:false,repositionTower:null,hero:null,
     nextTowerId:1,nextEnemyId:1,paused:false,menuOpen:false,defeatShown:false,gameSpeed:1,waveActive:false,completed:false,rewardGranted:false,
-    enemies:[],towers:[],shots:[],spawn:[],pulses:[],lightning:[],airstrikes:[],bombs:[],floatTexts:[],particles:[],impactFx:[],muzzleFx:[],particleTimer:0,screenShake:0,last:0,
+    enemies:[],towers:[],shots:[],spawn:[],shadowBloons:[],pulses:[],lightning:[],airstrikes:[],bombs:[],floatTexts:[],particles:[],impactFx:[],muzzleFx:[],particleTimer:0,screenShake:0,last:0,
     pendingClearCash:0,pendingWaveXp:0,paidMilestones:new Set(),
     masteryXpGranted:false,masterySession:Object.fromEntries(Object.keys(types).map(id=>[id,{used:false,damage:0,pops:0,income:0,actions:0}])),
     effects:{frenzy:0,focus:0,blizzard:0},powerUiClock:0,synergyAnnounced:{},
@@ -2559,6 +2562,17 @@ function initPersonalTd(){
     if(t.type==='boomerang'){out.boomerangTargets=(base.boomerangTargets||3)+step;out.returnMultiplier=Number(((base.returnMultiplier||.58)+step*.09).toFixed(2));out.detectsCamo=step>=2;out.breaksArmor=step>=3;}
     if(t.type==='alchemist'){out.alchemyPoison=Number(((base.alchemyPoison||.65)+step*.28).toFixed(2));out.alchemyMark=Number(((base.alchemyMark||.14)+step*.035).toFixed(3));out.alchemyExplosion=Number(((base.alchemyExplosion||1.45)+step*.18).toFixed(2));out.breaksArmor=step>=3;}
     if(t.type==='chronomancer'){out.temporalDelay=Math.max(2.2,(base.temporalDelay||3.2)-step*.22);out.slowFactor=Math.max(.48,(base.slowFactor||.72)-step*.06);out.detectsCamo=step>=2;out.breaksArmor=step>=2;}
+    if(t.type==='demonking'){
+      out.fearInterval=Math.max(7.5,(base.fearInterval||11)-step*1.05);
+      out.fearRadius=Math.round((base.fearRadius||158)+step*14);
+      out.fearBack=Math.round((base.fearBack||52)+step*9);
+      out.fearVuln=Number(((base.fearVuln||.15)+step*.035).toFixed(3));
+      out.fearDuration=Number(((base.fearDuration||5)+step*.45).toFixed(1));
+      out.shadowCap=(base.shadowCap||8)+step;
+      out.shadowDamageMult=Number(((base.shadowDamageMult||1)+step*.18).toFixed(2));
+      out.breaksArmor=step>=2;out.detectsCamo=step>=3;
+      out.burn={damage:Number(((base.burn?.damage||1.15)+step*.38).toFixed(2)),interval:1,ticks:4+step};
+    }
     return out;
   }
 
@@ -3129,6 +3143,7 @@ function initPersonalTd(){
     else if(t.type==='boomerang')special=` • 🪃 ${st.boomerangTargets} alvos + retorno ×${st.returnMultiplier.toFixed(2)}`;
     else if(t.type==='alchemist')special=` • 🧪 Veneno → Fraqueza → Explosão`;
     else if(t.type==='chronomancer')special=` • ⏳ Retorno temporal em ${st.temporalDelay.toFixed(1)}s`;
+    else if(t.type==='demonking')special=` • 😨 Medo ${st.fearRadius}px / ${st.fearInterval.toFixed(1)}s • 🌑 sombras ${st.shadowCap}`;
     const speedBonus=effectActive('frenzy')&&!st.rootHold&&!st.farm?' • ⚡ 2× velocidade ATIVO':'';
     const damageBonus=effectActive('focus')&&!st.rootHold&&!st.farm?' • 🔥 2× dano ATIVO':'';
     const received=st.receivedSupport||{},observer=st.receivedObserver||{};
@@ -3541,8 +3556,8 @@ function initPersonalTd(){
   function placeTower(x,y){
     const typeId=state.selected,type=types[typeId];if(!type)return false;
     if(!isTowerUnlocked(typeId)){setMsg(`${type.name} libera no nível ${type.unlockLevel}.`);return false;}
-    const placed=towerCount(typeId),price=towerPrice(typeId,state.map);
-    if(placed>=TOWER_LIMIT_PER_TYPE){setMsg(`🐾 Limite atingido: no máximo ${TOWER_LIMIT_PER_TYPE} ${type.name} por mapa.`);renderUnlocks();return false;}
+    const placed=towerCount(typeId),price=towerPrice(typeId,state.map),limit=type.limit||TOWER_LIMIT_PER_TYPE;
+    if(placed>=limit){setMsg(`🐾 Limite atingido: no máximo ${limit} ${type.name} por mapa.`);renderUnlocks();return false;}
     if(state.money<price){setMsg(`Faltam $${price-Math.floor(state.money)} para ${type.name} neste tier de mapa.`);return false;}
     if(distPath(x,y)<43){setMsg('Muito perto da estrada. Escolha outro ponto para confirmar.');return false;}
     if(obstacleAt(x,y,24)){setMsg('🌳 Esse obstáculo ocupa o espaço e também bloquearia a visão. Escolha outro ponto.');return false;}
@@ -3550,11 +3565,11 @@ function initPersonalTd(){
     state.money-=price;
     const pathTower=typeId==='dart'||typeId==='sniper';
     const tower={id:state.nextTowerId++,x,y,type:typeId,cool:0,level:1,angle:0,paths:pathTower?[0,0,0]:undefined,dartMainPath:null,dartLastPath:null,sniperMainPath:null,sniperLastPath:null,planeTimer:0,planeLastWave:state.wave,
-      spent:price,damageDealt:0,pops:0,incomeGenerated:0,masteryAbilityCd:0,masteryBuffTimer:0};
+      spent:price,damageDealt:0,pops:0,incomeGenerated:0,masteryAbilityCd:0,masteryBuffTimer:0,fearCooldown:typeId==='demonking'?1.4:0};
     state.towers.push(tower);state.masterySession[typeId].used=true;
     const count=towerCount(typeId);
     state.selectedTower=null;state.selectedHero=false;cancelPlacement(true);
-    setMsg(`✓ ${type.name} posicionado. ${count}/${TOWER_LIMIT_PER_TYPE} deste tipo. Para colocar outro, selecione o gatinho novamente na barra.`);
+    setMsg(`✓ ${type.name} posicionado. ${count}/${type.limit||TOWER_LIMIT_PER_TYPE} deste tipo. Para colocar outro, selecione o gatinho novamente na barra.`);
     notifyMatchTutorialAction('towerPlaced');
     renderUnlocks();updateStats();announceNewSynergies();return true;
   }
@@ -5411,7 +5426,7 @@ $$('.td-tower-picker [data-td-tower]').forEach(btn=>btn.onclick=()=>{
   const id=btn.dataset.tdTower,t=types[id];
   if(state.repositionTower)cancelReposition(true);
   if(!isTowerUnlocked(id)){setMsg(`${t.name} libera no nível ${t.unlockLevel}.`);return;}
-  if(towerCount(id)>=TOWER_LIMIT_PER_TYPE){setMsg(`🐾 ${t.name}: limite de ${TOWER_LIMIT_PER_TYPE} unidades atingido.`);return;}
+  const limit=t.limit||TOWER_LIMIT_PER_TYPE;if(towerCount(id)>=limit){setMsg(`🐾 ${t.name}: limite de ${limit} unidade${limit===1?'':'s'} atingido.`);return;}
   if(state.selected===id){cancelPlacement();return;}
   armPlacement(id);notifyMatchTutorialAction('towerSelected');
   let warning='';
