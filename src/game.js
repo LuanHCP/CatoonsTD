@@ -226,7 +226,7 @@ const types = {
   boomerang:{name:'Gato Bumerangue',icon:'🪃',role:'Perfuração / retorno',special:'Gatinho secreto. O bumerangue atravessa vários inimigos e volta causando um segundo impacto. Quanto mais evoluído, mais alvos alcança e mais forte fica o retorno.',cost:285,unlockLevel:1,secret:true,range:158,rate:.78,damage:4.15,color:'#e6a95d',fur:'#b77849',accent:'#f3c168',shot:'boomerang',boomerangTargets:3,returnMultiplier:.58},
   alchemist:{name:'Gato Alquimista',icon:'🧪',role:'Combos / dano contínuo',special:'Gatinho secreto. Alterna Veneno → Fraqueza → Explosão no mesmo alvo. No terceiro estágio detona uma área e reinicia o ciclo.',cost:345,unlockLevel:1,secret:true,range:154,rate:1.02,damage:3.35,splash:58,color:'#8be07b',fur:'#806aa2',accent:'#b7ff75',shot:'alchemist',alchemyPoison:.65,alchemyMark:.14,alchemyExplosion:1.45},
   chronomancer:{name:'Gato Cronomante',icon:'⏳',role:'Controle temporal',special:'Gatinho secreto. Marca o inimigo no tempo e, após alguns segundos, o devolve à posição em que estava. Chefões sofrem um retorno reduzido.',cost:515,unlockLevel:1,secret:true,range:176,rate:1.18,damage:5.10,slow:1.3,color:'#7fd8ff',fur:'#5d638c',accent:'#b7ecff',shot:'chronomancer',temporalDelay:3.2,slowFactor:.72},
-  demonking:{name:'Gatinho Rei Demônio',icon:'👑',role:'Área / Medo / Invocação',special:'Secreto do modo Impossível. Dispara Fogo Sombrio em área; sua aura causa Medo periodicamente, recua inimigos e aumenta o dano que recebem. Inimigos que morrem amedrontados renascem como Balões Sombrios aliados.',cost:650,unlockLevel:1,secret:true,limit:1,range:168,rate:1.05,damage:6.20,splash:78,color:'#a64dff',fur:'#211b2b',accent:'#d45cff',shot:'demonking',burn:{damage:1.15,interval:1,ticks:4},fearInterval:11,fearRadius:158,fearBack:52,fearVuln:.15,fearDuration:5,shadowCap:8,shadowDamageMult:1}
+  demonking:{name:'Gatinho Rei Demônio',icon:'👑',role:'Elite / Medo / Legião Sombria / 3 caminhos',special:'Secreto do modo Impossível. Unidade de fim de jogo com árvore própria: Senhor do Medo, Chamas do Abismo ou Legião Sombria. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3. Espalha Medo, causa dano em área e invoca Balões Sombrios aliados.',cost:650,unlockLevel:1,secret:true,limit:1,range:176,rate:.95,damage:7.80,splash:86,color:'#a64dff',fur:'#211b2b',accent:'#d45cff',shot:'demonking',burn:{damage:1.35,interval:1,ticks:5},fearInterval:10,fearRadius:166,fearBack:60,fearVuln:.18,fearDuration:5.5,shadowCap:10,shadowDamageMult:1.1,shadowSpawnCount:1}
 };
 
 const HEROES = {
@@ -618,12 +618,55 @@ const ELECTRIC_PATHS = [
   }
 ];
 
+
+const DEMONKING_MAX_TIER = 5;
+const DEMONKING_SECONDARY_MAX = 3;
+const DEMONKING_PATHS = [
+  {
+    id:'dread', icon:'😨', name:'Senhor do Medo', color:'#ff7ad9',
+    tiers:[
+      {name:'Aura Pavorosa', cost:120, description:'A aura de Medo ativa mais rápido e empurra mais os inimigos.'},
+      {name:'Terror Crescente', cost:210, description:'Mais raio e duração para o Medo.'},
+      {name:'Pânico Coletivo', cost:340, description:'Inimigos amedrontados recebem muito mais dano.'},
+      {name:'Pesadelo Vivo', cost:540, description:'O Medo passa a cobrir uma grande área e recarrega muito mais rápido.'},
+      {name:'Imperador do Pavor', cost:860, description:'Ápice do controle: a aura fica enorme, muito frequente e extremamente opressiva.'}
+    ]
+  },
+  {
+    id:'abyss', icon:'🔥', name:'Chamas do Abismo', color:'#ff8a63',
+    tiers:[
+      {name:'Brasa Sombria', cost:120, description:'Mais dano direto e fogo sombrio mais forte.'},
+      {name:'Labareda Cruel', cost:210, description:'Maior splash e mais ticks de queimadura.'},
+      {name:'Fornalha Maldita', cost:340, description:'Ataca mais rápido e queima com mais intensidade.'},
+      {name:'Inferno Negro', cost:540, description:'Grande salto no dano em área e no fogo.'},
+      {name:'Cataclismo Abissal', cost:860, description:'Pico ofensivo: dano brutal, explosão enorme e fogo devastador.'}
+    ]
+  },
+  {
+    id:'legion', icon:'🌑', name:'Legião Sombria', color:'#b88cff',
+    tiers:[
+      {name:'Sombra Desperta', cost:120, description:'Aumenta o limite de sombras invocadas.'},
+      {name:'Eco do Submundo', cost:210, description:'Sombras causam mais dano.'},
+      {name:'Chamado das Trevas', cost:340, description:'Cada inimigo morto amedrontado pode invocar sombras extras.'},
+      {name:'Horda Espectral', cost:540, description:'A legião cresce bastante e as sombras ficam ainda mais fortes.'},
+      {name:'Exército do Abismo', cost:860, description:'Ápice da invocação: muitas sombras, muito mais dano e reforço contra chefes.'}
+    ]
+  }
+];
+
 const powers = {
   frenzy:{name:'Patinhas Frenéticas',icon:'⚡',cost:70,duration:10,description:'Todas as torres atacam 2× mais rápido por 10 segundos.',effect:'attackSpeed'},
   focus:{name:'Instinto Predador',icon:'🔥',cost:85,duration:10,description:'Todas as torres causam 2× de dano por 10 segundos.',effect:'damage'},
   blizzard:{name:'Nevasca Felina',icon:'🌨️',cost:65,duration:8,description:'Todos os inimigos ficam com 35% da velocidade por 8 segundos.',effect:'slow'},
   cash:{name:'Cofre de Sardinhas',icon:'💰',cost:45,duration:0,description:'Receba +$350 imediatamente dentro da partida.',effect:'cash'},
   heal:{name:'Nove Vidas',icon:'❤️‍🩹',cost:55,duration:0,description:'Recupera até 6 vidas perdidas no mapa atual.',effect:'heal'}
+};
+
+const skins = {
+  elvenMage:{
+    name:'Gata Maga Élfica',icon:'🧝‍♀️',tower:'wizard',cost:0,
+    description:'Visual experimental do Gato Mago com pelagem clara, cabelos prateados, traje verde-petróleo e magia azul-dourada.'
+  }
 };
 
 const DEFAULT_PROFILE = {
@@ -641,6 +684,8 @@ const DEFAULT_PROFILE = {
   },
   maps:Object.fromEntries(Object.keys(maps).map(id=>[id,{cleared:{easy:false,normal:false,hard:false},wins:0}])),
   inventory:{frenzy:1,focus:0,blizzard:0,cash:0,heal:0},
+  ownedSkins:{},
+  equippedSkins:{},
   settings:{volume:.65,musicVolume:.35,uiScale:1},
   matchTutorialSeen:false,
   infiniteBest:Object.fromEntries(Object.keys(maps).map(id=>[id,{easy:0,normal:0,hard:0}]))
@@ -673,6 +718,11 @@ function normalizeProfile(saved){
   }
   for(const id of Object.keys(p.inventory)){
     if(saved.inventory&&saved.inventory[id]!=null) p.inventory[id]=Math.max(0,Math.floor(Number(saved.inventory[id])||0));
+  }
+  for(const id of Object.keys(skins))p.ownedSkins[id]=Boolean(saved.ownedSkins&&saved.ownedSkins[id]);
+  for(const towerId of Object.keys(types)){
+    const skinId=saved.equippedSkins&&saved.equippedSkins[towerId];
+    if(skinId&&skins[skinId]?.tower===towerId&&p.ownedSkins[skinId])p.equippedSkins[towerId]=skinId;
   }
   if(saved.settings&&saved.settings.volume!=null){
     p.settings.volume=Math.max(0,Math.min(1,Number(saved.settings.volume)||0));
@@ -1369,6 +1419,27 @@ function renderPowerShop(){
   if($('#powers-level')) $('#powers-level').textContent=profile.level;
   if($('#powers-xp-text')) $('#powers-xp-text').textContent=`${profile.xp}/${need} XP • próximo nível exige ${requiredXp(profile.level+1)} XP`;
   if($('#powers-xp-fill')) $('#powers-xp-fill').style.width=`${pct}%`;
+  renderSkinShop();
+}
+
+function renderSkinShop(){
+  const root=$('#skin-shop');if(!root)return;
+  root.innerHTML=Object.entries(skins).map(([id,skin])=>{
+    const owned=Boolean(profile.ownedSkins[id]),equipped=profile.equippedSkins[skin.tower]===id;
+    return `<article class="shop-card ${equipped?'skin-equipped':''}">
+      <div class="shop-card-head"><div class="shop-card-icon">${skin.icon}</div><div><h3>${skin.name}</h3><p>${skin.description}</p></div></div>
+      <div class="shop-card-meta"><span>Skin de: <b>${types[skin.tower].name}</b></span><span>${equipped?'✓ Equipada':owned?'Adquirida':'Teste gratuito'}</span></div>
+      <button type="button" data-skin-action="${id}" class="affordable">${equipped?'✓ Equipada':owned?'Equipar':'🪙 0 • Adquirir grátis'}</button>
+    </article>`;
+  }).join('');
+  $$('[data-skin-action]').forEach(btn=>btn.onclick=()=>unlockOrEquipSkin(btn.dataset.skinAction));
+}
+
+function unlockOrEquipSkin(id){
+  const skin=skins[id];if(!skin)return;
+  profile.ownedSkins[id]=true;
+  profile.equippedSkins[skin.tower]=id;
+  saveProfile();sfx('ui');renderPowerShop();
 }
 
 function buyPower(id){
@@ -2537,6 +2608,62 @@ function initPersonalTd(){
       chainTargets,chainRadius,slow,slowFactor,markBonus,markDuration,electricPaths:p.slice(),electricPrimary:primary};
   }
 
+
+  function demonkingPaths(t){
+    if(!t.paths||!Array.isArray(t.paths))t.paths=[0,0,0];
+    while(t.paths.length<3)t.paths.push(0);
+    t.paths=t.paths.slice(0,3).map(v=>Math.max(0,Math.min(DEMONKING_MAX_TIER,Math.floor(Number(v)||0))));
+    return t.paths;
+  }
+
+  function demonkingPrimaryPath(t){
+    const p=demonkingPaths(t);
+    if(Number.isInteger(t.demonMainPath)&&p[t.demonMainPath]>=4)return t.demonMainPath;
+    const high=p.map((tier,i)=>({tier,i})).filter(x=>x.tier>=4).sort((a,b)=>b.tier-a.tier);
+    if(!high.length){t.demonMainPath=null;return null;}
+    let chosen=high[0].i;
+    if(high.length>1&&high[0].tier===high[1].tier&&Number.isInteger(t.demonLastPath)&&p[t.demonLastPath]>=4)chosen=t.demonLastPath;
+    t.demonMainPath=chosen;
+    return chosen;
+  }
+
+  function demonkingBaseStats(t){
+    const base=types.demonking,p=demonkingPaths(t),primary=demonkingPrimaryPath(t);
+    let damage=base.damage,range=base.range,rate=base.rate,splash=base.splash;
+    let fearInterval=base.fearInterval||10,fearRadius=base.fearRadius||166,fearBack=base.fearBack||60,fearVuln=base.fearVuln||.18,fearDuration=base.fearDuration||5.5;
+    let shadowCap=base.shadowCap||10,shadowDamageMult=base.shadowDamageMult||1.1,shadowSpawnCount=base.shadowSpawnCount||1;
+    let burnDamage=base.burn?.damage||1.35,burnTicks=base.burn?.ticks||5,breaksArmor=true,detectsCamo=false;
+
+    // Caminho 1 — Senhor do Medo.
+    if(p[0]>=1){fearInterval-=.7;fearBack+=12;fearRadius+=10;}
+    if(p[0]>=2){fearRadius+=18;fearDuration+=.9;}
+    if(p[0]>=3){fearVuln+=.10;fearBack+=10;}
+    if(p[0]>=4&&primary===0){fearInterval-=1.1;fearRadius+=26;fearDuration+=1.1;fearVuln+=.10;}
+    if(p[0]>=5&&primary===0){fearInterval-=1.35;fearRadius+=34;fearBack+=18;fearDuration+=1.4;fearVuln+=.12;shadowCap+=2;}
+
+    // Caminho 2 — Chamas do Abismo.
+    if(p[1]>=1){damage+=1.2;burnDamage+=.45;}
+    if(p[1]>=2){splash+=16;burnTicks+=2;}
+    if(p[1]>=3){rate*=.88;damage+=1.6;burnDamage+=.55;}
+    if(p[1]>=4&&primary===1){damage+=3.0;splash+=22;burnDamage+=.90;burnTicks+=2;rate*=.88;detectsCamo=true;}
+    if(p[1]>=5&&primary===1){damage+=4.8;splash+=28;burnDamage+=1.20;burnTicks+=3;rate*=.82;detectsCamo=true;}
+
+    // Caminho 3 — Legião Sombria.
+    if(p[2]>=1)shadowCap+=4;
+    if(p[2]>=2)shadowDamageMult+=.35;
+    if(p[2]>=3){shadowCap+=3;shadowSpawnCount=2;}
+    if(p[2]>=4&&primary===2){shadowCap+=5;shadowDamageMult+=.55;shadowSpawnCount=2;fearDuration+=.6;}
+    if(p[2]>=5&&primary===2){shadowCap+=8;shadowDamageMult+=.90;shadowSpawnCount=3;fearDuration+=.8;detectsCamo=true;}
+
+    return{...base,
+      damage:Number(damage.toFixed(2)),range:Math.round(range),rate:Number(Math.max(.28,rate).toFixed(3)),splash:Math.round(splash),
+      fearInterval:Number(Math.max(5.0,fearInterval).toFixed(2)),fearRadius:Math.round(fearRadius),fearBack:Math.round(fearBack),
+      fearVuln:Number(fearVuln.toFixed(3)),fearDuration:Number(fearDuration.toFixed(1)),shadowCap:Math.round(shadowCap),
+      shadowDamageMult:Number(shadowDamageMult.toFixed(2)),shadowSpawnCount:Math.max(1,Math.round(shadowSpawnCount)),breaksArmor,detectsCamo,
+      burn:{damage:Number(burnDamage.toFixed(2)),interval:1,ticks:Math.round(burnTicks)},demonkingPaths:p.slice(),demonPrimary:primary
+    };
+  }
+
   function baseTowerStats(t){
     if(t.type==='dart')return dartBaseStats(t);
     if(t.type==='sniper')return sniperBaseStats(t);
@@ -2547,6 +2674,7 @@ function initPersonalTd(){
     if(t.type==='laser')return laserBaseStats(t);
     if(t.type==='wizard')return wizardBaseStats(t);
     if(t.type==='electric')return electricBaseStats(t);
+    if(t.type==='demonking')return demonkingBaseStats(t);
     const base=types[t.type],step=Math.max(0,(t.level||1)-1);
     const normalRate=Math.max(base.rate*.48,base.rate*Math.pow(.82,step));
     const rootRate=base.rootHold?Math.max(base.minRate||4,base.rate-step*((base.rate-(base.minRate||4))/Math.max(1,MAX_LEVEL-1))):normalRate;
@@ -2562,17 +2690,6 @@ function initPersonalTd(){
     if(t.type==='boomerang'){out.boomerangTargets=(base.boomerangTargets||3)+step;out.returnMultiplier=Number(((base.returnMultiplier||.58)+step*.09).toFixed(2));out.detectsCamo=step>=2;out.breaksArmor=step>=3;}
     if(t.type==='alchemist'){out.alchemyPoison=Number(((base.alchemyPoison||.65)+step*.28).toFixed(2));out.alchemyMark=Number(((base.alchemyMark||.14)+step*.035).toFixed(3));out.alchemyExplosion=Number(((base.alchemyExplosion||1.45)+step*.18).toFixed(2));out.breaksArmor=step>=3;}
     if(t.type==='chronomancer'){out.temporalDelay=Math.max(2.2,(base.temporalDelay||3.2)-step*.22);out.slowFactor=Math.max(.48,(base.slowFactor||.72)-step*.06);out.detectsCamo=step>=2;out.breaksArmor=step>=2;}
-    if(t.type==='demonking'){
-      out.fearInterval=Math.max(7.5,(base.fearInterval||11)-step*1.05);
-      out.fearRadius=Math.round((base.fearRadius||158)+step*14);
-      out.fearBack=Math.round((base.fearBack||52)+step*9);
-      out.fearVuln=Number(((base.fearVuln||.15)+step*.035).toFixed(3));
-      out.fearDuration=Number(((base.fearDuration||5)+step*.45).toFixed(1));
-      out.shadowCap=(base.shadowCap||8)+step;
-      out.shadowDamageMult=Number(((base.shadowDamageMult||1)+step*.18).toFixed(2));
-      out.breaksArmor=step>=2;out.detectsCamo=step>=3;
-      out.burn={damage:Number(((base.burn?.damage||1.15)+step*.38).toFixed(2)),interval:1,ticks:4+step};
-    }
     return out;
   }
 
@@ -2852,6 +2969,16 @@ function initPersonalTd(){
     return'';
   }
 
+
+  function demonkingPathLockReason(t,pathIndex){
+    const p=demonkingPaths(t),main=demonkingPrimaryPath(t),current=p[pathIndex],next=current+1;
+    if(current>=DEMONKING_MAX_TIER)return'Nível máximo';
+    const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
+    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
+    if(next>DEMONKING_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${DEMONKING_SECONDARY_MAX}`;
+    return'';
+  }
+
   // Só substitui o innerHTML quando o conteúdo realmente muda. Antes disso, este painel era
   // redesenhado do zero a cada ~120ms (mesmo sem nada ter mudado), o que podia destruir o botão
   // bem debaixo do clique do jogador e fazer o upgrade parecer travado/sem resposta.
@@ -2979,6 +3106,19 @@ function initPersonalTd(){
       if(!btn||btn.disabled)return;
       e.stopPropagation();
       upgradeElectricPath(Number(btn.dataset.electricPath));
+    };
+  }
+
+
+  function renderDemonkingUpgradeTree(t){
+    const root=$('#dart-upgrade-tree');if(!root)return;
+    const p=demonkingPaths(t);
+    renderTreeHTML(root,renderPathCards(t,DEMONKING_PATHS,p,demonkingPathLockReason,'data-demon-path',demonkingPrimaryPath(t)));
+    root.onclick=e=>{
+      const btn=e.target.closest('[data-demon-path]');
+      if(!btn||btn.disabled)return;
+      e.stopPropagation();
+      upgradeDemonkingPath(Number(btn.dataset.demonPath));
     };
   }
 
@@ -3129,6 +3269,20 @@ function initPersonalTd(){
       name.textContent=`${st.name} • árvore de especialização`;
       stats.textContent=`Dano ${st.damage.toFixed(2)} • Cadeia ${st.chainTargets} alvos (raio ${st.chainRadius}) • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.electricMainPath)?` • principal C${t.electricMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderElectricUpgradeTree(t);return;
+    }
+
+    if(t.type==='demonking'){
+      if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
+      const p=demonkingPaths(t),active=p.filter(v=>v>0).length,buffs=[];
+      buffs.push(`😨 ${st.fearRadius}px / ${st.fearInterval.toFixed(1)}s`);
+      buffs.push(`↩ empurra ${st.fearBack}`);
+      buffs.push(`🌑 sombras ${st.shadowCap}`);
+      if(st.fearVuln)buffs.push(`alvos sofrem +${Math.round(st.fearVuln*100)}% dano`);
+      if(st.burn)buffs.push(`🔥 ${st.burn.damage}×${st.burn.ticks}`);
+      if(st.detectsCamo)buffs.push('🥷 vê Camo');
+      name.textContent=`${st.name} • árvore de especialização`;
+      stats.textContent=`Dano ${st.damage.toFixed(2)} • Splash ${st.splash} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.demonMainPath)?` • principal C${t.demonMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      renderDemonkingUpgradeTree(t);return;
     }
 
     if(tree){tree.hidden=true;tree.innerHTML='';tree.__lastHtml='';}if(bar)bar.classList.remove('dart-mode');btn.hidden=false;
@@ -3563,8 +3717,8 @@ function initPersonalTd(){
     if(obstacleAt(x,y,24)){setMsg('🌳 Esse obstáculo ocupa o espaço e também bloquearia a visão. Escolha outro ponto.');return false;}
     if(state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<46)||(state.hero&&Math.hypot(state.hero.x-x,state.hero.y-y)<52)){setMsg('Muito perto de outra unidade. Escolha outro ponto.');return false;}
     state.money-=price;
-    const pathTower=typeId==='dart'||typeId==='sniper';
-    const tower={id:state.nextTowerId++,x,y,type:typeId,cool:0,level:1,angle:0,paths:pathTower?[0,0,0]:undefined,dartMainPath:null,dartLastPath:null,sniperMainPath:null,sniperLastPath:null,planeTimer:0,planeLastWave:state.wave,
+    const pathTower=['dart','sniper','frost','vine','burst','ninja','laser','wizard','electric','demonking'].includes(typeId);
+    const tower={id:state.nextTowerId++,x,y,type:typeId,cool:0,level:1,angle:0,paths:pathTower?[0,0,0]:undefined,dartMainPath:null,dartLastPath:null,sniperMainPath:null,sniperLastPath:null,demonMainPath:null,demonLastPath:null,planeTimer:0,planeLastWave:state.wave,
       spent:price,damageDealt:0,pops:0,incomeGenerated:0,masteryAbilityCd:0,masteryBuffTimer:0,fearCooldown:typeId==='demonking'?1.4:0};
     state.towers.push(tower);state.masterySession[typeId].used=true;
     const count=towerCount(typeId);
@@ -3590,7 +3744,7 @@ function initPersonalTd(){
 
   function heroAt(x,y){return state.hero&&Math.hypot(state.hero.x-x,state.hero.y-y)<=32?state.hero:null;}
 
-  function towerAt(x,y){return[...state.towers].reverse().find(t=>{const tier=t.type==='dart'?Math.max(0,...dartPaths(t)):t.type==='sniper'?Math.max(0,...sniperPaths(t)):t.type==='frost'?Math.max(0,...frostPaths(t)):t.type==='vine'?Math.max(0,...vinePaths(t)):t.type==='burst'?Math.max(0,...burstPaths(t)):t.type==='ninja'?Math.max(0,...ninjaPaths(t)):t.type==='laser'?Math.max(0,...laserPaths(t)):t.type==='wizard'?Math.max(0,...wizardPaths(t)):t.type==='electric'?Math.max(0,...electricPaths(t)):Math.max(0,(t.level||1)-1);return Math.hypot(t.x-x,t.y-y)<=24+tier*2;})||null;}
+  function towerAt(x,y){return[...state.towers].reverse().find(t=>{const tier=t.type==='dart'?Math.max(0,...dartPaths(t)):t.type==='sniper'?Math.max(0,...sniperPaths(t)):t.type==='frost'?Math.max(0,...frostPaths(t)):t.type==='vine'?Math.max(0,...vinePaths(t)):t.type==='burst'?Math.max(0,...burstPaths(t)):t.type==='ninja'?Math.max(0,...ninjaPaths(t)):t.type==='laser'?Math.max(0,...laserPaths(t)):t.type==='wizard'?Math.max(0,...wizardPaths(t)):t.type==='electric'?Math.max(0,...electricPaths(t)):t.type==='demonking'?Math.max(0,...demonkingPaths(t)):Math.max(0,(t.level||1)-1);return Math.hypot(t.x-x,t.y-y)<=24+tier*2;})||null;}
 
   function upgradeDartPath(pathIndex){
     const t=selectedTower();
@@ -3744,10 +3898,27 @@ function initPersonalTd(){
     updateUpgradePanel();updateStats();
   }
 
+
+  function upgradeDemonkingPath(pathIndex){
+    const t=selectedTower();
+    if(!t||t.type!=='demonking'){setMsg('Selecione um Gatinho Rei Demônio para usar os caminhos de upgrade.');return;}
+    if(pathIndex<0||pathIndex>=DEMONKING_PATHS.length)return;
+    const p=demonkingPaths(t),current=p[pathIndex],lock=demonkingPathLockReason(t,pathIndex);
+    if(lock){setMsg(`🔒 ${DEMONKING_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
+    const next=current+1,tier=DEMONKING_PATHS[pathIndex].tiers[current];
+    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.demonLastPath=pathIndex;
+    if(next===4)t.demonMainPath=pathIndex;
+    state.pulses.push({x:t.x,y:t.y,range:54+next*12,life:.6,maxLife:.6,color:DEMONKING_PATHS[pathIndex].color});
+    spawnFloatText(t.x,t.y-34,`${DEMONKING_PATHS[pathIndex].icon} T${next}`,DEMONKING_PATHS[pathIndex].color);
+    setMsg(`${DEMONKING_PATHS[pathIndex].icon} ${DEMONKING_PATHS[pathIndex].name} T${next}: ${tier.name}. ${tier.description}`);
+    updateUpgradePanel();updateStats();
+  }
+
   function upgradeTower(){
     const t=selectedTower();
     if(!t){setMsg('Clique primeiro em um gatinho já posicionado.');return;}
-    if(t.type==='dart'||t.type==='sniper'||t.type==='frost'||t.type==='vine'||t.type==='burst'||t.type==='ninja'||t.type==='laser'||t.type==='wizard'||t.type==='electric'){setMsg(`${types[t.type].name} usa a árvore de 3 caminhos na aba de upgrades da direita.`);updateUpgradePanel();return;}
+    if(t.type==='dart'||t.type==='sniper'||t.type==='frost'||t.type==='vine'||t.type==='burst'||t.type==='ninja'||t.type==='laser'||t.type==='wizard'||t.type==='electric'||t.type==='demonking'){setMsg(`${types[t.type].name} usa a árvore de 3 caminhos na aba de upgrades da direita.`);updateUpgradePanel();return;}
     if(t.level>=MAX_LEVEL){setMsg(`${types[t.type].name} já está no nível máximo.`);return;}
     const cost=upgradeCost(t);
     if(state.money<cost){setMsg(`Faltam $${cost-Math.floor(state.money)} para o upgrade.`);return;}
@@ -4169,7 +4340,7 @@ function initPersonalTd(){
   function summonShadowBalloon(enemy,source){
     const cap=Math.max(1,source?.shadowCap||8);
     if(state.shadowBloons.length>=cap)return;
-    const isBoss=enemy.kind==='boss',count=isBoss?Math.min(3,cap-state.shadowBloons.length):1;
+    const isBoss=enemy.kind==='boss',baseCount=Math.max(1,source?.shadowSpawnCount||1),count=isBoss?Math.min(Math.max(3,baseCount+2),cap-state.shadowBloons.length):Math.min(baseCount,cap-state.shadowBloons.length);
     for(let i=0;i<count;i++){
       const baseHp=Math.max(1,enemy.maxHp||enemy.hp||1);
       state.shadowBloons.push({
@@ -4179,8 +4350,7 @@ function initPersonalTd(){
         speed:isBoss?105:92,cool:0,life:18,source:{...(source||types.demonking),sourceType:'demonking',isShadowSummon:true}
       });
     }
-    const p=pointAt(pathTotal(enemy.path),enemy.path);
-    spawnFloatText(p.x,p.y-26,isBoss?'🌑 ×3 SOMBRAS':'🌑 SOMBRA INVOCADA','#d48cff');
+    const p=pointAt(pathTotal(enemy.path),enemy.path);spawnFloatText(p.x,p.y-26,isBoss?`🌑 ×${count} SOMBRAS`:(count>1?`🌑 ×${count} SOMBRAS`:'🌑 SOMBRA INVOCADA'),'#d48cff');
   }
 
   function updateShadowBloons(dt){
@@ -4883,9 +5053,10 @@ function drawTowerDeadZones(t,st){
 }
 
 function drawTower(t){
-    const st=towerStats(t),dartTier=t.type==='dart'?Math.max(0,...dartPaths(t)):null,sniperTier=t.type==='sniper'?Math.max(0,...sniperPaths(t)):null,frostTier=t.type==='frost'?Math.max(0,...frostPaths(t)):null,vineTier=t.type==='vine'?Math.max(0,...vinePaths(t)):null,burstTier=t.type==='burst'?Math.max(0,...burstPaths(t)):null,ninjaTier=t.type==='ninja'?Math.max(0,...ninjaPaths(t)):null,laserTier=t.type==='laser'?Math.max(0,...laserPaths(t)):null,wizardTier=t.type==='wizard'?Math.max(0,...wizardPaths(t)):null,electricTier=t.type==='electric'?Math.max(0,...electricPaths(t)):null,pathTier=t.type==='dart'?dartTier:t.type==='sniper'?sniperTier:t.type==='frost'?frostTier:t.type==='vine'?vineTier:t.type==='burst'?burstTier:t.type==='ninja'?ninjaTier:t.type==='laser'?laserTier:t.type==='wizard'?wizardTier:t.type==='electric'?electricTier:null,lv=pathTier!==null?Math.max(1,pathTier):t.level||1,selected=t.id===state.selectedTower;
+    const st=towerStats(t),dartTier=t.type==='dart'?Math.max(0,...dartPaths(t)):null,sniperTier=t.type==='sniper'?Math.max(0,...sniperPaths(t)):null,frostTier=t.type==='frost'?Math.max(0,...frostPaths(t)):null,vineTier=t.type==='vine'?Math.max(0,...vinePaths(t)):null,burstTier=t.type==='burst'?Math.max(0,...burstPaths(t)):null,ninjaTier=t.type==='ninja'?Math.max(0,...ninjaPaths(t)):null,laserTier=t.type==='laser'?Math.max(0,...laserPaths(t)):null,wizardTier=t.type==='wizard'?Math.max(0,...wizardPaths(t)):null,electricTier=t.type==='electric'?Math.max(0,...electricPaths(t)):null,demonTier=t.type==='demonking'?Math.max(0,...demonkingPaths(t)):null,pathTier=t.type==='dart'?dartTier:t.type==='sniper'?sniperTier:t.type==='frost'?frostTier:t.type==='vine'?vineTier:t.type==='burst'?burstTier:t.type==='ninja'?ninjaTier:t.type==='laser'?laserTier:t.type==='wizard'?wizardTier:t.type==='electric'?electricTier:t.type==='demonking'?demonTier:null,lv=pathTier!==null?Math.max(1,pathTier):t.level||1,selected=t.id===state.selectedTower;
     const mastered=masteryState(t.type).level>=50;
-    const r=17+Math.max(0,lv-1)*1.8,fur=st.fur||'#d8a56f',accent=mastered?'#f4d36b':(st.accent||st.color);
+    const elvenWizardSkin=t.type==='wizard'&&profile.equippedSkins?.wizard==='elvenMage';
+    const r=17+Math.max(0,lv-1)*1.8,fur=elvenWizardSkin?'#f5f1e8':(st.fur||'#d8a56f'),accent=elvenWizardSkin?'#65e1dc':(mastered?'#f4d36b':(st.accent||st.color));
     if(st.farm){
       if(selected){ctx.globalAlpha=.12;ctx.fillStyle='#ffcf8a';ctx.beginPath();ctx.arc(t.x,t.y,44,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
     }else if(st.globalRange){
@@ -4904,7 +5075,7 @@ function drawTower(t){
       const pulse=.14+.08*Math.sin(now*2.6+t.id);
       ctx.globalAlpha=pulse;ctx.fillStyle=accent;ctx.beginPath();ctx.arc(0,-3,r+7+(lv-3)*3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
     }
-    if((t.type==='dart'&&dartTier>=DART_MAX_TIER)||(t.type==='sniper'&&sniperTier>=SNIPER_MAX_TIER)||(t.type==='frost'&&frostTier>=FROST_MAX_TIER)||(t.type==='vine'&&vineTier>=VINE_MAX_TIER)||(t.type==='burst'&&burstTier>=BURST_MAX_TIER)||(t.type==='ninja'&&ninjaTier>=NINJA_MAX_TIER)||(t.type==='laser'&&laserTier>=LASER_MAX_TIER)||(t.type==='wizard'&&wizardTier>=WIZARD_MAX_TIER)||(t.type==='electric'&&electricTier>=ELECTRIC_MAX_TIER)||(!['dart','sniper','frost','vine','burst','ninja','laser','wizard','electric'].includes(t.type)&&lv>=MAX_LEVEL)){
+    if((t.type==='dart'&&dartTier>=DART_MAX_TIER)||(t.type==='sniper'&&sniperTier>=SNIPER_MAX_TIER)||(t.type==='frost'&&frostTier>=FROST_MAX_TIER)||(t.type==='vine'&&vineTier>=VINE_MAX_TIER)||(t.type==='burst'&&burstTier>=BURST_MAX_TIER)||(t.type==='ninja'&&ninjaTier>=NINJA_MAX_TIER)||(t.type==='laser'&&laserTier>=LASER_MAX_TIER)||(t.type==='wizard'&&wizardTier>=WIZARD_MAX_TIER)||(t.type==='electric'&&electricTier>=ELECTRIC_MAX_TIER)||(t.type==='demonking'&&demonTier>=DEMONKING_MAX_TIER)||(!['dart','sniper','frost','vine','burst','ninja','laser','wizard','electric','demonking'].includes(t.type)&&lv>=MAX_LEVEL)){
       ctx.globalAlpha=.55+.25*Math.sin(now*4+t.id);
       ctx.strokeStyle=accent;ctx.lineWidth=1.4;ctx.setLineDash([3,4]);
       ctx.beginPath();ctx.arc(0,-3,r+14,now*1.4,now*1.4+Math.PI*1.5);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
@@ -4969,7 +5140,23 @@ function drawTower(t){
       if(np[2]>=2){ctx.strokeStyle='#8a7fae';ctx.globalAlpha=.7;ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(0,-3,r*.88+6,.1,Math.PI*.6);ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle='#c9c0ff';ctx.beginPath();ctx.ellipse(-r*.34,-5,1.6,2.3,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(r*.34,-5,1.6,2.3,0,0,Math.PI*2);ctx.fill();}
     }else if(t.type==='wizard'){
       const wp=wizardPaths(t);
-      ctx.fillStyle='#443061';ctx.strokeStyle=accent;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-r*.82,-r*.48);ctx.lineTo(r*.82,-r*.48);ctx.lineTo(r*.15,-r-18-lv);ctx.closePath();ctx.fill();ctx.stroke();
+      if(elvenWizardSkin){
+        // Cabelo para trás e rosto do gatinho totalmente visível na frente.
+        ctx.fillStyle='#dbe7ea';ctx.globalAlpha=.96;
+        ctx.beginPath();ctx.moveTo(-r*.9,-9);ctx.quadraticCurveTo(-r*1.15,8,-r*.62,18);ctx.lineTo(-r*.1,11);ctx.lineTo(r*.1,11);ctx.lineTo(r*.62,18);ctx.quadraticCurveTo(r*1.15,8,r*.9,-9);ctx.quadraticCurveTo(0,-r-5,-r*.9,-9);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
+        ctx.fillStyle='#f7f1df';ctx.beginPath();ctx.arc(0,-3,r*.88,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#d7b75d';ctx.lineWidth=1.9;ctx.beginPath();ctx.arc(0,-12,r*.56,Math.PI*1.08,Math.PI*1.92);ctx.stroke();
+        ctx.fillStyle='#edf1f3';ctx.beginPath();ctx.moveTo(-r*.92,-8);ctx.quadraticCurveTo(-r*.7,-19,-r*.14,-12);ctx.quadraticCurveTo(0,-8,r*.14,-12);ctx.quadraticCurveTo(r*.7,-19,r*.92,-8);ctx.lineTo(r*.68,-1);ctx.quadraticCurveTo(r*.15,-7,0,-7);ctx.quadraticCurveTo(-r*.15,-7,-r*.68,-1);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#d9eef0';for(const side of[-1,1]){ctx.beginPath();ctx.moveTo(side*r*.6,-1);ctx.quadraticCurveTo(side*(r+9),7,side*r*.7,13);ctx.quadraticCurveTo(side*r*.48,9,side*r*.36,3);ctx.closePath();ctx.fill();}
+        ctx.fillStyle='#174e55';ctx.strokeStyle='#d7b75d';ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(-r*.82,9);ctx.quadraticCurveTo(0,1,r*.82,9);ctx.lineTo(r*.64,r+8);ctx.lineTo(-r*.64,r+8);ctx.closePath();ctx.fill();ctx.stroke();
+        ctx.fillStyle='#f7f1df';ctx.beginPath();ctx.moveTo(-r*.28,9);ctx.lineTo(0,18);ctx.lineTo(r*.28,9);ctx.lineTo(r*.16,r+5);ctx.lineTo(-r*.16,r+5);ctx.closePath();ctx.fill();
+        // Mini baú mimico ao lado para deixar a skin mais identificável.
+        ctx.fillStyle='#7a5033';ctx.strokeStyle='#d7b75d';ctx.lineWidth=1.1;ctx.beginPath();ctx.roundRect(-r-12,10,11,9,2);ctx.fill();ctx.stroke();
+        ctx.fillStyle='#f3d7b0';ctx.beginPath();ctx.moveTo(-r-11,14);ctx.lineTo(-r-6,12);ctx.lineTo(-r-2,14);ctx.lineTo(-r-6,16);ctx.closePath();ctx.fill();
+        if(lv>=3){ctx.strokeStyle='#d7b75d';ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(0,-3,r+10,now*.8,now*.8+Math.PI*1.35);ctx.stroke();}
+      }else{
+        ctx.fillStyle='#443061';ctx.strokeStyle=accent;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-r*.82,-r*.48);ctx.lineTo(r*.82,-r*.48);ctx.lineTo(r*.15,-r-18-lv);ctx.closePath();ctx.fill();ctx.stroke();
+      }
       drawWizardStaff(r,lv,accent);
       if(wp[0]>=2){ctx.strokeStyle='#d9c4ff';ctx.globalAlpha=.7;ctx.lineWidth=1.3;for(const off of[0,1]){ctx.beginPath();ctx.arc(0,-3,r+7+off*6,-.5-off*.15,.5+off*.15);ctx.stroke();}ctx.globalAlpha=1;}
       if(wp[1]>=2){ctx.fillStyle='#ffb26b';for(const [x,y] of[[-r*.55,r*.3],[r*.6,r*.35],[0,r*.65]]){ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x-2.6,y-8,x,y-12);ctx.quadraticCurveTo(x+2.6,y-8,x,y);ctx.fill();}}
@@ -5010,16 +5197,18 @@ function drawTower(t){
       if(sp[2]>=2){ctx.strokeStyle='#70caea';ctx.globalAlpha=.75;ctx.beginPath();ctx.arc(-5,-r-16,7,-.7,.7);ctx.stroke();ctx.beginPath();ctx.arc(-5,-r-16,11,-.55,.55);ctx.stroke();ctx.globalAlpha=1;}
       if(sp[2]>=5){ctx.font='12px Segoe UI Emoji,Segoe UI Symbol';ctx.textAlign='center';ctx.fillText('✈️',r*.75,-r-10);}
     }else if(t.type==='demonking'){
-      // Skin original "Rei Demônio da Academia": uniforme preto, carmesim e magia violeta.
-      ctx.fillStyle='#111019';ctx.strokeStyle='#5d263d';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(-r*.72,7,r*1.44,r*.92,5);ctx.fill();ctx.stroke();
-      ctx.fillStyle='#731f3d';ctx.beginPath();ctx.moveTo(-r*.72,8);ctx.lineTo(-r-9,18);ctx.lineTo(-r*.55,23);ctx.closePath();ctx.fill();
-      ctx.beginPath();ctx.moveTo(r*.72,8);ctx.lineTo(r+9,18);ctx.lineTo(r*.55,23);ctx.closePath();ctx.fill();
-      ctx.strokeStyle='#d8b36a';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-5,8);ctx.lineTo(0,18);ctx.lineTo(5,8);ctx.stroke();
-      ctx.fillStyle='#d8b36a';ctx.beginPath();ctx.arc(0,15,2,0,Math.PI*2);ctx.fill();
-      ctx.strokeStyle='#d45cff';ctx.lineWidth=2;ctx.shadowColor='#a64dff';ctx.shadowBlur=7;
-      ctx.beginPath();ctx.arc(0,-3,r+8,now*.9,now*.9+Math.PI*1.55);ctx.stroke();ctx.shadowBlur=0;
-      ctx.fillStyle='#a64dff';ctx.globalAlpha=.88;ctx.beginPath();ctx.moveTo(r+10,-7);ctx.quadraticCurveTo(r+4,-20,r+12,-29);ctx.quadraticCurveTo(r+20,-18,r+13,-8);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
-      ctx.fillStyle='#d45cff';ctx.font='900 13px Segoe UI Symbol';ctx.textAlign='center';ctx.fillText('♛',0,-r-16);
+      const dp=demonkingPaths(t);
+      // Coroa, chifres e capa mais legíveis para a skin não ficar estranha.
+      ctx.fillStyle='#1a1322';ctx.strokeStyle='#6a2f46';ctx.lineWidth=1.7;ctx.beginPath();ctx.roundRect(-r*.8,6,r*1.6,r,6);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#5b1832';ctx.beginPath();ctx.moveTo(-r*.82,8);ctx.lineTo(-r-12,20);ctx.lineTo(-r*.4,24);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(r*.82,8);ctx.lineTo(r+12,20);ctx.lineTo(r*.4,24);ctx.closePath();ctx.fill();
+      ctx.fillStyle='#23111b';for(const side of[-1,1]){ctx.beginPath();ctx.moveTo(side*r*.48,-r*.62);ctx.lineTo(side*r*.9,-r-9);ctx.lineTo(side*r*.28,-r*.42);ctx.closePath();ctx.fill();}
+      ctx.strokeStyle='#f0ca73';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(-7,-r-2);ctx.lineTo(-3,-r-11);ctx.lineTo(0,-r-5);ctx.lineTo(3,-r-12);ctx.lineTo(7,-r-2);ctx.stroke();
+      ctx.fillStyle='#f0ca73';ctx.beginPath();ctx.arc(0,-r-5,2.1,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#d45cff';ctx.lineWidth=2.2;ctx.shadowColor='#a64dff';ctx.shadowBlur=9;ctx.beginPath();ctx.arc(0,-3,r+8,now*.9,now*.9+Math.PI*1.55);ctx.stroke();ctx.shadowBlur=0;
+      ctx.fillStyle='#a64dff';ctx.globalAlpha=.82;ctx.beginPath();ctx.arc(r+12,-10,6,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(r+17,-19,3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+      if(dp[0]>=2){ctx.strokeStyle='#ff7ad9';ctx.globalAlpha=.75;ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(0,-3,r+13,-.4,Math.PI*1.2);ctx.stroke();ctx.globalAlpha=1;}
+      if(dp[1]>=2){ctx.fillStyle='#ff8a63';for(const [x,y] of [[-r*.55,r*.28],[r*.55,r*.28],[0,r*.62]]){ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x-3,y-9,x,y-14);ctx.quadraticCurveTo(x+3,y-9,x,y);ctx.fill();}}
+      if(dp[2]>=2){ctx.strokeStyle='#b88cff';ctx.globalAlpha=.7;ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(0,3,r*.95+8,.1,Math.PI*.72);ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle='#d4b0ff';ctx.font='900 12px Segoe UI Symbol';ctx.textAlign='center';ctx.fillText('♜',-r*.82,17);ctx.fillText('♜',r*.82,17);}
     }
     ctx.restore();
     if(lv>=2){
@@ -5034,7 +5223,7 @@ function drawTower(t){
       ctx.globalAlpha=1;
     }
     if(mastered){ctx.save();ctx.globalAlpha=.9;ctx.strokeStyle='#ffe48a';ctx.lineWidth=2.3;ctx.beginPath();ctx.arc(0,-3,r+8,0,Math.PI*2);ctx.stroke();ctx.font='13px Segoe UI Emoji';ctx.textAlign='center';ctx.fillText('⭐',0,-r-13);ctx.restore();}
-    if(t.type!=='frost'&&((t.type==='dart'&&dartTier>=DART_MAX_TIER)||(t.type==='sniper'&&sniperTier>=SNIPER_MAX_TIER)||(t.type==='vine'&&vineTier>=VINE_MAX_TIER)||(t.type==='burst'&&burstTier>=BURST_MAX_TIER)||(t.type==='ninja'&&ninjaTier>=NINJA_MAX_TIER)||(t.type==='laser'&&laserTier>=LASER_MAX_TIER)||(t.type==='wizard'&&wizardTier>=WIZARD_MAX_TIER)||(t.type==='electric'&&electricTier>=ELECTRIC_MAX_TIER)||(!['dart','sniper','vine','burst','ninja','laser','wizard','electric'].includes(t.type)&&lv>=MAX_LEVEL))){
+    if(t.type!=='frost'&&((t.type==='dart'&&dartTier>=DART_MAX_TIER)||(t.type==='sniper'&&sniperTier>=SNIPER_MAX_TIER)||(t.type==='vine'&&vineTier>=VINE_MAX_TIER)||(t.type==='burst'&&burstTier>=BURST_MAX_TIER)||(t.type==='ninja'&&ninjaTier>=NINJA_MAX_TIER)||(t.type==='laser'&&laserTier>=LASER_MAX_TIER)||(t.type==='wizard'&&wizardTier>=WIZARD_MAX_TIER)||(t.type==='electric'&&electricTier>=ELECTRIC_MAX_TIER)||(t.type==='demonking'&&demonTier>=DEMONKING_MAX_TIER)||(!['dart','sniper','vine','burst','ninja','laser','wizard','electric','demonking'].includes(t.type)&&lv>=MAX_LEVEL))){
       ctx.save();ctx.translate(0,-r-15);ctx.font='13px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText('👑',0,0);ctx.restore();
     }
     ctx.restore();
@@ -5043,7 +5232,7 @@ function drawTower(t){
     drawBuffBadges(t.x,t.y-r-18,activeTowerBuffLabels(t,st));
     if((t.stunTimer||0)>0){ctx.fillStyle='#ffe0a6';ctx.font='900 13px Segoe UI Emoji,Segoe UI Symbol';ctx.textAlign='center';ctx.fillText('😵',t.x,t.y-r-42);}
     ctx.fillStyle='#f6f4ff';ctx.font='800 9px Segoe UI,Arial';ctx.textAlign='center';
-    ctx.fillText(t.type==='dart'?`${dartTier>=DART_MAX_TIER?'★':''}T${dartTier}`:t.type==='sniper'?`${sniperTier>=SNIPER_MAX_TIER?'★':''}T${sniperTier}`:t.type==='frost'?`${frostTier>=FROST_MAX_TIER?'★':''}T${frostTier}`:t.type==='vine'?`${vineTier>=VINE_MAX_TIER?'★':''}T${vineTier}`:t.type==='burst'?`${burstTier>=BURST_MAX_TIER?'★':''}T${burstTier}`:t.type==='ninja'?`${ninjaTier>=NINJA_MAX_TIER?'★':''}T${ninjaTier}`:t.type==='laser'?`${laserTier>=LASER_MAX_TIER?'★':''}T${laserTier}`:t.type==='wizard'?`${wizardTier>=WIZARD_MAX_TIER?'★':''}T${wizardTier}`:t.type==='electric'?`${electricTier>=ELECTRIC_MAX_TIER?'★':''}T${electricTier}`:`${lv>=MAX_LEVEL?'★':''}L${lv}`,t.x,t.y+r+15);
+    ctx.fillText(t.type==='dart'?`${dartTier>=DART_MAX_TIER?'★':''}T${dartTier}`:t.type==='sniper'?`${sniperTier>=SNIPER_MAX_TIER?'★':''}T${sniperTier}`:t.type==='frost'?`${frostTier>=FROST_MAX_TIER?'★':''}T${frostTier}`:t.type==='vine'?`${vineTier>=VINE_MAX_TIER?'★':''}T${vineTier}`:t.type==='burst'?`${burstTier>=BURST_MAX_TIER?'★':''}T${burstTier}`:t.type==='ninja'?`${ninjaTier>=NINJA_MAX_TIER?'★':''}T${ninjaTier}`:t.type==='laser'?`${laserTier>=LASER_MAX_TIER?'★':''}T${laserTier}`:t.type==='wizard'?`${wizardTier>=WIZARD_MAX_TIER?'★':''}T${wizardTier}`:t.type==='electric'?`${electricTier>=ELECTRIC_MAX_TIER?'★':''}T${electricTier}`:t.type==='demonking'?`${demonTier>=DEMONKING_MAX_TIER?'★':''}T${demonTier}`:`${lv>=MAX_LEVEL?'★':''}L${lv}`,t.x,t.y+r+15);
   }
 
 function drawTree(x,y,s=1,night=false){

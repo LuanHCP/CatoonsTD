@@ -1,0 +1,32 @@
+CATOONS TD v0.27.4 — REI DEMÔNIO REFORÇADO + AJUSTE DA GATA MAGA ÉLFICA
+
+Esta edição não contém executáveis, launchers, arquivos .bat ou instaladores.
+Ela possui somente HTML, CSS, JavaScript e este arquivo de instruções.
+
+COMO ABRIR
+1. Extraia/baixe os arquivos do projeto.
+2. Abra o arquivo index.html com Google Chrome ou Microsoft Edge, ou use o GitHub Pages.
+
+NOVIDADES DESTA VERSÃO
+- Mantém a skin gratuita Gata Maga Élfica do Gato Mago.
+- Ajusta o visual da Gata Maga Élfica para mostrar melhor o rostinho do gato de frente.
+- Adiciona um mini baú mimico decorativo na skin élfica.
+- Reforça bastante o Gatinho Rei Demônio para o papel de unidade secreta de fim de jogo.
+- O Rei Demônio agora possui árvore própria de 3 caminhos: Senhor do Medo, Chamas do Abismo e Legião Sombria.
+- Regra dos caminhos: até 2 caminhos ativos; um pode ir ao T5 e o secundário vai até T3.
+- Buff base do Rei Demônio: mais dano, alcance, splash, medo e sombras.
+- Senhor do Medo aumenta raio, frequência, duração, recuo e vulnerabilidade do Medo.
+- Chamas do Abismo aumenta muito dano direto, splash e queimadura.
+- Legião Sombria aumenta limite, força e quantidade de sombras invocadas.
+- Visual do Rei Demônio refinado com coroa, chifres, capa e aura mais legíveis.
+
+DESBLOQUEIO DO REI DEMÔNIO
+- Concluir Passagem Cega no Fácil, Normal e Difícil.
+- Limite de 1 Rei Demônio por partida.
+
+SKIN ÉLFICA
+Na loja, desça até Skins. Adquira a Gata Maga Élfica por 0 moedas e clique em Equipar.
+A skin modifica somente a aparência do Gato Mago.
+
+OBSERVAÇÃO
+O JavaScript é validado sintaticamente pela rotina de CI. Ainda é recomendado testar partidas longas, especialmente no modo Infinito, para sentir o novo balanceamento e verificar o desempenho com muitas sombras.

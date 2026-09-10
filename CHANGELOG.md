@@ -1,5 +1,15 @@
 # Changelog
 
+
+## v0.27.4 — Rei Demônio reforçado + skin élfica ajustada
+
+- Gatinho Rei Demônio rebalanceado como unidade secreta de fim de jogo.
+- Nova árvore com 3 caminhos: Senhor do Medo, Chamas do Abismo e Legião Sombria.
+- Crosspath: um caminho até T5 e um secundário até T3.
+- Buffs em dano, alcance, splash, Medo e invocações sombrias.
+- Gata Maga Élfica redesenhada para mostrar melhor o rosto, com mini baú mimico decorativo.
+- Visual do Rei Demônio refinado com coroa, chifres, capa e aura mais legíveis.
+
 Este arquivo resume os principais marcos do Catoons TD. Nem todo hotfix intermediário está listado.
 
 ## v0.27.2 — Gatinho Rei Demônio

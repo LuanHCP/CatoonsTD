@@ -4,7 +4,7 @@
 
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-**Status:** Beta de portfólio · **Build:** v0.27.2  
+**Status:** Beta de portfólio · **Build:** v0.27.4  
 **Plataformas:** Navegador moderno · Windows x64 via launcher local  
 **Idioma atual:** Português (Brasil)
 
@@ -23,7 +23,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 - **13 mapas** organizados em 4 tiers: 6 Iniciantes, 4 Médios, 2 Difíceis e 1 Impossível.
 - **3 dificuldades por mapa**: Fácil, Normal e Difícil.
 - **14 gatinhos**, incluindo 4 personagens secretos descobertos apenas por conclusão completa de tiers, com o **Gatinho Rei Demônio** reservado ao tier Impossível.
-- **Árvores de upgrade** com caminhos e crosspath limitado em unidades específicas.
+- **Árvores de upgrade** com caminhos e crosspath limitado em unidades específicas, incluindo o Rei Demônio com Senhor do Medo, Chamas do Abismo e Legião Sombria.
 - **Maestria até o nível 50**, com bônus permanentes, skin dourada e habilidade exclusiva no nível máximo.
 - **4 Heróis Gatinhos**, com evolução do nível 1 ao 10 dentro de cada partida e habilidades/ultimates próprias.
 - **8 sinergias** que alteram comportamento de combate quando combinações específicas estão em campo.

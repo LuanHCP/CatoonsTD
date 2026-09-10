@@ -250,6 +250,8 @@ body.in-game .game-panel{width:min(1280px,100%);margin:0 auto}
 .shop-card-meta{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#b7c9d1}
 .shop-card button{font-weight:800}
 .shop-card button.affordable{border-color:#76642d;background:#29210d;color:#ffe79a}
+.shop-card.skin-equipped{border-color:#58d8d1;box-shadow:0 0 0 1px #58d8d155,0 10px 28px #0b6f6a22}
+.shop-card.skin-equipped button{border-color:#58d8d1;background:#123f43;color:#bafffb}
 
 
 .game-modal{position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:20px;background:#03070ddd;backdrop-filter:blur(9px)}
