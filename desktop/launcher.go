@@ -12,7 +12,7 @@ import (
     "unsafe"
 )
 
-const appVersion = "0.27.2"
+const appVersion = "0.27.5"
 
 // Este launcher NÃO embute, extrai, baixa ou altera os arquivos do jogo.
 // Ele apenas abre app/index.html, que fica ao lado do executável, em modo app

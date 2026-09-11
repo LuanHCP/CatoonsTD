@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.27.5 — Festa na Igreja + tela responsiva
+
+- novo mapa Impossível “Festa na Igreja”, com duas procissões em rotas que formam uma cruz;
+- bancos funcionam como posições elevadas: gatinhos sobre eles enxergam por cima dos pilares;
+- canvas ajustado automaticamente pela largura e altura disponíveis, inclusive em notebooks e Windows 125%/150%;
+- botão de entrada com estado de carregamento e reposicionamento correto da tela;
+- economia da partida renomeada visualmente para salmões (🐟), mantendo moedas para a progressão permanente;
+- conteúdo da v0.27.4 preservado, incluindo Rei Demônio e Gata Maga Élfica.
+
 
 ## v0.27.4 — Rei Demônio reforçado + skin élfica ajustada
 

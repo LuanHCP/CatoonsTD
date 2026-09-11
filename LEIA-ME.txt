@@ -1,4 +1,4 @@
-CATOONS TD v0.27.4 — REI DEMÔNIO REFORÇADO + AJUSTE DA GATA MAGA ÉLFICA
+CATOONS TD v0.27.5 — FESTA NA IGREJA + TELA RESPONSIVA
 
 Esta edição não contém executáveis, launchers, arquivos .bat ou instaladores.
 Ela possui somente HTML, CSS, JavaScript e este arquivo de instruções.
@@ -8,6 +8,13 @@ COMO ABRIR
 2. Abra o arquivo index.html com Google Chrome ou Microsoft Edge, ou use o GitHub Pages.
 
 NOVIDADES DESTA VERSÃO
+- Novo mapa Impossível Festa na Igreja, com duas rotas em cruz.
+- Bancos aceitam gatinhos e dão visão elevada por cima dos pilares.
+- O mapa se encaixa automaticamente no espaço disponível da tela.
+- Melhor uso em notebooks e com escala/zoom do Windows em 125% ou 150%.
+- Botão de entrada do mapa com estado de carregamento e ajuste automático da tela.
+- A economia da fase agora aparece como salmões (🐟) no topo do campo.
+- Preserva todas as novidades da v0.27.4 listadas abaixo.
 - Mantém a skin gratuita Gata Maga Élfica do Gato Mago.
 - Ajusta o visual da Gata Maga Élfica para mostrar melhor o rostinho do gato de frente.
 - Adiciona um mini baú mimico decorativo na skin élfica.
@@ -21,7 +28,7 @@ NOVIDADES DESTA VERSÃO
 - Visual do Rei Demônio refinado com coroa, chifres, capa e aura mais legíveis.
 
 DESBLOQUEIO DO REI DEMÔNIO
-- Concluir Passagem Cega no Fácil, Normal e Difícil.
+- Concluir Passagem Cega e Festa na Igreja no Fácil, Normal e Difícil. Quem já havia desbloqueado o Rei Demônio mantém o desbloqueio.
 - Limite de 1 Rei Demônio por partida.
 
 SKIN ÉLFICA

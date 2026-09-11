@@ -1,4 +1,4 @@
-// Catoons TD — Beta portfolio build v0.27.2
+// Catoons TD — Beta portfolio build v0.27.5
 'use strict';
 
 const $ = selector => document.querySelector(selector);
@@ -159,6 +159,24 @@ const maps = {
       [{x:-40,y:100},{x:150,y:100},{x:250,y:180},{x:420,y:120},{x:560,y:190},{x:700,y:110},{x:960,y:140}],
       [{x:-40,y:430},{x:150,y:430},{x:260,y:350},{x:420,y:410},{x:560,y:340},{x:700,y:420},{x:960,y:390}]
     ]
+  },
+  church: {
+    name:'Festa na Igreja', rounds:31, startMoney:285, lives:11, hpMultiplier:1.42, speedMultiplier:1.34, rewardMultiplier:.92, clearCoins:190, enemyDensity:1.34,
+    description:'Mapa Impossível: duas procissões entram por portas diferentes e se cruzam no centro da igreja. Os pilares bloqueiam a visão, mas gatinhos colocados sobre os bancos enxergam por cima deles.',
+    obstacles:[
+      {x:275,y:145,r:31,type:'pillar'},{x:645,y:145,r:31,type:'pillar'},
+      {x:275,y:375,r:31,type:'pillar'},{x:645,y:375,r:31,type:'pillar'},
+      {x:125,y:95,r:25,type:'pillar'},{x:795,y:425,r:25,type:'pillar'}
+    ],
+    perches:[
+      {x:70,y:130,w:145,h:34},{x:315,y:130,w:92,h:34},{x:513,y:130,w:92,h:34},{x:705,y:130,w:145,h:34},
+      {x:70,y:356,w:145,h:34},{x:315,y:356,w:92,h:34},{x:513,y:356,w:92,h:34},{x:705,y:356,w:145,h:34}
+    ],
+    sky:['#24152f','#100c18'], ground:'#2a2030', road:'#9b7a67', shoulder:'#443444',
+    paths:[
+      [{x:-40,y:260},{x:175,y:260},{x:340,y:260},{x:460,y:260},{x:625,y:260},{x:790,y:260},{x:960,y:260}],
+      [{x:460,y:-40},{x:460,y:105},{x:460,y:260},{x:460,y:415},{x:460,y:560}]
+    ]
   }
 };
 
@@ -172,13 +190,14 @@ Object.values(maps).forEach(map=>{
   if(map.path)map.path=map.path.map(p=>({x:p.x*MAP_SCALE_X,y:p.y*MAP_SCALE_Y}));
   if(map.paths)map.paths=map.paths.map(onePath=>onePath.map(p=>({x:p.x*MAP_SCALE_X,y:p.y*MAP_SCALE_Y})));
   map.obstacles=(map.obstacles||[]).map(o=>({...o,x:o.x*MAP_SCALE_X,y:o.y*MAP_SCALE_Y,r:o.r*((MAP_SCALE_X+MAP_SCALE_Y)/2)}));
+  map.perches=(map.perches||[]).map(p=>({...p,x:p.x*MAP_SCALE_X,y:p.y*MAP_SCALE_Y,w:p.w*MAP_SCALE_X,h:p.h*MAP_SCALE_Y}));
 });
 
 const MAP_CATEGORIES=[
   {id:'beginner',name:'Iniciantes',icon:'🌱',maps:['grove','meadow','creek','ridge','garden','toll'],description:'6 mapas de aprendizado com pressão crescente: rotas simples no começo e mais obstáculos/economia apertada perto do final.'},
   {id:'medium',name:'Medianos',icon:'🧭',maps:['harbor','canyon','ruins','factory'],description:'4 mapas com mais densidade, rotas longas, bloqueios de visão e decisões de posicionamento mais exigentes.'},
   {id:'hardmaps',name:'Difíceis',icon:'🔥',maps:['fork','storm'],description:'2 mapas de duas rotas: a defesa precisa ser dividida e pouco espaço pode ser desperdiçado.'},
-  {id:'impossible',name:'Impossíveis',icon:'💀',maps:['blind'],description:'1 desafio máximo: duas rotas, neblina, visão bloqueada, menos economia e inimigos mais fortes.'}
+  {id:'impossible',name:'Impossíveis',icon:'💀',maps:['blind','church'],description:'2 desafios máximos de duas rotas: neblina ou caminhos em cruz, visão bloqueada, pouca economia e inimigos mais fortes.'}
 ];
 
 const SECRET_TOWER_RULES={
@@ -658,7 +677,7 @@ const powers = {
   frenzy:{name:'Patinhas Frenéticas',icon:'⚡',cost:70,duration:10,description:'Todas as torres atacam 2× mais rápido por 10 segundos.',effect:'attackSpeed'},
   focus:{name:'Instinto Predador',icon:'🔥',cost:85,duration:10,description:'Todas as torres causam 2× de dano por 10 segundos.',effect:'damage'},
   blizzard:{name:'Nevasca Felina',icon:'🌨️',cost:65,duration:8,description:'Todos os inimigos ficam com 35% da velocidade por 8 segundos.',effect:'slow'},
-  cash:{name:'Cofre de Sardinhas',icon:'💰',cost:45,duration:0,description:'Receba +$350 imediatamente dentro da partida.',effect:'cash'},
+  cash:{name:'Cofre de Sardinhas',icon:'🐟',cost:45,duration:0,description:'Receba +350 salmões imediatamente dentro da partida.',effect:'cash'},
   heal:{name:'Nove Vidas',icon:'❤️‍🩹',cost:55,duration:0,description:'Recupera até 6 vidas perdidas no mapa atual.',effect:'heal'}
 };
 
@@ -847,7 +866,10 @@ function masteryBonusSummary(id,level=masteryState(id).level){
 // tela dela. `zoom` é suportado nos dois navegadores usados pelo launcher.
 function applyUiScale(value){
   const v=Math.max(.7,Math.min(1.4,Number(value)||1));
-  try{document.documentElement.style.zoom=String(v);}catch(err){}
+  try{
+    document.documentElement.style.setProperty('--ui-scale',String(v));
+    document.documentElement.style.zoom=String(v);
+  }catch(err){}
 }
 applyUiScale(profile.settings&&profile.settings.uiScale);
 
@@ -947,7 +969,7 @@ const MUSIC_THEMES={
 Object.assign(MUSIC_THEMES,{
   meadow:MUSIC_THEMES.grove, creek:MUSIC_THEMES.grove, garden:MUSIC_THEMES.ridge,
   harbor:MUSIC_THEMES.toll, ruins:MUSIC_THEMES.canyon, factory:MUSIC_THEMES.canyon,
-  storm:MUSIC_THEMES.fork
+  storm:MUSIC_THEMES.fork, church:MUSIC_THEMES.blind
 });
 function midiFreq(m){ return 440*Math.pow(2,(m-69)/12); }
 function musicPluck(ctx,dest,freq,time,dur,peak,type){
@@ -1126,6 +1148,7 @@ function setScreen(id,pushHistory=true){
   // outra tela volta pro tema de lobby.
   if(id!=='game') playMusicTheme('lobby');
   const active=$(`#screen-${id}`);if(active)active.scrollTop=0;
+  if(id==='game')requestAnimationFrame(()=>window.dispatchEvent(new Event('catoons:fit-map')));
 }
 
 function renderHub(){
@@ -1279,7 +1302,7 @@ function renderCatCollection(){
   const visibleTypes=Object.entries(types).filter(([id,t])=>!t.secret||isTowerUnlocked(id));
   root.innerHTML=visibleTypes.map(([id,t])=>{const unlocked=isTowerUnlocked(id),m=masteryState(id),pct=masteryProgressPct(id),max=m.level>=50,need=max?0:requiredMasteryXp(m.level);
     return `<article class="cat-card mastery-card ${unlocked?'':'locked'} ${max?'mastered':''} ${catCollectionSelection===id?'selected':''}" data-mastery-cat="${id}" style="--cat-glow:${max?'#f2cf62':t.color}33">
-      <div class="cat-head"><div class="cat-avatar">${unlocked?t.icon:'🔒'}</div><div><h3>${t.name}</h3><small>${t.role} • $${t.cost}</small></div></div>
+      <div class="cat-head"><div class="cat-avatar">${unlocked?t.icon:'🔒'}</div><div><h3>${t.name}</h3><small>${t.role} • 🐟 ${t.cost}</small></div></div>
       <p class="cat-role">${max?'<span class="mastery-gold-label">⭐ Maestria Máxima • Skin Dourada</span>':`Maestria ${m.level}/50`} • ${masteryBonusSummary(id).text}</p>
       <div class="mastery-mini-track"><i style="width:${pct}%"></i></div><div class="mastery-mini-text"><span>${max?'MAX':`${m.xp}/${need} XP`}</span><span>${Math.round(pct)}%</span></div>
       <div class="cat-unlock">${unlocked?'✓ Liberado para jogar':`🔒 Libera no nível ${t.unlockLevel} • você está no ${profile.level}`}</div></article>`;}).join('');
@@ -1315,7 +1338,7 @@ function drawHeroPreview(heroId){
 function renderHeroDetail(heroId){
   const root=$('#hero-detail-info');if(!root)return;
   const h=HEROES[heroId]||HEROES.king;
-  root.innerHTML=`<div class="hero-detail-head"><div><span class="eyebrow">HERÓI GATINHO</span><h3>${h.icon} ${h.name}</h3><small>${h.role}</small></div><span class="hero-cost-chip">$${h.cost} base</span></div>
+  root.innerHTML=`<div class="hero-detail-head"><div><span class="eyebrow">HERÓI GATINHO</span><h3>${h.icon} ${h.name}</h3><small>${h.role}</small></div><span class="hero-cost-chip">🐟 ${h.cost} base</span></div>
     <div class="hero-passive-card"><b>✨ Passiva</b><p>${h.passive}</p></div>
     <div class="hero-skill-grid"><div><b>🔓 Nv.5 • ${h.skill.icon} ${h.skill.name}</b><p>${h.skill.description}</p><small>Cooldown: ${h.skill.cooldown}s</small></div><div class="ultimate"><b>⭐ Nv.10 • ${h.ultimate.icon} ${h.ultimate.name}</b><p>${h.ultimate.description}</p><small>Cooldown: ${h.ultimate.cooldown}s</small></div></div>
     <button type="button" id="hero-equip" class="primary big-action">${profile.selectedHero===heroId?'✓ Herói equipado':'Equipar '+h.name}</button>
@@ -1328,7 +1351,7 @@ function renderHeroCollection(){
   const root=$('#hero-collection');if(!root)return;
   if(!HEROES[heroCollectionSelection])heroCollectionSelection=profile.selectedHero||'king';
   root.innerHTML=Object.entries(HEROES).map(([id,h])=>`<article class="hero-card ${profile.selectedHero===id?'equipped':''} ${heroCollectionSelection===id?'selected':''}" data-hero-choice="${id}" style="--hero-color:${h.color}">
-    <div class="hero-card-icon">${h.icon}</div><div class="hero-card-copy"><h3>${h.name}</h3><small>${h.role}</small><p>${h.passive}</p><span>$${h.cost} base • habilidade Nv.5 • Ultimate Nv.10</span></div>${profile.selectedHero===id?'<b class="hero-equipped-label">✓ EQUIPADO</b>':''}</article>`).join('');
+    <div class="hero-card-icon">${h.icon}</div><div class="hero-card-copy"><h3>${h.name}</h3><small>${h.role}</small><p>${h.passive}</p><span>🐟 ${h.cost} base • habilidade Nv.5 • Ultimate Nv.10</span></div>${profile.selectedHero===id?'<b class="hero-equipped-label">✓ EQUIPADO</b>':''}</article>`).join('');
   $$('[data-hero-choice]').forEach(card=>card.onclick=()=>{sfx('ui');heroCollectionSelection=card.dataset.heroChoice;renderHeroCollection();});
   if($('#hero-equipped-chip'))$('#hero-equipped-chip').textContent=`🦸 Equipado: ${(HEROES[profile.selectedHero]||HEROES.king).name}`;
   renderHeroDetail(heroCollectionSelection);
@@ -1337,7 +1360,7 @@ function renderHeroCollection(){
 function renderPlayHeroSummary(){
   const root=$('#play-hero-summary');if(!root)return;
   const h=HEROES[profile.selectedHero]||HEROES.king,price=heroPrice(profile.selectedHero,lobbySelection.map);
-  root.innerHTML=`<span class="play-hero-icon">${h.icon}</span><span><b>${h.name}</b><small>${h.role} • $${price} neste mapa • Nv.5 ${h.skill.name} • Nv.10 ${h.ultimate.name}</small></span>`;
+  root.innerHTML=`<span class="play-hero-icon">${h.icon}</span><span><b>${h.name}</b><small>${h.role} • 🐟 ${price} neste mapa • Nv.5 ${h.skill.name} • Nv.10 ${h.ultimate.name}</small></span>`;
 }
 
 const TOWER_TIPS={
@@ -1362,7 +1385,7 @@ const BALLOON_GUIDE=[
   {icon:'➕',name:'Regenerador',color:'#5fd88a',desc:'Recupera vida aos poucos quando fica um tempo sem ser atingido.',counter:'Dano constante e rápido (Laser, Dardo, Ninja) não dá espaço pra ele regenerar.'},
   {icon:'❤️',name:'Curandeiro',color:'#62d887',desc:'Regenera 1 camada por segundo dos balões próximos em um raio pequeno.',counter:'Priorize o Curandeiro antes que uma formação inteira comece a recuperar camadas.'},
   {icon:'🤡',name:'Atrapalhão',color:'#ff9f5d',desc:'Pode estourar 1 camada do balão à frente, mas o impacto atordoa gatinhos próximos por 1,2s.',counter:'Evite concentrar toda a defesa colada no mesmo ponto quando ele estiver chegando.'},
-  {icon:'🃏',name:'Bobo da Corte',color:'#ce78ff',desc:'Tem apenas 1 de vida. O dano do tiro que o acerta tira dinheiro da partida.',counter:'O prejuízo é limitado a $500 por acerto. Torres fracas/rápidas podem ser mais econômicas do que um tiro enorme de Sniper.'},
+  {icon:'🃏',name:'Bobo da Corte',color:'#ce78ff',desc:'Tem apenas 1 de vida. O dano do tiro que o acerta tira salmões da partida.',counter:'O prejuízo é limitado a 500 salmões por acerto. Torres fracas/rápidas podem ser mais econômicas do que um tiro enorme de Sniper.'},
   {icon:'😇',name:'Anjo',color:'#f4efc7',desc:'Dá 1 escudo a um balão próximo. O escudo bloqueia um ataque inteiro, mas reduz em 18% a velocidade do protegido.',counter:'Ataques baratos e rápidos quebram o escudo antes dos seus golpes pesados.'},
   {icon:'😈',name:'Demônio',color:'#a94455',desc:'Rouba até 1 camada de balões próximos e converte isso em vida máxima própria.',counter:'Mate cedo: ele pode crescer até 2× a vida máxima original se ficar cercado de aliados.'},
   {icon:'⭐',name:'Elite',color:'#ffd36b',desc:'Não é bem um tipo novo — é uma versão fortalecida (+45% de vida) de qualquer balão comum ou especial, a partir da rodada 3.',counter:'Fica mais fácil de notar pela barra de vida maior; trate como o tipo base, só que mais resistente.'},
@@ -1373,11 +1396,11 @@ function renderTutorial(){
   const towerRoot=$('#tutorial-towers');
   if(towerRoot){
     towerRoot.innerHTML=Object.entries(types).map(([id,t])=>{
-      const cadence=t.farm?`+$${t.farmIncome}/rodada`:t.rootHold?`recarga ${t.rate.toFixed(1)}s`:`${(1/t.rate).toFixed(1)} ataque(s)/s`;
+      const cadence=t.farm?`+🐟 ${t.farmIncome}/rodada`:t.rootHold?`recarga ${t.rate.toFixed(1)}s`:`${(1/t.rate).toFixed(1)} ataque(s)/s`;
       return `<article class="cat-card" style="--cat-glow:${t.color}33">
         <div class="cat-head">
           <div class="cat-avatar">${t.icon}</div>
-          <div><h3>${t.name}</h3><small>${t.role} • $${t.cost}</small></div>
+          <div><h3>${t.name}</h3><small>${t.role} • 🐟 ${t.cost}</small></div>
         </div>
         <p class="cat-role">${t.farm?'Economia • não ataca':t.rootHold?'Controle • imobiliza':`Dano ${t.damage.toFixed(2)}`} • ${t.globalRange?'range GLOBAL':`range ${t.range}`} • ${cadence}.</p>
         <div class="tutorial-tip">💡 ${TOWER_TIPS[id]||t.special}</div>
@@ -1467,12 +1490,12 @@ function renderUnlocks(){
     btn.classList.toggle('locked',!unlocked);
     btn.classList.toggle('maxed',maxed);
     const small=btn.querySelector('small');
-    if(small)small.innerHTML=`${price}<span class="tower-count">${placed}/${limit}</span>`;
+    if(small)small.innerHTML=`🐟${price}<span class="tower-count">${placed}/${limit}</span>`;
     btn.title=!unlocked
       ?`Bloqueado: ${t.name} libera no nível ${t.unlockLevel}.`
       :maxed
         ?`${t.name}: limite de ${limit} unidade${limit===1?'':'s'} atingido.`
-        :`${t.name} • ${price} (${category.name}) • ${placed}/${limit} no mapa • ${t.special}`;
+        :`${t.name} • ${price} salmões (${category.name}) • ${placed}/${limit} no mapa • ${t.special}`;
   });
 }
 
@@ -1703,6 +1726,27 @@ function initPersonalTd(){
   const canvas=$('#personal-td-canvas');
   if(!canvas||personalTd) return;
   const ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height,MAX_LEVEL=4;
+  const canvasWrap=canvas.closest('.canvas-wrap');
+  let canvasFitFrame=0;
+  function fitCanvasToViewport(){
+    cancelAnimationFrame(canvasFitFrame);
+    canvasFitFrame=requestAnimationFrame(()=>{
+      if(!canvasWrap)return;
+      const rect=canvasWrap.getBoundingClientRect();
+      if(rect.width<2||rect.height<2)return;
+      // getBoundingClientRect já inclui o zoom da interface. Dividir pelo zoom
+      // evita aplicar a escala duas vezes em Windows 125%/150%.
+      const rootZoom=Math.max(.01,Number(getComputedStyle(document.documentElement).zoom)||1);
+      const scale=Math.min((rect.width/rootZoom)/W,(rect.height/rootZoom)/H);
+      canvas.style.setProperty('width',`${Math.max(1,Math.floor(W*scale))}px`,'important');
+      canvas.style.setProperty('height',`${Math.max(1,Math.floor(H*scale))}px`,'important');
+    });
+  }
+  if(canvasWrap&&'ResizeObserver' in window)new ResizeObserver(fitCanvasToViewport).observe(canvasWrap);
+  window.addEventListener('resize',fitCanvasToViewport,{passive:true});
+  window.addEventListener('catoons:fit-map',fitCanvasToViewport);
+  document.addEventListener('fullscreenchange',fitCanvasToViewport);
+  fitCanvasToViewport();
   const state={
     map:'grove',difficulty:'easy',mode:'campaign',money:720,lives:25,wave:0,lastClearedWave:0,lastFarmPaidWave:0,selected:null,selectedTower:null,selectedHero:false,repositionTower:null,hero:null,
     nextTowerId:1,nextEnemyId:1,paused:false,menuOpen:false,defeatShown:false,gameSpeed:1,waveActive:false,completed:false,rewardGranted:false,
@@ -1758,7 +1802,7 @@ function initPersonalTd(){
       <div class="playtest-debug-row"><span>Velocidade</span><b>${state.gameSpeed}×</b></div>
       <div class="playtest-debug-row"><span>Rodada</span><b>${state.wave}/${isInfinite()?'∞':mapRounds(state.map,state.difficulty)}</b></div>
       <div class="playtest-debug-row"><span>Vidas</span><b>${state.lives}</b></div>
-      <div class="playtest-debug-row"><span>Dinheiro</span><b>$${Math.floor(state.money)}</b></div>
+      <div class="playtest-debug-row"><span>Salmões</span><b>🐟 ${Math.floor(state.money)}</b></div>
       <div class="playtest-debug-row"><span>Inimigos</span><b>${alive.length} + ${state.spawn.length}</b></div>
       <div class="playtest-debug-row"><span>Torres</span><b>${state.towers.length}</b></div>
       <div class="playtest-debug-row"><span>Projéteis</span><b>${projectileCount}</b></div>
@@ -1830,7 +1874,7 @@ function initPersonalTd(){
     if(!h){setMsg('Coloque um Herói em campo antes de upar com ouro.');return;}
     if(h.level>=10){setMsg('🦸 Herói já está no nível máximo.');return;}
     const cost=heroLevelUpCost(h.level);
-    if(state.money<cost){setMsg(`Faltam $${cost-Math.floor(state.money)} para upar ${HEROES[h.type].name} com ouro.`);return;}
+    if(state.money<cost){setMsg(`Faltam 🐟 ${cost-Math.floor(state.money)} para upar ${HEROES[h.type].name}.`);return;}
     state.money-=cost;
     const missing=Math.max(0,heroRequiredXp(h.level)-(h.xp||0));
     grantHeroXp(missing);
@@ -1896,6 +1940,7 @@ function initPersonalTd(){
   }
 
   function hasLineOfSight(tower,point){
+    if(tower&&tower.elevated)return true;
     return !currentObstacles().some(o=>segmentHitsCircle(tower.x,tower.y,point.x,point.y,o.x,o.y,o.r));
   }
 
@@ -1923,6 +1968,11 @@ function initPersonalTd(){
     let diff=((target-current+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI;
     if(diff>maxDelta)diff=maxDelta;else if(diff<-maxDelta)diff=-maxDelta;
     return current+diff;
+  }
+
+  function currentPerches(){return currentMap().perches||[];}
+  function perchAt(x,y,padding=0){
+    return currentPerches().find(p=>x>=p.x-padding&&x<=p.x+p.w+padding&&y>=p.y-padding&&y<=p.y+p.h+padding)||null;
   }
 
   function obstacleAt(x,y,padding=0){
@@ -2077,7 +2127,7 @@ function initPersonalTd(){
     return Math.max(1,Math.round((1+bonus*.18+Math.max(0,hp)*1.15)*map.rewardMultiplier*diff.waveReward));
   }
 
-  const MAP_PARTICLE_KIND={grove:'leaf',ridge:'snow',toll:'ember'};
+  const MAP_PARTICLE_KIND={grove:'leaf',ridge:'snow',toll:'ember',church:'ember'};
 
   function makeMapParticle(){
     const kind=MAP_PARTICLE_KIND[state.map]||'leaf';
@@ -2788,7 +2838,7 @@ function initPersonalTd(){
     if(damage>.001)labels.push({text:`DMG +${Math.round(damage*100)}%`,color:'#ff9a78'});
     if(attack>.001)labels.push({text:`SPD +${Math.round(attack*100)}%`,color:'#ffe06b'});
     if(range>.001)labels.push({text:`RNG +${Math.round(range*100)}%`,color:'#77d8ff'});
-    if(income>.001)labels.push({text:`$ +${Math.round(income*100)}%`,color:'#8ee89a'});
+    if(income>.001)labels.push({text:`🐟 +${Math.round(income*100)}%`,color:'#8ee89a'});
     return labels;
   }
   function drawBuffBadges(x,y,labels){
@@ -2818,8 +2868,8 @@ function initPersonalTd(){
     const income=Math.max(0,Math.round(t.incomeGenerated||0));
     const ml=masteryState(t.type).level;
     return types[t.type]?.farm
-      ?`📊 Renda gerada $${income} • Maestria ${ml}/50 • Investido $${spent} • Venda $${refund} (50%)`
-      :`📊 Dano causado ${damage} • Eliminações ${pops} • Maestria ${ml}/50 • Investido $${spent} • Venda $${refund} (50%)`;
+      ?`📊 Renda gerada 🐟 ${income} • Maestria ${ml}/50 • Investido 🐟 ${spent} • Venda 🐟 ${refund} (50%)`
+      :`📊 Dano causado ${damage} • Eliminações ${pops} • Maestria ${ml}/50 • Investido 🐟 ${spent} • Venda 🐟 ${refund} (50%)`;
   }
 
   function syncPlacementUi(){
@@ -2873,7 +2923,7 @@ function initPersonalTd(){
     state.towers=state.towers.filter(x=>x.id!==t.id);
     state.selectedTower=null;
     updateUpgradePanel();renderUnlocks();updateStats();renderSynergies();
-    setMsg(`💰 ${name} vendido por $${refund} — 50% dos $${Math.round(t.spent||0)} investidos.`);
+    setMsg(`🐟 ${name} vendido por ${refund} salmões — 50% dos ${Math.round(t.spent||0)} investidos.`);
   }
 
   function moveRepositionedTower(x,y){
@@ -2881,10 +2931,10 @@ function initPersonalTd(){
     if(distPath(x,y)<43){setMsg('↔ Reposicionamento: muito perto da estrada. Escolha outro ponto.');return false;}
     if(obstacleAt(x,y,24)){setMsg('↔ Reposicionamento: há um obstáculo nesse ponto.');return false;}
     if(state.towers.some(other=>other.id!==t.id&&Math.hypot(other.x-x,other.y-y)<46)){setMsg('↔ Reposicionamento: muito perto de outra torre.');return false;}
-    t.x=x;t.y=y;
+    t.x=x;t.y=y;t.elevated=Boolean(perchAt(x,y));
     state.pulses.push({x,y,range:54,life:.55,maxLife:.55,color:types[t.type].accent||types[t.type].color});
     state.repositionTower=null;syncPlacementUi();
-    setMsg(`✓ ${types[t.type].name} reposicionado sem custo.`);
+    setMsg(t.elevated?`✓ ${types[t.type].name} reposicionado sobre um banco: visão elevada, sem bloqueio dos pilares.`:`✓ ${types[t.type].name} reposicionado sem custo.`);
     updateStats();return true;
   }
 
@@ -2995,7 +3045,7 @@ function initPersonalTd(){
       return`<article class="dart-path-card ${isMain?'main-path':''} ${lock&&level<5?'path-locked':''}" style="--path-color:${path.color}">
         <div class="dart-path-head"><span>${path.icon} <b>${path.name}</b></span><strong>T${level}/5${isMain?' • PRINCIPAL':''}</strong></div>
         <small>${level===0?'Ainda não escolhido.':tier.name}${nextTier?` → ${nextTier.description}`:' • caminho completo'}</small>
-        <button type="button" ${buttonAttr}="${i}" ${lock?'disabled':''}>${level>=5?'T5 completo':lock||`T${next} • $${nextTier.cost}`}</button>
+        <button type="button" ${buttonAttr}="${i}" ${lock?'disabled':''}>${level>=5?'T5 completo':lock||`T${next} • 🐟 ${nextTier.cost}`}</button>
       </article>`;
     }).join('');
   }
@@ -3149,7 +3199,7 @@ function initPersonalTd(){
     if(bar)bar.hidden=false;if(dock)dock.classList.add('upgrade-open');
     if(actions)actions.hidden=false;
     if(perf)perf.textContent=towerPerformanceText(t);
-    if(sellBtn)sellBtn.textContent=`💰 Vender $${towerRefund(t)}`;
+    if(sellBtn)sellBtn.textContent=`🐟 Vender ${towerRefund(t)}`;
     if(moveBtn)moveBtn.textContent='↔ Reposicionar';
     if(abilityBtn){const m=masteryState(t.type),ab=MASTERY_ABILITIES[t.type];abilityBtn.hidden=m.level<50;abilityBtn.disabled=(t.masteryAbilityCd||0)>0;abilityBtn.textContent=m.level>=50?`${ab.icon} ${ab.name}${(t.masteryAbilityCd||0)>0?` • ${Math.ceil(t.masteryAbilityCd)}s`:''}`:'⭐ Habilidade Nv.50';}
     updatePriorityRow(t);
@@ -3288,7 +3338,7 @@ function initPersonalTd(){
     if(tree){tree.hidden=true;tree.innerHTML='';tree.__lastHtml='';}if(bar)bar.classList.remove('dart-mode');btn.hidden=false;
     const max=t.level>=MAX_LEVEL,cost=upgradeCost(t);
     let special='';
-    if(st.farm)special=` • 🎣 +$${st.farmIncome} por rodada`;
+    if(st.farm)special=` • 🎣 +🐟 ${st.farmIncome} por rodada`;
     else if(st.globalRange)special=' • 🎯 Range GLOBAL';
     else if(st.fullAoe)special=' • ❄️ FULL AOE';
     else if(st.breaksArmor)special=' • 💥 Quebra blindagem';
@@ -3304,11 +3354,11 @@ function initPersonalTd(){
     const supportText=(received.damage||received.range||received.attack||received.salmon)?' • 🐟 buff de Suporte ativo':'';
     const observerText=(observer.damage||observer.range)?' • 🛰️ buff de Observador ativo':'';
     name.textContent=`${st.name} • nível ${t.level}/${MAX_LEVEL}`;
-    const cadence=st.farm?`Renda $${st.farmIncome}/rodada`:st.rootHold?`Recarga ${st.rate.toFixed(1)}s`:`Vel. ${(1/st.rate).toFixed(1)}/s`;
+    const cadence=st.farm?`Renda 🐟 ${st.farmIncome}/rodada`:st.rootHold?`Recarga ${st.rate.toFixed(1)}s`:`Vel. ${(1/st.rate).toFixed(1)}/s`;
     stats.textContent=st.farm
-      ?`${st.role} • não ataca • ${cadence}${special}${supportText}${observerText} • limite ${TOWER_LIMIT_PER_TYPE} por tipo • ${max?'nível máximo':`próximo upgrade $${cost}`}`
-      :`${st.role} • ${st.rootHold?'Controle':`Dano ${st.damage.toFixed(2)}`} • ${st.globalRange?'Range GLOBAL':`Range ${st.range}`} • ${cadence}${special}${supportText}${observerText}${speedBonus}${damageBonus} • ${max?'nível máximo':`próximo upgrade $${cost}`}`;
-    btn.textContent=max?'Nível máximo':`Upgrade $${cost}`;btn.disabled=max;
+      ?`${st.role} • não ataca • ${cadence}${special}${supportText}${observerText} • limite ${TOWER_LIMIT_PER_TYPE} por tipo • ${max?'nível máximo':`próximo upgrade 🐟 ${cost}`}`
+      :`${st.role} • ${st.rootHold?'Controle':`Dano ${st.damage.toFixed(2)}`} • ${st.globalRange?'Range GLOBAL':`Range ${st.range}`} • ${cadence}${special}${supportText}${observerText}${speedBonus}${damageBonus} • ${max?'nível máximo':`próximo upgrade 🐟 ${cost}`}`;
+    btn.textContent=max?'Nível máximo':`Upgrade 🐟 ${cost}`;btn.disabled=max;
   }
 
   function renderHotbar(){
@@ -3340,7 +3390,7 @@ function initPersonalTd(){
   const SPECIAL_ENEMY_INFO={
     healer:{icon:'❤️',name:'Curandeiro',color:'#62d887',description:'A cada 1s regenera 1 camada dos balões próximos em um raio pequeno.'},
     trickster:{icon:'🤡',name:'Atrapalhão',color:'#ff9f5d',description:'Às vezes estoura 1 camada do balão da frente e atordoa gatinhos próximos por 1,2s.'},
-    jester:{icon:'🃏',name:'Bobo da Corte',color:'#ce78ff',description:'Tem apenas 1 de vida. O dano do tiro que o acerta vira perda de dinheiro, limitada a $500.'},
+    jester:{icon:'🃏',name:'Bobo da Corte',color:'#ce78ff',description:'Tem apenas 1 de vida. O dano do tiro que o acerta vira perda de salmões, limitada a 500.'},
     angel:{icon:'😇',name:'Anjo',color:'#f4efc7',description:'Concede 1 escudo a um balão próximo. O escudo bloqueia um ataque, mas deixa o protegido 18% mais lento.'},
     demon:{icon:'😈',name:'Demônio',color:'#a94455',description:'Rouba camadas de balões próximos para aumentar permanentemente sua vida máxima, até 2× a vida original.'}
   };
@@ -3398,7 +3448,7 @@ function initPersonalTd(){
     const price=heroPrice(profile.selectedHero,state.map);
     if(icon)icon.textContent=def.icon;if(name)name.textContent=def.name;
     if(btn){btn.disabled=!!h;btn.classList.toggle('placed',!!h);}
-    if(stateEl)stateEl.textContent=h?`Em campo • Nv. ${h.level}/10`:`$${price} • pronto para entrar`;
+    if(stateEl)stateEl.textContent=h?`Em campo • Nv. ${h.level}/10`:`🐟 ${price} • pronto para entrar`;
     const progress=$('#td-hero-progress'),actions=$('#td-hero-actions');
     // O XP/nível (e o botão de upar com ouro, que mora no mesmo bloco) só aparece com o herói
     // selecionado — clique nele em campo para ver/gerenciar o progresso, como já funciona para
@@ -3410,14 +3460,14 @@ function initPersonalTd(){
     if($('#td-hero-level'))$('#td-hero-level').textContent=h.level>=10?'⭐ Nv. 10 MAX':`Nv. ${h.level}/10`;
     if($('#td-hero-xp'))$('#td-hero-xp').textContent=h.level>=10?'Ultimate liberada':`${h.xp}/${need} XP`;
     if($('#td-hero-xp-fill'))$('#td-hero-xp-fill').style.width=`${pct}%`;
-    if($('#td-hero-passive'))$('#td-hero-passive').textContent=`${def.passive}${def.farm?` • Renda própria: +$${hs.farmIncome}/rodada`:` • Dano ${hs.damage} • Range ${hs.range}`}`;
+    if($('#td-hero-passive'))$('#td-hero-passive').textContent=`${def.passive}${def.farm?` • Renda própria: +🐟 ${hs.farmIncome}/rodada`:` • Dano ${hs.damage} • Range ${hs.range}`}`;
     const buyBtn=$('#td-hero-buy-level');
     if(buyBtn){
       if(h.level>=10){buyBtn.hidden=true;}
       else{
         const cost=heroLevelUpCost(h.level);
         buyBtn.hidden=false;buyBtn.disabled=state.money<cost;
-        buyBtn.textContent=`💰 Upar com ouro • $${cost}`;
+        buyBtn.textContent=`🐟 Upar com salmões • ${cost}`;
       }
     }
     const skill=$('#td-hero-skill'),ult=$('#td-hero-ultimate');
@@ -3461,7 +3511,7 @@ function initPersonalTd(){
     if(state.selectedTower){
       const t=selectedTower(),perf=$('#td-selected-performance'),sellBtn=$('#td-sell');
       if(t&&perf)perf.textContent=towerPerformanceText(t);
-      if(t&&sellBtn)sellBtn.textContent=`💰 Vender $${towerRefund(t)}`;
+      if(t&&sellBtn)sellBtn.textContent=`🐟 Vender ${towerRefund(t)}`;
     }
     updateSpeedButtons();renderNextWavePreview();
   }
@@ -3481,7 +3531,9 @@ function initPersonalTd(){
     hideGameModal('#pause-menu');hideGameModal('#result-screen');
     setMsg(isInfinite()
       ?`${map.name} • ∞ Infinito ${diff.name}. Não existe rodada final: a dificuldade sobe continuamente e cada 10 rodadas concluídas rende moedas permanentes.`
-      :`${map.name} • ${diff.name}. Obstáculos grandes bloqueiam a visão. Chame as rodadas no seu ritmo — você pode sobrepor ondas.`);
+      :state.map==='church'
+        ?`${map.name} • ${diff.name}. ⛪ Coloque gatinhos nos bancos marcados com patinhas para enxergar por cima dos pilares. As duas rotas se cruzam no centro.`
+        :`${map.name} • ${diff.name}. Obstáculos grandes bloqueiam a visão. Chame as rodadas no seu ritmo — você pode sobrepor ondas.`);
     renderHotbar();renderEffects();renderUnlocks();renderHeroHud();updateStats();
   }
 
@@ -3579,7 +3631,7 @@ function initPersonalTd(){
 
   const BOSS_NAMES={
     grove:'Dirigível do Bosque',meadow:'Dirigível do Prado',creek:'Dirigível do Riacho',ridge:'Dirigível da Neblina',garden:'Dirigível das Lanternas',toll:'Dirigível do Pedágio',
-    harbor:'Dirigível do Porto',canyon:'Dirigível do Desfiladeiro',ruins:'Dirigível Ancestral',factory:'Dirigível Mecânico',fork:'Dirigível Gêmeo',storm:'Dirigível da Tempestade',blind:'Dirigível das Sombras'
+    harbor:'Dirigível do Porto',canyon:'Dirigível do Desfiladeiro',ruins:'Dirigível Ancestral',factory:'Dirigível Mecânico',fork:'Dirigível Gêmeo',storm:'Dirigível da Tempestade',blind:'Dirigível das Sombras',church:'Dirigível do Sino Partido'
   };
 
   function strongestRegularDurability(round){
@@ -3712,18 +3764,19 @@ function initPersonalTd(){
     if(!isTowerUnlocked(typeId)){setMsg(`${type.name} libera no nível ${type.unlockLevel}.`);return false;}
     const placed=towerCount(typeId),price=towerPrice(typeId,state.map),limit=type.limit||TOWER_LIMIT_PER_TYPE;
     if(placed>=limit){setMsg(`🐾 Limite atingido: no máximo ${limit} ${type.name} por mapa.`);renderUnlocks();return false;}
-    if(state.money<price){setMsg(`Faltam $${price-Math.floor(state.money)} para ${type.name} neste tier de mapa.`);return false;}
+    if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} para ${type.name} neste tier de mapa.`);return false;}
     if(distPath(x,y)<43){setMsg('Muito perto da estrada. Escolha outro ponto para confirmar.');return false;}
     if(obstacleAt(x,y,24)){setMsg('🌳 Esse obstáculo ocupa o espaço e também bloquearia a visão. Escolha outro ponto.');return false;}
     if(state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<46)||(state.hero&&Math.hypot(state.hero.x-x,state.hero.y-y)<52)){setMsg('Muito perto de outra unidade. Escolha outro ponto.');return false;}
     state.money-=price;
     const pathTower=['dart','sniper','frost','vine','burst','ninja','laser','wizard','electric','demonking'].includes(typeId);
-    const tower={id:state.nextTowerId++,x,y,type:typeId,cool:0,level:1,angle:0,paths:pathTower?[0,0,0]:undefined,dartMainPath:null,dartLastPath:null,sniperMainPath:null,sniperLastPath:null,demonMainPath:null,demonLastPath:null,planeTimer:0,planeLastWave:state.wave,
+    const elevated=Boolean(perchAt(x,y));
+    const tower={id:state.nextTowerId++,x,y,type:typeId,cool:0,level:1,angle:0,elevated,paths:pathTower?[0,0,0]:undefined,dartMainPath:null,dartLastPath:null,sniperMainPath:null,sniperLastPath:null,demonMainPath:null,demonLastPath:null,planeTimer:0,planeLastWave:state.wave,
       spent:price,damageDealt:0,pops:0,incomeGenerated:0,masteryAbilityCd:0,masteryBuffTimer:0,fearCooldown:typeId==='demonking'?1.4:0};
     state.towers.push(tower);state.masterySession[typeId].used=true;
     const count=towerCount(typeId);
     state.selectedTower=null;state.selectedHero=false;cancelPlacement(true);
-    setMsg(`✓ ${type.name} posicionado. ${count}/${type.limit||TOWER_LIMIT_PER_TYPE} deste tipo. Para colocar outro, selecione o gatinho novamente na barra.`);
+    setMsg(elevated?`⛪ ${type.name} subiu no banco! Visão elevada: pilares não bloqueiam seus ataques.`:`✓ ${type.name} posicionado. ${count}/${type.limit||TOWER_LIMIT_PER_TYPE} deste tipo. Para colocar outro, selecione o gatinho novamente na barra.`);
     notifyMatchTutorialAction('towerPlaced');
     renderUnlocks();updateStats();announceNewSynergies();return true;
   }
@@ -3731,7 +3784,7 @@ function initPersonalTd(){
   function placeHero(x,y){
     if(state.hero){setMsg('🦸 Só é permitido 1 Herói Gatinho por partida.');return false;}
     const id=profile.selectedHero||'king',h=HEROES[id]||HEROES.king,price=heroPrice(id,state.map);
-    if(state.money<price){setMsg(`Faltam $${price-Math.floor(state.money)} para colocar ${h.name}.`);return false;}
+    if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} para colocar ${h.name}.`);return false;}
     if(distPath(x,y)<46){setMsg('O herói está muito perto da estrada. Escolha outro ponto.');return false;}
     if(obstacleAt(x,y,27)){setMsg('🌳 Esse obstáculo ocupa o espaço do herói. Escolha outro ponto.');return false;}
     if(state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<52)){setMsg('Muito perto de outro gatinho. Escolha outro ponto.');return false;}
@@ -3753,7 +3806,7 @@ function initPersonalTd(){
     const p=dartPaths(t),current=p[pathIndex],lock=dartPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${DART_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=DART_PATHS[pathIndex].tiers[current];
-    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    if(state.money<tier.cost){setMsg(`Faltam 🐟 ${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
     state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.dartLastPath=pathIndex;
     if(next===4)t.dartMainPath=pathIndex;
     const st=towerStats(t);
@@ -3770,7 +3823,7 @@ function initPersonalTd(){
     const p=sniperPaths(t),current=p[pathIndex],lock=sniperPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${SNIPER_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=SNIPER_PATHS[pathIndex].tiers[current];
-    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    if(state.money<tier.cost){setMsg(`Faltam 🐟 ${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
     state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.sniperLastPath=pathIndex;
     if(next===4)t.sniperMainPath=pathIndex;
     if(pathIndex===2&&next===5){t.planeTimer=0;t.planeLastWave=state.wave;}
@@ -3788,7 +3841,7 @@ function initPersonalTd(){
     const p=frostPaths(t),current=p[pathIndex],lock=frostPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${FROST_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=FROST_PATHS[pathIndex].tiers[current];
-    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    if(state.money<tier.cost){setMsg(`Faltam 🐟 ${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
     state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.frostLastPath=pathIndex;
     if(next===4)t.frostMainPath=pathIndex;
     state.pulses.push({x:t.x,y:t.y,range:48+next*10,life:.55,maxLife:.55,color:FROST_PATHS[pathIndex].color});
@@ -3804,7 +3857,7 @@ function initPersonalTd(){
     const p=vinePaths(t),current=p[pathIndex],lock=vinePathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${VINE_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=VINE_PATHS[pathIndex].tiers[current];
-    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    if(state.money<tier.cost){setMsg(`Faltam 🐟 ${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
     state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.vineLastPath=pathIndex;
     if(next===4)t.vineMainPath=pathIndex;
     state.pulses.push({x:t.x,y:t.y,range:48+next*10,life:.55,maxLife:.55,color:VINE_PATHS[pathIndex].color});
@@ -3820,7 +3873,7 @@ function initPersonalTd(){
     const p=burstPaths(t),current=p[pathIndex],lock=burstPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${BURST_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=BURST_PATHS[pathIndex].tiers[current];
-    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    if(state.money<tier.cost){setMsg(`Faltam 🐟 ${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
     state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.burstLastPath=pathIndex;
     if(next===4)t.burstMainPath=pathIndex;
     const st=towerStats(t);
@@ -3837,7 +3890,7 @@ function initPersonalTd(){
     const p=ninjaPaths(t),current=p[pathIndex],lock=ninjaPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${NINJA_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=NINJA_PATHS[pathIndex].tiers[current];
-    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    if(state.money<tier.cost){setMsg(`Faltam 🐟 ${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
     state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.ninjaLastPath=pathIndex;
     if(next===4)t.ninjaMainPath=pathIndex;
     const st=towerStats(t);
@@ -3854,7 +3907,7 @@ function initPersonalTd(){
     const p=laserPaths(t),current=p[pathIndex],lock=laserPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${LASER_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=LASER_PATHS[pathIndex].tiers[current];
-    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    if(state.money<tier.cost){setMsg(`Faltam 🐟 ${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
     state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.laserLastPath=pathIndex;
     if(next===4)t.laserMainPath=pathIndex;
     const st=towerStats(t);
@@ -3871,7 +3924,7 @@ function initPersonalTd(){
     const p=wizardPaths(t),current=p[pathIndex],lock=wizardPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${WIZARD_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=WIZARD_PATHS[pathIndex].tiers[current];
-    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    if(state.money<tier.cost){setMsg(`Faltam 🐟 ${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
     state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.wizardLastPath=pathIndex;
     if(next===4)t.wizardMainPath=pathIndex;
     const st=towerStats(t);
@@ -3888,7 +3941,7 @@ function initPersonalTd(){
     const p=electricPaths(t),current=p[pathIndex],lock=electricPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${ELECTRIC_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=ELECTRIC_PATHS[pathIndex].tiers[current];
-    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    if(state.money<tier.cost){setMsg(`Faltam 🐟 ${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
     state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.electricLastPath=pathIndex;
     if(next===4)t.electricMainPath=pathIndex;
     const st=towerStats(t);
@@ -3906,7 +3959,7 @@ function initPersonalTd(){
     const p=demonkingPaths(t),current=p[pathIndex],lock=demonkingPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${DEMONKING_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=DEMONKING_PATHS[pathIndex].tiers[current];
-    if(state.money<tier.cost){setMsg(`Faltam $${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
+    if(state.money<tier.cost){setMsg(`Faltam 🐟 ${tier.cost-Math.floor(state.money)} para ${tier.name}.`);return;}
     state.money-=tier.cost;t.spent=(t.spent||towerPrice(t.type,state.map))+tier.cost;p[pathIndex]=next;t.paths=p;t.demonLastPath=pathIndex;
     if(next===4)t.demonMainPath=pathIndex;
     state.pulses.push({x:t.x,y:t.y,range:54+next*12,life:.6,maxLife:.6,color:DEMONKING_PATHS[pathIndex].color});
@@ -3921,13 +3974,13 @@ function initPersonalTd(){
     if(t.type==='dart'||t.type==='sniper'||t.type==='frost'||t.type==='vine'||t.type==='burst'||t.type==='ninja'||t.type==='laser'||t.type==='wizard'||t.type==='electric'||t.type==='demonking'){setMsg(`${types[t.type].name} usa a árvore de 3 caminhos na aba de upgrades da direita.`);updateUpgradePanel();return;}
     if(t.level>=MAX_LEVEL){setMsg(`${types[t.type].name} já está no nível máximo.`);return;}
     const cost=upgradeCost(t);
-    if(state.money<cost){setMsg(`Faltam $${cost-Math.floor(state.money)} para o upgrade.`);return;}
+    if(state.money<cost){setMsg(`Faltam 🐟 ${cost-Math.floor(state.money)} para o upgrade.`);return;}
     const before=towerStats(t);state.money-=cost;t.spent=(t.spent||towerPrice(t.type,state.map))+cost;t.level++;
     const st=towerStats(t);
     state.pulses.push({x:t.x,y:t.y,range:46+t.level*10,life:.5,maxLife:.5,color:st.accent||st.color});
     spawnFloatText(t.x,t.y-30,`⬆ nível ${t.level}`,st.accent||'#ffe89a');
     if(st.farm){
-      setMsg(`${st.name} → nível ${t.level}: renda $${before.farmIncome}→$${st.farmIncome} por rodada concluída.`);
+      setMsg(`${st.name} → nível ${t.level}: renda 🐟 ${before.farmIncome}→${st.farmIncome} por rodada concluída.`);
     }else if(st.rootHold){
       setMsg(`${st.name} → nível ${t.level}: recarga ${before.rate.toFixed(1)}s→${st.rate.toFixed(1)}s • imobiliza por ${st.rootDuration}s • range ${st.range}.`);
     }else{
@@ -3964,7 +4017,7 @@ function initPersonalTd(){
     }else if(t.type==='chronomancer'){
       ctx.strokeStyle='#9de7ff';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(0,-3,r+8,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#d8f6ff';ctx.beginPath();ctx.arc(r*.75,-r*.45,8,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#446c89';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(r*.75,-r*.45);ctx.lineTo(r*.75,-r*.45-5);ctx.moveTo(r*.75,-r*.45);ctx.lineTo(r*.75+4,-r*.45);ctx.stroke();
     }else if(t.type==='salmon'){
-      const cash=Math.max(1,Math.round((st.farmIncome||1)*3));state.money+=cash;t.incomeGenerated=(t.incomeGenerated||0)+cash;recordMastery('salmon','income',cash);spawnFloatText(t.x,t.y-30,`🐟 +$${cash}`,'#ffcf8a');
+      const cash=Math.max(1,Math.round((st.farmIncome||1)*3));state.money+=cash;t.incomeGenerated=(t.incomeGenerated||0)+cash;recordMastery('salmon','income',cash);spawnFloatText(t.x,t.y-30,`🐟 +${cash}`,'#ffcf8a');
     }else if(t.type==='ninja'){
       t.masteryBuffTimer=10;state.pulses.push({x:t.x,y:t.y,range:80,life:.8,maxLife:.8,color:'#b58cff'});
     }else if(t.type==='wizard'){
@@ -3996,7 +4049,7 @@ function initPersonalTd(){
     if(h.type==='king'){h.commandTimer=8;state.pulses.push({x:h.x,y:h.y,range:st.auraRange,life:.8,maxLife:.8,color:def.color});}
     if(h.type==='warrior'){const targets=heroTargetsInRange(h,st).sort((a,b)=>((b.hp||0)+(b.innerHp||0))-((a.hp||0)+(a.innerHp||0)));const e=targets[0];if(!e){setMsg('Nenhum inimigo no alcance para o Golpe Heroico.');return;}damageEnemy(e,st.damage*5,st);const p=pointAt(e.d,e.path);spawnFloatText(p.x,p.y-30,'⚔️ ×5',def.color);}
     if(h.type==='luna'){const targets=heroTargetsInRange(h,st).sort((a,b)=>((b.hp||0)+(b.innerHp||0))-((a.hp||0)+(a.innerHp||0))).slice(0,3);if(!targets.length){setMsg('Nenhum inimigo no alcance para o Passo Lunar.');return;}targets.forEach(e=>{e.d=Math.max(0,e.d-120);const p=pointAt(e.d,e.path);spawnFloatText(p.x,p.y-22,'🌙 RECUO',def.color);});}
-    if(h.type==='merchant'){const cash=180+h.level*55;state.money+=cash;spawnFloatText(h.x,h.y-34,`💰 +$${cash}`,def.color);}
+    if(h.type==='merchant'){const cash=180+h.level*55;state.money+=cash;spawnFloatText(h.x,h.y-34,`🐟 +${cash}`,def.color);}
     h.skillCd=def.skill.cooldown;sfx('ui');setMsg(`${def.skill.icon} ${def.name}: ${def.skill.name} ativada!`);renderHeroHud();updateStats();
   }
 
@@ -4008,7 +4061,7 @@ function initPersonalTd(){
     if(h.type==='king'){h.ultimateTimer=10;state.pulses.push({x:h.x,y:h.y,range:Math.max(W,H),life:1,maxLife:1,color:def.color});}
     if(h.type==='warrior'){const targets=heroTargetsInRange(h,st);if(!targets.length){setMsg('Nenhum inimigo no alcance para Mil Cortes.');return;}for(let i=0;i<4;i++)targets.forEach(e=>{if(!e.dead)damageEnemy(e,st.damage*1.25,st);});state.pulses.push({x:h.x,y:h.y,range:st.range,life:.9,maxLife:.9,color:def.color});}
     if(h.type==='luna'){state.enemies.forEach(e=>{if(e.dead)return;e.slowTimer=Math.max(e.slowTimer||0,8);e.slowFactor=Math.min(e.slowFactor||1,.35);e.markTimer=Math.max(e.markTimer||0,8);e.markBonus=Math.max(e.markBonus||0,.25);});state.pulses.push({x:W/2,y:H/2,range:Math.max(W,H),life:1.2,maxLife:1.2,color:def.color});}
-    if(h.type==='merchant'){const cash=700+h.level*80;state.money+=cash;h.farmBoostWaves=2;spawnFloatText(h.x,h.y-36,`💎 +$${cash}`,def.color);}
+    if(h.type==='merchant'){const cash=700+h.level*80;state.money+=cash;h.farmBoostWaves=2;spawnFloatText(h.x,h.y-36,`🐟 +${cash}`,def.color);}
     h.ultimateCd=def.ultimate.cooldown;sfx('boss');setMsg(`${def.ultimate.icon} ${def.name}: ${def.ultimate.name} ativada!`);renderHeroHud();updateStats();
   }
 
@@ -4250,7 +4303,7 @@ function initPersonalTd(){
     if(armorReward>0){
       state.money+=armorReward;
       const p=pointAt(enemy.d,enemy.path);
-      spawnFloatText(p.x,p.y-14,`+$${armorReward}`,'#9fe0ff');
+      spawnFloatText(p.x,p.y-14,`🐟 +${armorReward}`,'#9fe0ff');
     }
   }
 
@@ -4403,8 +4456,8 @@ function initPersonalTd(){
     if(enemy.kind==='jester'&&dealt>0){
       const cap=enemy.moneyPenaltyCap||500,penalty=Math.min(cap,Math.max(1,Math.ceil(dealt))),lost=Math.min(state.money,penalty);
       state.money=Math.max(0,state.money-lost);
-      const p=pointAt(enemy.d,enemy.path);spawnFloatText(p.x,p.y-32,`🃏 -$${lost}`,'#ff8fbf');
-      if(penalty>=cap)spawnFloatText(p.x,p.y-46,'LIMITE $500','#ffd0e4');
+      const p=pointAt(enemy.d,enemy.path);spawnFloatText(p.x,p.y-32,`🃏 -🐟 ${lost}`,'#ff8fbf');
+      if(penalty>=cap)spawnFloatText(p.x,p.y-46,'LIMITE 🐟 500','#ffd0e4');
     }
 
     const sourceTower=Number.isFinite(source.sourceTowerId)?state.towers.find(t=>t.id===source.sourceTowerId):null;
@@ -4442,12 +4495,12 @@ function initPersonalTd(){
         state.money+=enemy.reward;
         const bonusCoins=Math.round(20*currentDifficulty().coinMultiplier);
         profile.coins+=bonusCoins;saveProfile();
-        spawnFloatText(p.x,p.y-18,`👑 +$${enemy.reward} • +🪙${bonusCoins}`,'#ffd36b');
-        setMsg(`👑 Você derrotou ${enemy.name}! +$${enemy.reward} na partida e +🪙${bonusCoins} moedas permanentes.`);
+        spawnFloatText(p.x,p.y-18,`👑 +🐟 ${enemy.reward} • +🪙${bonusCoins}`,'#ffd36b');
+        setMsg(`👑 Você derrotou ${enemy.name}! +🐟 ${enemy.reward} na partida e +🪙${bonusCoins} moedas permanentes.`);
       }else{
         sfx('pop');
         state.money+=enemy.reward;
-        spawnFloatText(p.x,p.y-14,`+$${enemy.reward}`,enemy.elite?'#ffd36b':'#ffe89a');
+        spawnFloatText(p.x,p.y-14,`🐟 +${enemy.reward}`,enemy.elite?'#ffd36b':'#ffe89a');
       }
     }
     return true;
@@ -4475,17 +4528,17 @@ function initPersonalTd(){
         if(merchantBoost)income=Math.round(income*2);
         cash+=income;
         farm.incomeGenerated=(farm.incomeGenerated||0)+income;recordMastery(farm.type,'income',income);
-        spawnFloatText(farm.x,farm.y-28,`🎣 +$${income}`,'#ffcf8a');
+        spawnFloatText(farm.x,farm.y-28,`🎣 +🐟 ${income}`,'#ffcf8a');
       }
       if(state.hero?.type==='merchant'){
         const hIncome=heroStats(state.hero).farmIncome||0;cash+=hIncome;
-        spawnFloatText(state.hero.x,state.hero.y-30,`💰 +$${hIncome}`,HEROES.merchant.color);
+        spawnFloatText(state.hero.x,state.hero.y-30,`🐟 +${hIncome}`,HEROES.merchant.color);
         if(merchantBoost)state.hero.farmBoostWaves=Math.max(0,(state.hero.farmBoostWaves||0)-1);
       }
       if(cash>0&&synergyActive('fishMarket')&&next%5===0){
         const festival=Math.max(1,Math.round(cash*.35));cash+=festival;
-        const fx=state.hero||farms[0];if(fx)spawnFloatText(fx.x,fx.y-52,`🎣💰 FESTIVAL +$${festival}`,'#ffe0a1');
-        setMsg(`🎣💰 Mercado de Peixes: Festival do Salmão! +$${festival} de renda extra na rodada ${next}.`);
+        const fx=state.hero||farms[0];if(fx)spawnFloatText(fx.x,fx.y-52,`🎣🐟 FESTIVAL +${festival}`,'#ffe0a1');
+        setMsg(`🎣🐟 Mercado de Peixes: Festival do Salmão! +${festival} salmões de renda extra na rodada ${next}.`);
       }
       if(cash>0){state.money+=cash;awards.push({wave:next,cash});}
     }
@@ -4885,7 +4938,7 @@ function initPersonalTd(){
     const milestoneAwards=processClearedRounds();
     if(farmAwards.length&&(state.enemies.length||state.spawn.length)){
       const last=farmAwards[farmAwards.length-1],totalFarm=farmAwards.reduce((sum,x)=>sum+x.cash,0);
-      setMsg(`🎣 Pescadores renderam +$${totalFarm} ao concluir ${farmAwards.length>1?`${farmAwards.length} rodadas`:`a rodada ${last.wave}`}.`);
+      setMsg(`🎣 Pescadores renderam +🐟 ${totalFarm} ao concluir ${farmAwards.length>1?`${farmAwards.length} rodadas`:`a rodada ${last.wave}`}.`);
     }
     if(state.waveActive&&!state.enemies.length&&!state.spawn.length){
       state.waveActive=false;
@@ -4894,8 +4947,8 @@ function initPersonalTd(){
       else{
         const levelText=settled.levels.length?` • 🎖️ Nível ${profile.level}!`:'';
         const milestoneText=milestoneAwards.length?` • 🪙 +${milestoneAwards.reduce((sum,x)=>sum+x.coins,0)} moedas permanentes`:'';
-        const farmText=farmAwards.length?` • 🎣 +$${farmAwards.reduce((sum,x)=>sum+x.cash,0)} dos Pescadores`:'';
-        setMsg(`${isInfinite()?'∞ ':''}Campo limpo após a rodada ${state.wave}. +$${settled.cash} • +${settled.xp} XP${farmText}${milestoneText}${levelText} Você pode chamar a próxima.`);
+        const farmText=farmAwards.length?` • 🎣 +🐟 ${farmAwards.reduce((sum,x)=>sum+x.cash,0)} dos Pescadores`:'';
+        setMsg(`${isInfinite()?'∞ ':''}Campo limpo após a rodada ${state.wave}. +🐟 ${settled.cash} • +${settled.xp} XP${farmText}${milestoneText}${levelText} Você pode chamar a próxima.`);
       }
     }
     if(state.lives<=0&&!state.defeatShown){
@@ -5036,7 +5089,7 @@ function drawHero(h){
 // obstáculo bloqueia a linha de tiro — ou seja, onde "aquele gatinho não consegue acertar"
 // mesmo estando nominalmente dentro do alcance.
 function drawTowerDeadZones(t,st){
-  if(!currentObstacles().length)return;
+  if(t.elevated||!currentObstacles().length)return;
   const steps=96,step=Math.PI*2/steps;
   ctx.save();ctx.fillStyle='#ff3b3b';ctx.globalAlpha=.32;
   for(let i=0;i<steps;i++){
@@ -5057,6 +5110,7 @@ function drawTower(t){
     const mastered=masteryState(t.type).level>=50;
     const elvenWizardSkin=t.type==='wizard'&&profile.equippedSkins?.wizard==='elvenMage';
     const r=17+Math.max(0,lv-1)*1.8,fur=elvenWizardSkin?'#f5f1e8':(st.fur||'#d8a56f'),accent=elvenWizardSkin?'#65e1dc':(mastered?'#f4d36b':(st.accent||st.color));
+    if(t.elevated){ctx.fillStyle='#ffd36b2e';ctx.beginPath();ctx.ellipse(t.x,t.y+15,r+9,8,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ffe39aaa';ctx.lineWidth=1.5;ctx.stroke();}
     if(st.farm){
       if(selected){ctx.globalAlpha=.12;ctx.fillStyle='#ffcf8a';ctx.beginPath();ctx.arc(t.x,t.y,44,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
     }else if(st.globalRange){
@@ -5276,6 +5330,14 @@ function drawBlockingObstacle(o){
   ctx.fillStyle='#00000040';ctx.beginPath();ctx.ellipse(o.x,o.y+o.r*.55,o.r*.82,o.r*.28,0,0,Math.PI*2);ctx.fill();
   if(o.type==='tree')drawTree(o.x,o.y,o.r/26,true);
   else if(o.type==='pine')drawPine(o.x,o.y,o.r/27);
+  else if(o.type==='pillar'){
+    const h=o.r*2.05,w=o.r*.82;
+    ctx.fillStyle='#2a1d2c';ctx.fillRect(o.x-w*.62,o.y-h*.48,w*1.24,h*.94);
+    const stone=ctx.createLinearGradient(o.x-w,o.y,o.x+w,o.y);stone.addColorStop(0,'#6d5a70');stone.addColorStop(.5,'#d1b9c8');stone.addColorStop(1,'#5c4a62');
+    ctx.fillStyle=stone;ctx.fillRect(o.x-w*.38,o.y-h*.42,w*.76,h*.80);
+    ctx.fillStyle='#d8c6d4';ctx.fillRect(o.x-w*.55,o.y-h*.48,w*1.1,h*.12);ctx.fillRect(o.x-w*.52,o.y+h*.30,w*1.04,h*.12);
+    ctx.strokeStyle='#f0d8a955';ctx.lineWidth=2;ctx.strokeRect(o.x-w*.38,o.y-h*.42,w*.76,h*.80);
+  }
   else drawRock(o.x,o.y,o.r/18);
   ctx.strokeStyle='#ffd36b55';ctx.lineWidth=1;ctx.setLineDash([3,5]);ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
   ctx.restore();
@@ -5375,6 +5437,29 @@ function drawMap(){
     ctx.fillStyle='#10182a';for(let i=0;i<9;i++){const x=i*145-30,h=55+(i%3)*25;ctx.beginPath();ctx.moveTo(x,H*.54);ctx.lineTo(x+70,H*.54-h);ctx.lineTo(x+145,H*.54);ctx.closePath();ctx.fill();}
     ctx.strokeStyle='#8fcfff55';ctx.lineWidth=2;for(let i=0;i<7;i++){const x=(i*173+70)%W;ctx.beginPath();ctx.moveTo(x,20);ctx.lineTo(x-18,85);ctx.lineTo(x+3,85);ctx.lineTo(x-12,142);ctx.stroke();}
     const rain=performance.now()/14;ctx.strokeStyle='#a9d9ff2f';ctx.lineWidth=1.2;for(let i=0;i<55;i++){const x=(i*97+rain)%W,y=(i*53+rain*1.6)%H;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-8,y+18);ctx.stroke();}
+  }else if(state.map==='church'){
+    // Festa na Igreja: piso da nave, vitrais, bancos elevados e duas procissões em cruz.
+    ctx.fillStyle=map.ground;ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='#49394c';ctx.lineWidth=1;
+    for(let x=0;x<W;x+=54){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=42){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    const churchGlow=ctx.createRadialGradient(W/2,70,8,W/2,70,220);churchGlow.addColorStop(0,'#ffd78255');churchGlow.addColorStop(.45,'#d27cff25');churchGlow.addColorStop(1,'#d27cff00');ctx.fillStyle=churchGlow;ctx.fillRect(W/2-230,-20,460,300);
+    for(let i=0;i<7;i++){
+      const x=95+i*150,colors=['#69c9ff','#ff6fae','#ffd36b'];
+      ctx.fillStyle='#130e19';ctx.beginPath();ctx.roundRect(x-28,22,56,82,26);ctx.fill();
+      ctx.fillStyle=colors[i%colors.length]+'aa';ctx.beginPath();ctx.roundRect(x-21,29,42,67,20);ctx.fill();
+      ctx.strokeStyle='#f4dca066';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,31);ctx.lineTo(x,94);ctx.moveTo(x-20,62);ctx.lineTo(x+20,62);ctx.stroke();
+    }
+    currentPerches().forEach(p=>{
+      const wood=ctx.createLinearGradient(p.x,p.y,p.x,p.y+p.h);wood.addColorStop(0,'#a56f49');wood.addColorStop(1,'#4a2b28');
+      ctx.fillStyle='#160f17aa';ctx.beginPath();ctx.roundRect(p.x+4,p.y+8,p.w,p.h,7);ctx.fill();
+      ctx.fillStyle=wood;ctx.beginPath();ctx.roundRect(p.x,p.y,p.w,p.h,7);ctx.fill();
+      ctx.fillStyle='#d89a5c';ctx.fillRect(p.x+7,p.y+6,p.w-14,5);
+      ctx.strokeStyle='#ffd78488';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.strokeRect(p.x+3,p.y+3,p.w-6,p.h-6);ctx.setLineDash([]);
+      ctx.fillStyle='#fff0b7';ctx.font='900 13px Segoe UI Emoji,Segoe UI';ctx.textAlign='center';ctx.fillText('🐾',p.x+p.w/2,p.y+p.h/2+5);
+    });
+    ctx.fillStyle='#dcc59b';ctx.fillRect(W/2-65,112,130,12);ctx.fillStyle='#7c5664';ctx.fillRect(W/2-54,124,108,24);
+    ctx.fillStyle='#ffe7a8';ctx.font='900 16px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText('FESTA FELINA',W/2,141);
   }else if(state.map==='blind'){
     // Passagem Cega: neblina espessa o tempo todo — a visão curta das torres é o ponto do mapa.
     ctx.fillStyle=map.ground;ctx.fillRect(0,H*.08,W,H*.92);
@@ -5625,13 +5710,13 @@ canvas.addEventListener('click',e=>{
   const hitHero=heroAt(x,y);
   if(hitHero){
     cancelPlacement(true);state.selectedTower=null;state.selectedHero=true;updateUpgradePanel();const hs=heroStats(hitHero),def=HEROES[hitHero.type];
-    setMsg(`🦸 ${def.name} • Nv.${hitHero.level}/10 • ${def.role}${def.farm?` • +$${hs.farmIncome}/rodada`:` • Dano ${hs.damage} • Range ${hs.range}`} • eliminações ${hitHero.pops||0}. XP e habilidades ficam no painel HERÓI à direita.`);
+    setMsg(`🦸 ${def.name} • Nv.${hitHero.level}/10 • ${def.role}${def.farm?` • +🐟 ${hs.farmIncome}/rodada`:` • Dano ${hs.damage} • Range ${hs.range}`} • eliminações ${hitHero.pops||0}. XP e habilidades ficam no painel HERÓI à direita.`);
     renderHeroHud();return;
   }
   const hit=towerAt(x,y);
   if(hit){
     cancelPlacement(true);state.selectedTower=hit.id;state.selectedHero=false;notifyMatchTutorialAction('towerInspected');renderHeroHud();const st=towerStats(hit);
-    const cadence=st.farm?`+$${st.farmIncome} por rodada`:st.rootHold?`recarga ${st.rate.toFixed(1)}s`:`${(1/st.rate).toFixed(1)} ataques/s`;
+    const cadence=st.farm?`+🐟 ${st.farmIncome} por rodada`:st.rootHold?`recarga ${st.rate.toFixed(1)}s`:`${(1/st.rate).toFixed(1)} ataques/s`;
     setMsg(hit.type==='dart'
       ?`${st.name} selecionado • ${dartPaths(hit).map((v,i)=>`C${i+1}:T${v}`).join(' / ')} • os caminhos estão na aba da direita.`
       :hit.type==='sniper'
@@ -5713,7 +5798,7 @@ $$('[data-speed]').forEach(btn=>btn.onclick=()=>{
 if($('#td-hero-deploy'))$('#td-hero-deploy').onclick=()=>{
   if(state.hero){setMsg(`🦸 ${HEROES[state.hero.type].name} já está em campo. O limite é 1 herói por partida.`);return;}
   if(state.selected==='__hero__'){cancelPlacement();return;}
-  armHeroPlacement();const h=currentHeroDef();setMsg(`📍 ${h.icon} ${h.name} pronto para posicionar por $${heroPrice(profile.selectedHero,state.map)}. Limite: 1 Herói Gatinho por partida.`);
+  armHeroPlacement();const h=currentHeroDef();setMsg(`📍 ${h.icon} ${h.name} pronto para posicionar por 🐟 ${heroPrice(profile.selectedHero,state.map)}. Limite: 1 Herói Gatinho por partida.`);
 };
 if($('#td-hero-skill'))$('#td-hero-skill').onclick=e=>{e.stopPropagation();activateHeroSkill();};
 if($('#td-hero-ultimate'))$('#td-hero-ultimate').onclick=e=>{e.stopPropagation();activateHeroUltimate();};
@@ -5727,14 +5812,17 @@ $$('.td-tower-picker [data-td-tower]').forEach(btn=>btn.onclick=()=>{
   if(state.selected===id){cancelPlacement();return;}
   armPlacement(id);notifyMatchTutorialAction('towerSelected');
   let warning='';
-  if(t.farm)warning=` Farm: +$${t.farmIncome} por rodada concluída e não ataca.`;
+  if(t.farm)warning=` Farm: +🐟 ${t.farmIncome} por rodada concluída e não ataca.`;
   else if(t.globalRange)warning=' Alcance GLOBAL e detecção de CAMUFLADOS.';
   else if(t.fullAoe)warning=' FULL AOE: atinge todos os alvos válidos no alcance.';
   else if(t.breaksArmor)warning=' Quebra BLINDADOS.';
-  setMsg(`📍 ${t.name} pronto para posicionar por $${towerPrice(id,state.map)} (${mapCategoryForMap(state.map).name}).${warning} Clique UMA vez em um local válido do mapa. Depois da colocação, a seleção será cancelada.`);
+  setMsg(`📍 ${t.name} pronto para posicionar por 🐟 ${towerPrice(id,state.map)} (${mapCategoryForMap(state.map).name}).${warning} Clique UMA vez em um local válido do mapa. Depois da colocação, a seleção será cancelada.`);
 });
 
 if($('#play-enter'))$('#play-enter').onclick=()=>{
+  const enterBtn=$('#play-enter');
+  if(enterBtn&&enterBtn.dataset.loading==='1')return;
+  if(enterBtn){enterBtn.dataset.loading='1';enterBtn.disabled=true;enterBtn.textContent='🐾 Preparando mapa...';}
   sfx('ui');
   const mapId=lobbySelection.map,diffId=lobbySelection.difficulty,modeId=lobbySelection.mode;
   runMapLoading(mapId,diffId,()=>{
@@ -5742,6 +5830,10 @@ if($('#play-enter'))$('#play-enter').onclick=()=>{
     setScreen('game');
     const area=$('#game-area');
     if(area)area.scrollTop=0;
+    const gameScreen=$('#screen-game');
+    if(gameScreen)gameScreen.scrollTop=0;
+    if(document.scrollingElement)document.scrollingElement.scrollTop=0;
+    if(enterBtn){delete enterBtn.dataset.loading;enterBtn.disabled=false;}
     maybeStartMatchTutorial();
   },modeId);
 };

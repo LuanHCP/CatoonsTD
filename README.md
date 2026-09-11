@@ -4,7 +4,7 @@
 
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-**Status:** Beta de portfólio · **Build:** v0.27.4  
+**Status:** Beta de portfólio · **Build:** v0.27.5
 **Plataformas:** Navegador moderno · Windows x64 via launcher local  
 **Idioma atual:** Português (Brasil)
 
@@ -20,7 +20,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 
 ## ✨ Destaques do projeto
 
-- **13 mapas** organizados em 4 tiers: 6 Iniciantes, 4 Médios, 2 Difíceis e 1 Impossível.
+- **14 mapas** organizados em 4 tiers: 6 Iniciantes, 4 Médios, 2 Difíceis e 2 Impossíveis. Em **Festa na Igreja**, duas rotas formam uma cruz e os bancos funcionam como posições elevadas.
 - **3 dificuldades por mapa**: Fácil, Normal e Difícil.
 - **14 gatinhos**, incluindo 4 personagens secretos descobertos apenas por conclusão completa de tiers, com o **Gatinho Rei Demônio** reservado ao tier Impossível.
 - **Árvores de upgrade** com caminhos e crosspath limitado em unidades específicas, incluindo o Rei Demônio com Senhor do Medo, Chamas do Abismo e Legião Sombria.
@@ -28,7 +28,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 - **4 Heróis Gatinhos**, com evolução do nível 1 ao 10 dentro de cada partida e habilidades/ultimates próprias.
 - **8 sinergias** que alteram comportamento de combate quando combinações específicas estão em campo.
 - **5 inimigos especiais** com habilidades próprias: Curandeiro, Atrapalhão, Bobo da Corte, Anjo e Demônio.
-- **Economia e progressão persistente** com moedas, XP, estrelas, poderes consumíveis e saves locais.
+- **Economia da partida em salmões** e progressão persistente com moedas, XP, estrelas, poderes consumíveis e saves locais.
 - **Campanha e modo Infinito**.
 - **Venda por 50% do investimento**, reposicionamento e estatísticas por torre.
 - **Tutorial guiado**, configurações, exportação/importação de save e painel de playtest por `F8`.
