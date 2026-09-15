@@ -1,39 +1,55 @@
-CATOONS TD v0.27.5 — FESTA NA IGREJA + TELA RESPONSIVA
+CATOONS TD v0.28.3 — BALANCE HOTFIX + CELESTIAL + GIRO DIÁRIO + PIX
 
 Esta edição não contém executáveis, launchers, arquivos .bat ou instaladores.
 Ela possui somente HTML, CSS, JavaScript e este arquivo de instruções.
 
 COMO ABRIR
-1. Extraia/baixe os arquivos do projeto.
-2. Abra o arquivo index.html com Google Chrome ou Microsoft Edge, ou use o GitHub Pages.
+1. Extraia o ZIP para uma pasta.
+2. Abra o arquivo index.html com Google Chrome ou Microsoft Edge.
 
 NOVIDADES DESTA VERSÃO
-- Novo mapa Impossível Festa na Igreja, com duas rotas em cruz.
-- Bancos aceitam gatinhos e dão visão elevada por cima dos pilares.
-- O mapa se encaixa automaticamente no espaço disponível da tela.
-- Melhor uso em notebooks e com escala/zoom do Windows em 125% ou 150%.
-- Botão de entrada do mapa com estado de carregamento e ajuste automático da tela.
-- A economia da fase agora aparece como salmões (🐟) no topo do campo.
-- Preserva todas as novidades da v0.27.4 listadas abaixo.
-- Mantém a skin gratuita Gata Maga Élfica do Gato Mago.
-- Ajusta o visual da Gata Maga Élfica para mostrar melhor o rostinho do gato de frente.
-- Adiciona um mini baú mimico decorativo na skin élfica.
-- Reforça bastante o Gatinho Rei Demônio para o papel de unidade secreta de fim de jogo.
-- O Rei Demônio agora possui árvore própria de 3 caminhos: Senhor do Medo, Chamas do Abismo e Legião Sombria.
-- Regra dos caminhos: até 2 caminhos ativos; um pode ir ao T5 e o secundário vai até T3.
-- Buff base do Rei Demônio: mais dano, alcance, splash, medo e sombras.
-- Senhor do Medo aumenta raio, frequência, duração, recuo e vulnerabilidade do Medo.
-- Chamas do Abismo aumenta muito dano direto, splash e queimadura.
-- Legião Sombria aumenta limite, força e quantidade de sombras invocadas.
-- Visual do Rei Demônio refinado com coroa, chifres, capa e aura mais legíveis.
-
-DESBLOQUEIO DO REI DEMÔNIO
-- Concluir Passagem Cega e Festa na Igreja no Fácil, Normal e Difícil. Quem já havia desbloqueado o Rei Demônio mantém o desbloqueio.
+- Preserva a skin gratuita Gata Maga Élfica do Gato Mago.
+- Adiciona o Gatinho Rei Demônio como secreto do tier Impossível.
+- Desbloqueio: concluir Passagem Cega no Fácil, Normal e Difícil.
 - Limite de 1 Rei Demônio por partida.
+- Ataque Fogo Sombrio em área com queimadura.
+- Aura Medo recua inimigos e aumenta o dano recebido temporariamente.
+- Inimigos que morrem sob Medo geram Balões Sombrios aliados no final da pista; eles percorrem a rota ao contrário e atacam inimigos.
+- Chefões sofrem recuo reduzido e podem gerar até 3 sombras.
+- Skin original Rei Demônio da Academia: uniforme preto/carmesim, olhos vermelhos, detalhes dourados e magia violeta.
 
 SKIN ÉLFICA
 Na loja, desça até Skins. Adquira a Gata Maga Élfica por 0 moedas e clique em Equipar.
-A skin modifica somente a aparência do Gato Mago.
+A skin modifica somente a aparência do Gato Mago. Dano, alcance e caminhos de melhoria permanecem iguais.
 
 OBSERVAÇÃO
-O JavaScript é validado sintaticamente pela rotina de CI. Ainda é recomendado testar partidas longas, especialmente no modo Infinito, para sentir o novo balanceamento e verificar o desempenho com muitas sombras.
+O Rei Demônio é um primeiro playtest de balanceamento. A mecânica foi implementada e o JavaScript foi validado sintaticamente, mas ainda vale testar partidas longas no modo Infinito para conferir FPS com muitas sombras.
+
+
+
+NOVO v0.28.3 — BALANCE HOTFIX
+- Dinheiro inicial fixo em $350 em Fácil, Normal e Difícil.
+- Recompensas das rodadas 1–5 reduzidas em 20% no Normal e Difícil.
+- Boss final mantém 75x de resistência e passa a andar a 55% da velocidade-base de boss em todos os mapas.
+- A rodada 15 não cria Mini Boss quando ela já é a rodada final.
+- Celestial / Purificação T4 precisa de 3 acertos no mesmo blindado para remover a blindagem.
+- Celestial / Purificação T5 normaliza no máximo 1 Camo/Blindado a cada 1,5s.
+- Roleta Celestial mantém 1,5%, mas garante o Gato Celestial no 50º giro sem sucesso.
+
+NOVO v0.28.2 — GIRO DIÁRIO
+- A Roleta Celestial agora libera 1 giro gratuito a cada 24 horas.
+- O tempo começa a contar no momento em que o giro gratuito é utilizado.
+- Enquanto o giro diário está em recarga, giros extras continuam custando 150 moedas permanentes.
+- A loja mostra um contador com o tempo restante para o próximo giro gratuito.
+- Saves antigos recebem um giro gratuito ao migrar para esta versão.
+
+NOVO v0.28.0 — CELESTIAL + BALANCE
+- Toda partida começa com $350.
+- Preço de todos os gatinhos +10%.
+- Preço de todos os upgrades +10%.
+- Gatinhos secretos continuam totalmente escondidos na barra direita até o desbloqueio.
+- Rodada 15 no Normal/Difícil recebe Mini Boss com 30x a resistência do inimigo mais forte até ali.
+- Boss final: 30% mais lento e 50% mais vida do que antes (75x a referência regular).
+- Nova Roleta Celestial: 1,5% Gato Celestial, 30% moedas, 68,5% XP de Maestria direcionável. O primeiro giro é grátis; os seguintes custam 150 moedas permanentes.
+- Gato Celestial: 1 drone base e +1 drone a cada 2 upgrades por caminho; caminhos de dano/velocidade, range/AOE e purificação Camo/Blindagem.
+- Configurações: botão 'Apoie o criador' abre uma tela separada e sem recompensa de gameplay. O QR Pix real aguarda a imagem do QR ou os dados Pix do criador; esta build já inclui um QR Pix configurado no botão Apoie o criador.

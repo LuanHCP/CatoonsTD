@@ -4,7 +4,7 @@
 
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-**Status:** Beta de portfólio · **Build:** v0.27.5
+**Status:** Beta de portfólio · **Build:** v0.28.3
 **Plataformas:** Navegador moderno · Windows x64 via launcher local  
 **Idioma atual:** Português (Brasil)
 
@@ -22,13 +22,15 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 
 - **14 mapas** organizados em 4 tiers: 6 Iniciantes, 4 Médios, 2 Difíceis e 2 Impossíveis. Em **Festa na Igreja**, duas rotas formam uma cruz e os bancos funcionam como posições elevadas.
 - **3 dificuldades por mapa**: Fácil, Normal e Difícil.
-- **14 gatinhos**, incluindo 4 personagens secretos descobertos apenas por conclusão completa de tiers, com o **Gatinho Rei Demônio** reservado ao tier Impossível.
+- **15 gatinhos**, incluindo personagens secretos, o **Gatinho Rei Demônio** do tier Impossível e o exclusivo **Gato Celestial**.
+- **Roleta Celestial** com um giro gratuito a cada 24 horas, recompensas de moedas/XP e garantia do Gato Celestial no 50º giro sem sucesso.
 - **Árvores de upgrade** com caminhos e crosspath limitado em unidades específicas, incluindo o Rei Demônio com Senhor do Medo, Chamas do Abismo e Legião Sombria.
 - **Maestria até o nível 50**, com bônus permanentes, skin dourada e habilidade exclusiva no nível máximo.
 - **4 Heróis Gatinhos**, com evolução do nível 1 ao 10 dentro de cada partida e habilidades/ultimates próprias.
 - **8 sinergias** que alteram comportamento de combate quando combinações específicas estão em campo.
 - **5 inimigos especiais** com habilidades próprias: Curandeiro, Atrapalhão, Bobo da Corte, Anjo e Demônio.
 - **Economia da partida em salmões** e progressão persistente com moedas, XP, estrelas, poderes consumíveis e saves locais.
+- **Apoie o criador** com QR Code e código Pix, sem conceder vantagens dentro do jogo.
 - **Campanha e modo Infinito**.
 - **Venda por 50% do investimento**, reposicionamento e estatísticas por torre.
 - **Tutorial guiado**, configurações, exportação/importação de save e painel de playtest por `F8`.
@@ -111,7 +113,7 @@ CatoonsTD/
 
 O repositório inclui uma workflow de CI em `.github/workflows/ci.yml` que valida a sintaxe do JavaScript e faz cross-build do launcher Windows a cada push/PR nas branches principais.
 
-A build v0.27.x entrou em uma fase específica de **playtest e balanceamento**. O jogo possui um painel de diagnóstico acionado por `F8`, mostrando FPS, inimigos, projéteis, efeitos, torres, economia, HP de bosses, herói e sinergias ativas.
+A build v0.28.3 está em fase de **playtest e balanceamento**. O hotfix padroniza o início em 350 salmões, reduz as recompensas iniciais no Normal/Difícil, ajusta o boss final e limita a frequência da Purificação Celestial. O jogo possui um painel de diagnóstico acionado por `F8`, mostrando FPS, inimigos, projéteis, efeitos, torres, economia, HP de bosses, herói e sinergias ativas.
 
 O checklist recomendado para o beta está em [`docs/BETA_TESTING.md`](docs/BETA_TESTING.md).
 

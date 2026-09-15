@@ -4,7 +4,7 @@
 
 > **Web/desktop Tower Defense built with HTML, CSS and JavaScript, using AI as an engineering copilot.**
 
-**Status:** Portfolio Beta · **Build:** v0.27.5
+**Status:** Portfolio Beta · **Build:** v0.28.3
 **Platforms:** Modern web browsers · Windows x64 through a lightweight Go launcher
 
 Catoons TD is a personal software engineering project focused on **progression, team composition, combat readability and iterative product development**. It evolved from a small prototype into a game with map tiers, difficulty levels, upgrade paths, heroes, mastery, hidden units, synergies, special enemies, powers and an infinite mode.
@@ -13,7 +13,8 @@ Catoons TD is a personal software engineering project focused on **progression, 
 
 - 14 maps across 4 progression tiers, including the cross-shaped two-route **Church Party** Impossible map with elevated bench positions;
 - 3 difficulty levels per map;
-- 14 cat units, including 4 completely hidden unlocks, with the **Demon King Cat** tied to the Impossible tier;
+- 15 cat units, including hidden unlocks, the **Demon King Cat** and the exclusive drone-based **Celestial Cat**;
+- Celestial Wheel with one free spin every 24 hours, coin/XP rewards and a guaranteed Celestial Cat by the 50th unsuccessful spin;
 - multi-path upgrade systems and limited crosspathing;
 - Mastery progression up to level 50 with permanent bonuses, a golden skin and a unique active ability;
 - 4 heroes that level from 1 to 10 during each match;
@@ -21,6 +22,7 @@ Catoons TD is a personal software engineering project focused on **progression, 
 - 5 special enemies with non-trivial mechanics;
 - Campaign and Infinite modes;
 - persistent local progression, save export/import and backward save migration;
+- optional creator support through Pix, with no gameplay rewards;
 - guided tutorial, responsive HUD and a developer playtest panel (`F8`);
 - Go-based Windows launcher that opens the local web build in Edge/Chrome app mode.
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.28.3 — Celestial + giro diário + balance hotfix
+
+- novo Gato Celestial exclusivo, com drones e três caminhos de melhoria;
+- Roleta Celestial com moedas, XP direcionável e 1,5% de chance do gatinho exclusivo;
+- um giro gratuito a cada 24 horas e garantia do Gato Celestial no 50º giro sem sucesso;
+- Purificação T4 exige 3 acertos no mesmo blindado e a T5 normaliza no máximo um alvo especial a cada 1,5 segundo;
+- dinheiro inicial fixado em 350 salmões e recompensas das rodadas 1–5 reduzidas no Normal/Difícil;
+- boss final mais lento e rodada 15 sem Mini Boss duplicado quando já for a rodada final;
+- tela “Apoie o criador” com QR Code/código Pix e sem recompensa de gameplay;
+- preservados o mapa Festa na Igreja, bancos elevados, encaixe responsivo e suporte a zoom do Windows da v0.27.5.
+
 ## v0.27.5 — Festa na Igreja + tela responsiva
 
 - novo mapa Impossível “Festa na Igreja”, com duas procissões em rotas que formam uma cruz;
