@@ -313,6 +313,10 @@ body.in-game .game-panel{width:min(1280px,100%);margin:0 auto}
 .settings-save-io button{flex:1 1 140px}
 #menu-save-io-status{color:#8fe7a8}
 #menu-save-io-status.io-error{color:#ff8f97}
+.beta-notice{display:grid;gap:7px;padding:10px;border:1px solid #416378;border-radius:11px;background:#0c1a24;color:#d7ebf3}
+.beta-notice b{font-size:11px;color:#91e4fa}
+.beta-notice p{margin:0;font-size:10px;line-height:1.45;color:#a9bdc6}
+.beta-feedback-button{display:flex;align-items:center;justify-content:center;text-decoration:none;padding:9px 10px;border:1px solid #496b7e;border-radius:9px;font-size:10px;font-weight:900;color:#e9f8ff;background:#132632}
 .result-summary{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}.result-summary span{border:1px solid var(--border);border-radius:999px;background:#0a151e;padding:7px 10px;font-size:12px}
 .result-card #result-next[hidden]{display:none}.result-card.victory{border-color:#876d2c}.result-card.defeat{border-color:#713646}
 
@@ -434,7 +438,9 @@ body.in-game .td-stats span{padding:6px 9px;font-size:11px}
 .td-tower-picker button.maxed small{color:#ffcf8a}
 
 .td-side-controls{margin-top:auto;display:grid;gap:6px;padding-top:7px;border-top:1px solid #293d4b}
-.td-wave-button{min-height:58px;padding:6px!important;border-radius:12px!important;display:grid;place-items:center;align-content:center;gap:1px}
+.td-wave-button{position:relative;width:100%;min-height:58px;padding:6px!important;border-radius:12px!important;display:grid;place-items:center;align-content:center;gap:1px;cursor:pointer;touch-action:manipulation;isolation:isolate}
+.td-wave-button>*{pointer-events:none}
+.td-wave-button::after{content:"";position:absolute;inset:-3px;pointer-events:none}
 .td-wave-button .wave-play-icon{font-size:20px;line-height:1}
 .td-wave-button small{font-size:9px;font-weight:900;line-height:1.15;text-align:center}
 .td-side-controls .speed-controls{display:grid!important;grid-template-columns:repeat(3,1fr);gap:3px;padding:4px;border-radius:10px;width:100%}
@@ -797,7 +803,7 @@ body[data-screen="play"] .difficulty-strip{position:sticky;bottom:0;z-index:18;b
   body.in-game .td-tower-picker button{height:91px!important}
   body.in-game .td-hero-slot{flex:0 0 150px;height:91px;overflow:auto}
   body.in-game .td-side-controls{width:96px;margin:0;padding:0 0 0 5px;border-top:0;border-left:1px solid #293d4b;gap:2px}
-  body.in-game .td-wave-button{min-height:32px;height:32px;padding:2px!important}
+  body.in-game .td-wave-button{min-height:44px;height:44px;padding:3px!important}
   body.in-game .td-dock-upgrade{bottom:112px}
   body[data-screen="play"] .map-selection-grid{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(210px,78vw);grid-template-columns:none;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
   body[data-screen="play"] .mode-strip,body[data-screen="play"] .difficulty-strip{grid-template-columns:1fr}

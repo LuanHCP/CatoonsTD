@@ -4,7 +4,7 @@
 
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-**Status:** Beta de portfólio · **Build:** v0.28.3
+**Status:** Beta público · **Build:** v0.28.4
 **Plataformas:** Navegador moderno · Windows x64 via launcher local  
 **Idioma atual:** Português (Brasil)
 
@@ -130,7 +130,9 @@ Veja o passo a passo completo em [`docs/DEPLOY_GITHUB.md`](docs/DEPLOY_GITHUB.md
 
 ## 🐞 Feedback do beta
 
-Encontrou um problema? Use **Issues** e escolha o template **Bug report**. O template pede mapa, dificuldade, wave, herói, resolução e informações do painel F8 para facilitar a reprodução.
+Encontrou um problema? Abra **Configurações → Enviar feedback ou relatar bug**, ou use **Issues** e escolha o template **Bug report**. O template pede mapa, dificuldade, rodada, herói, resolução e informações do painel F8 para facilitar a reprodução.
+
+> O save desta versão fica somente no navegador. Exporte uma cópia regularmente em **Configurações → Exportar save**, especialmente antes de limpar os dados do navegador ou trocar de computador.
 
 ## 🗺️ Próximos passos antes do 1.0
 

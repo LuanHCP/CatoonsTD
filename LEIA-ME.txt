@@ -1,4 +1,4 @@
-CATOONS TD v0.28.3 — BALANCE HOTFIX + CELESTIAL + GIRO DIÁRIO + PIX
+CATOONS TD v0.28.4 — BETA HOTFIX + CELESTIAL + GIRO DIÁRIO + PIX
 
 Esta edição não contém executáveis, launchers, arquivos .bat ou instaladores.
 Ela possui somente HTML, CSS, JavaScript e este arquivo de instruções.
@@ -25,10 +25,15 @@ A skin modifica somente a aparência do Gato Mago. Dano, alcance e caminhos de m
 OBSERVAÇÃO
 O Rei Demônio é um primeiro playtest de balanceamento. A mecânica foi implementada e o JavaScript foi validado sintaticamente, mas ainda vale testar partidas longas no modo Infinito para conferir FPS com muitas sombras.
 
+NOVO v0.28.4 — BETA HOTFIX
+- Corrige a área clicável do botão de iniciar rodada, inclusive em notebooks e escala do Windows em 125%/150%.
+- Padroniza preços, recompensas, upgrades e mensagens da partida como salmões (🐟).
+- Adiciona aviso de save local e acesso direto ao formulário de feedback nas Configurações.
+- Atualiza o checklist público de testes do beta.
 
 
 NOVO v0.28.3 — BALANCE HOTFIX
-- Dinheiro inicial fixo em $350 em Fácil, Normal e Difícil.
+- Salmões iniciais fixos em 🐟 350 no Fácil, Normal e Difícil.
 - Recompensas das rodadas 1–5 reduzidas em 20% no Normal e Difícil.
 - Boss final mantém 75x de resistência e passa a andar a 55% da velocidade-base de boss em todos os mapas.
 - A rodada 15 não cria Mini Boss quando ela já é a rodada final.
@@ -44,7 +49,7 @@ NOVO v0.28.2 — GIRO DIÁRIO
 - Saves antigos recebem um giro gratuito ao migrar para esta versão.
 
 NOVO v0.28.0 — CELESTIAL + BALANCE
-- Toda partida começa com $350.
+- Toda partida começa com 🐟 350 salmões.
 - Preço de todos os gatinhos +10%.
 - Preço de todos os upgrades +10%.
 - Gatinhos secretos continuam totalmente escondidos na barra direita até o desbloqueio.

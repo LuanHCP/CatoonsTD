@@ -11,7 +11,7 @@
   <main class="game-shell">
     <header class="hero">
       <div>
-        <span class="eyebrow">NAVEGADOR • v0.28.3 BALANCE HOTFIX</span>
+        <span class="eyebrow">NAVEGADOR • v0.28.4 BETA HOTFIX</span>
         <h1>Catoons TD</h1>
         <p>Escolha um lobby, evolua sua conta e monte sua defesa felina.</p>
       </div>
@@ -250,18 +250,18 @@
               <div id="td-tower-actions" class="td-tower-actions" hidden>
                 <button type="button" id="td-mastery-ability" class="mastery-ability-button" hidden>⭐ Habilidade</button>
                 <button type="button" id="td-reposition" class="ghost">↔ Reposicionar</button>
-                <button type="button" id="td-sell" class="danger-button">💰 Vender</button>
+                <button type="button" id="td-sell" class="danger-button">🐟 Vender</button>
               </div>
             </section>
 
             <div class="td-side-controls">
-              <button id="td-start" class="primary td-wave-button" title="Chamar próxima rodada"><span class="wave-play-icon">▶</span><small>Rodada 1</small></button>
+              <button type="button" id="td-start" class="primary td-wave-button" title="Chamar próxima rodada"><span class="wave-play-icon">▶</span><small>Rodada 1</small></button>
               <div class="speed-controls" aria-label="Velocidade do jogo">
                 <button type="button" class="active" data-speed="1">1×</button>
                 <button type="button" data-speed="2">2×</button>
                 <button type="button" data-speed="3">3×</button>
               </div>
-              <button id="td-pause" class="ghost td-pause-button" title="Pausar ou continuar">⏸</button>
+              <button type="button" id="td-pause" class="ghost td-pause-button" title="Pausar ou continuar">⏸</button>
             </div>
           </aside>
         </div>
@@ -421,6 +421,11 @@
           <button type="button" id="menu-import-save" class="ghost" title="Carrega um arquivo .json de save exportado antes">⬆️ Importar save</button>
           <input type="file" id="menu-import-save-input" accept="application/json,.json" hidden>
         </div>
+        <section class="beta-notice" aria-label="Informações do beta">
+          <b>🧪 Beta v0.28.4</b>
+          <p>O progresso fica salvo somente neste navegador. Exporte seu save regularmente para não perder a evolução ao limpar os dados do navegador ou trocar de computador.</p>
+          <a class="ghost beta-feedback-button" href="https://github.com/LuanHCP/CatoonsTD/issues/new?template=bug_report.md&amp;title=%5BBETA%20v0.28.4%5D%20" target="_blank" rel="noopener noreferrer">🐞 Enviar feedback ou relatar bug</a>
+        </section>
         <small id="menu-save-io-status" class="modal-hint" hidden></small>
       </div>
       <details class="enemy-guide">
@@ -436,7 +441,7 @@
       <details class="enemy-guide credits-details">
         <summary>🎬 Créditos</summary>
         <div class="credits-body">
-          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.28.3</span></p>
+          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.28.4</span></p>
           <p>Criado por <b>Luan</b>.</p>
           <p>Trilha sonora, efeitos sonoros e toda a arte das torres, heróis e mapas são originais, feitos direto no jogo.</p>
           <p class="credits-thanks">Obrigado por jogar! 🐾</p>

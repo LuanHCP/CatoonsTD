@@ -21,7 +21,7 @@ Descreva o problema de forma objetiva.
 
 ## Contexto da partida
 
-- Versão: v0.27.1
+- Versão: v0.28.4
 - Mapa:
 - Tier:
 - Dificuldade:

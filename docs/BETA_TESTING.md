@@ -1,6 +1,6 @@
 # Checklist de Beta / Playtest
 
-## Objetivo
+## Objetivo — v0.28.4
 
 Validar se os sistemas atuais funcionam juntos antes de adicionar novas mecânicas grandes.
 
@@ -47,7 +47,7 @@ Validar se os sistemas atuais funcionam juntos antes de adicionar novas mecânic
 
 - [ ] Curandeiro: cura 1 camada por segundo em raio pequeno.
 - [ ] Atrapalhão: remove camada do aliado e stuna torres próximas.
-- [ ] Bobo da Corte: perda por acerto nunca ultrapassa $500.
+- [ ] Bobo da Corte: perda por acerto nunca ultrapassa 🐟 500 salmões.
 - [ ] Anjo: escudo bloqueia um ataque e reduz velocidade do protegido.
 - [ ] Demônio: rouba camadas e aumenta HP máximo dentro do limite.
 
@@ -87,10 +87,33 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 - [ ] Confirmar restauração correta.
 - [ ] Testar migração de um save antigo, quando disponível.
 
+## 10. Interface e botões
+
+- [ ] Clicar nas bordas, no ícone e no texto do botão de iniciar rodada.
+- [ ] Confirmar o botão de rodada em 100%, 125% e 150% de escala do Windows.
+- [ ] Confirmar que Play abre a fase e reposiciona a tela corretamente.
+- [ ] Testar todos os botões do menu, pausa, velocidade, upgrades e configurações.
+- [ ] Confirmar que preços e recompensas da partida usam salmões (🐟), não `$` ou “ouro”.
+
+## 11. Conteúdo v0.28.x
+
+- [ ] Jogar Festa na Igreja e colocar gatinhos sobre todos os bancos elevados.
+- [ ] Confirmar desbloqueio e limite de 1 Rei Demônio por partida.
+- [ ] Testar os três caminhos do Gato Celestial até T5.
+- [ ] Confirmar o giro gratuito, a recarga de 24 horas e a garantia no 50º giro.
+- [ ] Confirmar que o Pix abre, copia o código e não concede recompensa de gameplay.
+- [ ] Abrir o formulário de feedback pelas Configurações.
+
+## 12. Limitações conhecidas do beta
+
+- O progresso é local ao navegador; exportar o save é recomendado.
+- A recarga diária usa o relógio do dispositivo durante este beta.
+- Login Google e sincronização em nuvem ainda não fazem parte desta versão.
+
 ## Modelo para reportar bug
 
 ```text
-Versão: v0.27.1
+Versão: v0.28.4
 Mapa:
 Tier:
 Dificuldade:

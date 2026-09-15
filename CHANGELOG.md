@@ -1,12 +1,20 @@
 # Changelog
 
+## v0.28.4 — correções para o beta
+
+- área clicável do botão de iniciar rodada estabilizada e ampliada para notebook/telas compactas;
+- conteúdo interno do botão não é mais recriado continuamente durante o clique;
+- economia da partida padronizada visualmente como salmões (🐟) em preços, upgrades, dicas e mensagens;
+- aviso de save local e botão de feedback adicionados às Configurações;
+- checklist e formulário de bugs atualizados para a versão atual.
+
 ## v0.28.3 — Celestial + giro diário + balance hotfix
 
 - novo Gato Celestial exclusivo, com drones e três caminhos de melhoria;
 - Roleta Celestial com moedas, XP direcionável e 1,5% de chance do gatinho exclusivo;
 - um giro gratuito a cada 24 horas e garantia do Gato Celestial no 50º giro sem sucesso;
 - Purificação T4 exige 3 acertos no mesmo blindado e a T5 normaliza no máximo um alvo especial a cada 1,5 segundo;
-- dinheiro inicial fixado em 350 salmões e recompensas das rodadas 1–5 reduzidas no Normal/Difícil;
+- saldo inicial fixado em 350 salmões e recompensas das rodadas 1–5 reduzidas no Normal/Difícil;
 - boss final mais lento e rodada 15 sem Mini Boss duplicado quando já for a rodada final;
 - tela “Apoie o criador” com QR Code/código Pix e sem recompensa de gameplay;
 - preservados o mapa Festa na Igreja, bancos elevados, encaixe responsivo e suporte a zoom do Windows da v0.27.5.
@@ -53,7 +61,7 @@ Este arquivo resume os principais marcos do Catoons TD. Nem todo hotfix intermed
 ## v0.25.0 — Inimigos Especiais
 - Curandeiro;
 - Atrapalhão;
-- Bobo da Corte com perda limitada a $500 por acerto;
+- Bobo da Corte com perda limitada a 🐟 500 salmões por acerto;
 - Anjo;
 - Demônio.
 

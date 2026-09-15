@@ -4,7 +4,7 @@
 
 > **Web/desktop Tower Defense built with HTML, CSS and JavaScript, using AI as an engineering copilot.**
 
-**Status:** Portfolio Beta · **Build:** v0.28.3
+**Status:** Public Beta · **Build:** v0.28.4
 **Platforms:** Modern web browsers · Windows x64 through a lightweight Go launcher
 
 Catoons TD is a personal software engineering project focused on **progression, team composition, combat readability and iterative product development**. It evolved from a small prototype into a game with map tiers, difficulty levels, upgrade paths, heroes, mastery, hidden units, synergies, special enemies, powers and an infinite mode.
