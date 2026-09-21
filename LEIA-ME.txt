@@ -1,4 +1,4 @@
-CATOONS TD v0.28.4 — BETA HOTFIX + CELESTIAL + GIRO DIÁRIO + PIX
+CATOONS TD v0.28.5 — BETA HOTFIX + CELESTIAL + GIRO DIÁRIO + PIX
 
 Esta edição não contém executáveis, launchers, arquivos .bat ou instaladores.
 Ela possui somente HTML, CSS, JavaScript e este arquivo de instruções.
@@ -24,6 +24,10 @@ A skin modifica somente a aparência do Gato Mago. Dano, alcance e caminhos de m
 
 OBSERVAÇÃO
 O Rei Demônio é um primeiro playtest de balanceamento. A mecânica foi implementada e o JavaScript foi validado sintaticamente, mas ainda vale testar partidas longas no modo Infinito para conferir FPS com muitas sombras.
+
+NOVO v0.28.5 — PAINEL DE UPGRADES
+- A tela de upgrades agora fica sempre acima do mapa e da interface normal da partida.
+- Corrigido o recorte do painel em notebooks e telas estreitas.
 
 NOVO v0.28.4 — BETA HOTFIX
 - Corrige a área clicável do botão de iniciar rodada, inclusive em notebooks e escala do Windows em 125%/150%.

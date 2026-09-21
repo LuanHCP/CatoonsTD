@@ -1,6 +1,6 @@
 # Checklist de Beta / Playtest
 
-## Objetivo — v0.28.4
+## Objetivo — v0.28.5
 
 Validar se os sistemas atuais funcionam juntos antes de adicionar novas mecânicas grandes.
 
@@ -113,7 +113,7 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 ## Modelo para reportar bug
 
 ```text
-Versão: v0.28.4
+Versão: v0.28.5
 Mapa:
 Tier:
 Dificuldade:

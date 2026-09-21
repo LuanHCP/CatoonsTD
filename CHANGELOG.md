@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.28.5 — painel de upgrades acima da partida
+
+- Corrigida a camada visual do painel de upgrades para ele sempre aparecer acima do mapa e da interface normal da partida.
+- Removido o recorte causado pelo `overflow` da barra lateral responsiva.
+- Mantido o comportamento adaptado para notebook e telas estreitas.
+
 ## v0.28.4 — correções para o beta
 
 - área clicável do botão de iniciar rodada estabilizada e ampliada para notebook/telas compactas;

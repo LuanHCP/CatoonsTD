@@ -810,3 +810,15 @@ body[data-screen="play"] .difficulty-strip{position:sticky;bottom:0;z-index:18;b
   body[data-screen="play"] .difficulty-strip{position:static;box-shadow:none}
   .match-tutorial-card{bottom:116px;width:calc(100vw - 16px);max-width:none;padding:8px 10px;gap:5px}
 }
+
+/* v0.28.5 — mantém os upgrades acima do mapa. A adaptação responsiva
+   aplicava overflow:hidden no dock e podia recortar o painel. */
+body.in-game .td-game-layout{isolation:isolate}
+body.in-game .td-field-column{position:relative;z-index:1}
+body.in-game .td-side-dock{position:relative;z-index:40;overflow:visible}
+body.in-game .td-dock-upgrade{z-index:120}
+
+@media (max-width:720px){
+  body.in-game .td-side-dock{position:static}
+  body.in-game .td-dock-upgrade{z-index:120}
+}

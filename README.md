@@ -4,7 +4,7 @@
 
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-**Status:** Beta público · **Build:** v0.28.4
+**Status:** Beta público · **Build:** v0.28.5
 **Plataformas:** Navegador moderno · Windows x64 via launcher local  
 **Idioma atual:** Português (Brasil)
 
