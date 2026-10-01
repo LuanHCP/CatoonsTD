@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.29.0 — inglês + troca de idioma
+
+- Jogo completo em **inglês e português**: menus, gatinhos, caminhos de upgrade, heróis, sinergias, poderes, mapas, inimigos, tutorial guiado, mensagens da partida e textos desenhados no mapa.
+- Idioma inicial automático pelo navegador (português para `pt-*`, inglês para o resto), com troca manual pelo botão 🌐 do lobby ou em Configurações → 🌐 Idioma. A escolha fica salva neste navegador.
+- Durante uma partida o seletor fica bloqueado (trocar recarrega a página); a troca é feita pelo lobby.
+- Botão "⚙️ Som" do lobby renomeado para "⚙️ Configurações".
+- QR Code e código Pix do "Apoie o criador" trocados para chave aleatória (o CPF não aparece mais no jogo nem no repositório).
+
 ## v0.28.5 — painel de upgrades acima da partida
 
 - Corrigida a camada visual do painel de upgrades para ele sempre aparecer acima do mapa e da interface normal da partida.

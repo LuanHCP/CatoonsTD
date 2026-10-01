@@ -126,3 +126,13 @@ src/
 ```
 
 A prioridade antes do beta público é **estabilidade**, então essa refatoração deve ser gradual e coberta por playtests para evitar regressões.
+
+## Idiomas (i18n)
+
+Desde a v0.29.0 o jogo roda em português e inglês.
+
+- Os textos continuam escritos em português no código. Textos visíveis ficam dentro de `$t('...')` (strings simples) ou `` $T`...` `` (template strings).
+- No topo de `src/game.js`, o objeto `I18N_EN` mapeia cada trecho em português para o inglês. Trechos de HTML são traduzidos pedaço por pedaço (o texto entre as tags e os atributos `title`, `aria-label`, `alt` e `placeholder`).
+- O HTML estático de `index.html` é traduzido uma vez ao carregar, pelo mesmo dicionário.
+- Idioma: escolha salva em `localStorage` (`catoonsTD_lang`) → idioma do navegador → inglês. Trocar de idioma recarrega a página.
+- Ao criar um texto novo: escreva em português dentro de `$t`/`$T` e acrescente a tradução em `I18N_EN`. Sem a entrada, o texto aparece em português também no modo inglês.

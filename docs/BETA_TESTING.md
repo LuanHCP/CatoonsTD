@@ -1,6 +1,6 @@
 # Checklist de Beta / Playtest
 
-## Objetivo — v0.28.5
+## Objetivo — v0.29.0
 
 Validar se os sistemas atuais funcionam juntos antes de adicionar novas mecânicas grandes.
 
@@ -104,7 +104,14 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 - [ ] Confirmar que o Pix abre, copia o código e não concede recompensa de gameplay.
 - [ ] Abrir o formulário de feedback pelas Configurações.
 
-## 12. Limitações conhecidas do beta
+## 12. Idiomas (v0.29.0)
+
+- [ ] Abrir com save limpo num navegador em inglês e confirmar que o jogo inicia em inglês.
+- [ ] Trocar o idioma pelo botão 🌐 do lobby e pelo seletor em Configurações.
+- [ ] Jogar uma partida inteira em inglês procurando textos que ficaram em português.
+- [ ] Confirmar que o seletor de idioma fica bloqueado no menu de pausa durante a partida.
+
+## 13. Limitações conhecidas do beta
 
 - O progresso é local ao navegador; exportar o save é recomendado.
 - A recarga diária usa o relógio do dispositivo durante este beta.
@@ -113,7 +120,8 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 ## Modelo para reportar bug
 
 ```text
-Versão: v0.28.5
+Versão: v0.29.0
+Idioma:
 Mapa:
 Tier:
 Dificuldade:

@@ -4,9 +4,9 @@
 
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-**Status:** Beta público · **Build:** v0.28.5
+**Status:** Beta público · **Build:** v0.29.0
 **Plataformas:** Navegador moderno · Windows x64 via launcher local  
-**Idioma atual:** Português (Brasil)
+**Idiomas:** Português (Brasil) e English — detectado pelo navegador, com troca manual no jogo
 
 Catoons TD é um Tower Defense focado em **progressão, composição de equipes e leitura de combate**. O projeto começou como um protótipo simples e evoluiu para um jogo com mapas por tiers, dificuldades, caminhos de upgrade, heróis, maestria, unidades secretas, sinergias, inimigos especiais, poderes e modo infinito.
 
@@ -33,6 +33,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 - **Apoie o criador** com QR Code e código Pix, sem conceder vantagens dentro do jogo.
 - **Campanha e modo Infinito**.
 - **Venda por 50% do investimento**, reposicionamento e estatísticas por torre.
+- **Português e inglês**, com troca de idioma no lobby/Configurações.
 - **Tutorial guiado**, configurações, exportação/importação de save e painel de playtest por `F8`.
 - **Launcher Windows em Go**, sem embutir ou extrair o jogo: ele apenas abre a build local em modo app no Edge/Chrome.
 
@@ -113,7 +114,7 @@ CatoonsTD/
 
 O repositório inclui uma workflow de CI em `.github/workflows/ci.yml` que valida a sintaxe do JavaScript e faz cross-build do launcher Windows a cada push/PR nas branches principais.
 
-A build v0.28.3 está em fase de **playtest e balanceamento**. O hotfix padroniza o início em 350 salmões, reduz as recompensas iniciais no Normal/Difícil, ajusta o boss final e limita a frequência da Purificação Celestial. O jogo possui um painel de diagnóstico acionado por `F8`, mostrando FPS, inimigos, projéteis, efeitos, torres, economia, HP de bosses, herói e sinergias ativas.
+A build atual está em fase de **playtest e balanceamento**. O jogo possui um painel de diagnóstico acionado por `F8`, mostrando FPS, inimigos, projéteis, efeitos, torres, economia, HP de bosses, herói e sinergias ativas.
 
 O checklist recomendado para o beta está em [`docs/BETA_TESTING.md`](docs/BETA_TESTING.md).
 

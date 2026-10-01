@@ -11,7 +11,7 @@
   <main class="game-shell">
     <header class="hero">
       <div>
-        <span class="eyebrow">NAVEGADOR • v0.28.5 BETA HOTFIX</span>
+        <span class="eyebrow">NAVEGADOR • v0.29.0 BETA</span>
         <h1>Catoons TD</h1>
         <p>Escolha um lobby, evolua sua conta e monte sua defesa felina.</p>
       </div>
@@ -35,7 +35,8 @@
       <button type="button" data-screen="heroes">🦸 Heróis</button>
       <button type="button" data-screen="powers">⚡ Poderes</button>
       <button type="button" data-screen="tutorial">📖 Tutorial</button>
-      <button type="button" id="hub-settings-btn" class="settings-tab" title="Configurações de som">⚙️ Som</button>
+      <button type="button" id="hub-settings-btn" class="settings-tab" title="Configurações">⚙️ Configurações</button>
+      <button type="button" id="hub-language-btn" class="settings-tab" title="Idioma / Language">🌐 EN</button>
     </nav>
 
     <section id="screen-hub" class="screen active">
@@ -403,6 +404,14 @@
         <input id="menu-music" type="range" min="0" max="100" step="1" value="35">
       </label>
       <div class="settings-extra">
+        <label class="ui-scale-control" for="menu-language">
+          <span>🌐 Idioma</span>
+          <select id="menu-language">
+            <option value="pt">Português (Brasil)</option>
+            <option value="en">English</option>
+          </select>
+        </label>
+        <small id="menu-language-hint" class="modal-hint" style="display:none">Troque o idioma no lobby (a página recarrega).</small>
         <label class="ui-scale-control" for="menu-ui-scale">
           <span>🔍 Tamanho da interface</span>
           <select id="menu-ui-scale">
@@ -422,9 +431,9 @@
           <input type="file" id="menu-import-save-input" accept="application/json,.json" hidden>
         </div>
         <section class="beta-notice" aria-label="Informações do beta">
-          <b>🧪 Beta v0.28.5</b>
+          <b>🧪 Beta v0.29.0</b>
           <p>O progresso fica salvo somente neste navegador. Exporte seu save regularmente para não perder a evolução ao limpar os dados do navegador ou trocar de computador.</p>
-          <a class="ghost beta-feedback-button" href="https://github.com/LuanHCP/CatoonsTD/issues/new?template=bug_report.md&amp;title=%5BBETA%20v0.28.5%5D%20" target="_blank" rel="noopener noreferrer">🐞 Enviar feedback ou relatar bug</a>
+          <a class="ghost beta-feedback-button" href="https://github.com/LuanHCP/CatoonsTD/issues/new?template=bug_report.md&amp;title=%5BBETA%20v0.29.0%5D%20" target="_blank" rel="noopener noreferrer">🐞 Enviar feedback ou relatar bug</a>
         </section>
         <small id="menu-save-io-status" class="modal-hint" hidden></small>
       </div>
@@ -441,7 +450,7 @@
       <details class="enemy-guide credits-details">
         <summary>🎬 Créditos</summary>
         <div class="credits-body">
-          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.28.5</span></p>
+          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.29.0</span></p>
           <p>Criado por <b>Luan</b>.</p>
           <p>Trilha sonora, efeitos sonoros e toda a arte das torres, heróis e mapas são originais, feitos direto no jogo.</p>
           <p class="credits-thanks">Obrigado por jogar! 🐾</p>

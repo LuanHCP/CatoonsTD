@@ -1,4 +1,1331 @@
 'use strict';
+// ===== i18n (v0.29.0) =====
+// Idioma: escolha salva > idioma do navegador (pt* = português) > inglês.
+// Textos do jogo continuam escritos em português no código; $t('...') e $T`...`
+// trocam cada trecho pelo equivalente em inglês do dicionário I18N_EN quando o
+// idioma ativo é 'en'. Trocar de idioma salva a escolha e recarrega a página.
+const I18N_LANG_KEY='catoonsTD_lang';
+const I18N_LANG=(()=>{
+  try{const s=localStorage.getItem(I18N_LANG_KEY);if(s==='pt'||s==='en')return s;}catch(e){}
+  const nav=(navigator.languages&&navigator.languages[0])||navigator.language||'en';
+  return /^pt/i.test(nav)?'pt':'en';
+})();
+const I18N_EN={
+  "Fácil": "Easy",
+  "Começa com 🐟 350 salmões. +3 vidas, menos rodadas e sem blindados.": "Starts with 🐟 350 salmon. +3 lives, fewer rounds and no armored enemies.",
+  "Começa com 🐟 350 salmões. Ondas mais cheias, inimigos mais rápidos e blindados a partir daqui.": "Starts with 🐟 350 salmon. Fuller waves, faster enemies and armored enemies from here on.",
+  "Difícil": "Hard",
+  "Começa com 🐟 350 salmões. Inimigos muito rápidos, mais rodadas e margem pequena para erro.": "Starts with 🐟 350 salmon. Very fast enemies, more rounds and little room for error.",
+  "Bosque dos Gatinhos": "Kitten Grove",
+  "Curvas abertas, árvores iluminadas e um grande gancho ao redor do bosque central — o mapa mais simples para aprender as tropas.": "Wide curves, glowing trees and a big hook around the central grove — the simplest map for learning your troops.",
+  "Serra Felina": "Feline Ridge",
+  "Montanhas, neblina e uma estrada de montanha com duas curvas fechadas em ziguezague.": "Mountains, fog and a mountain road with two tight zigzag turns.",
+  "Pedágio da Meia-Noite": "Midnight Tollbooth",
+  "Cidade ao fundo, postes de luz e uma volta quase completa ao redor da praça do pedágio — o trecho mais pesado dos mapas Iniciantes.": "A city in the background, street lamps and an almost full loop around the toll plaza — the toughest stretch of the Beginner maps.",
+  "Prado das Patinhas": "Paw Meadow",
+  "Pradaria aberta com curvas largas e poucos bloqueios. Introduz posicionamento em ambos os lados da rota sem apertar demais a economia.": "Open grassland with wide curves and few obstacles. Introduces placing on both sides of the track without squeezing your economy too much.",
+  "Riacho do Novelo": "Yarn Creek",
+  "Uma rota sinuosa acompanha um riacho. As curvas aumentam o tempo no alcance, mas pedras começam a criar pontos cegos importantes.": "A winding track follows a creek. The curves keep enemies in range longer, but rocks start creating important blind spots.",
+  "Jardim das Lanternas": "Lantern Garden",
+  "O último treino antes dos mapas Médios: rota longa ao redor de jardins e lanternas, com vários bloqueios de visão próximos às melhores curvas.": "The last practice before the Medium maps: a long track around gardens and lanterns, with several line-of-sight blockers near the best curves.",
+  "Desfiladeiro Escaldante": "Scorching Canyon",
+  "Mapa mediano: rota bem mais longa e sinuosa entre as rochas, mais rodadas e mais balões por onda que os mapas iniciantes.": "Medium map: a much longer, winding track between the rocks, with more rounds and more balloons per wave than the beginner maps.",
+  "Porto das Sardinhas": "Sardine Harbor",
+  "Cais estreitos e contêineres criam corredores de tiro. Mais balões por onda e uma rota que muda de direção várias vezes.": "Narrow docks and containers create firing lanes. More balloons per wave and a track that changes direction several times.",
+  "Ruínas do Ronrom": "Purr Ruins",
+  "Ruínas antigas dividem as melhores linhas de tiro. A rota faz um grande oito e exige coberturas que funcionem em mais de uma passagem.": "Ancient ruins split the best firing lines. The track makes a big figure eight and demands coverage that works on more than one pass.",
+  "Fábrica de Brinquedos": "Toy Factory",
+  "Esteiras imaginárias, máquinas e curvas de 90°. É o mapa Mediano mais pesado e prepara o jogador para defender setores separados.": "Imaginary conveyor belts, machines and 90° turns. The toughest Medium map, preparing you to defend separate sectors.",
+  "Vale Bifurcado": "Forked Valley",
+  "Mapa Difícil: duas trilhas separadas por uma cordilheira central, cada uma exigindo sua própria defesa. As 2 primeiras rodadas vêm só pela trilha de cima, as 2 seguintes só pela de baixo — a partir da rodada 5 as duas trilhas recebem balões ao mesmo tempo.": "Hard map: two tracks separated by a central mountain range, each needing its own defense. The first 2 rounds come only through the top track, the next 2 only through the bottom — from round 5 on, both tracks get balloons at the same time.",
+  "Ponte da Tempestade": "Storm Bridge",
+  "Mapa Difícil: duas pontes longas atravessam a tempestade. As rotas pressionam lados opostos e os rochedos centrais reduzem as linhas de tiro cruzadas.": "Hard map: two long bridges cross the storm. The tracks press opposite sides and the central boulders cut down cross-fire lines.",
+  "Passagem Cega": "Blind Pass",
+  "Mapa Impossível: as mesmas duas trilhas paralelas do Vale Bifurcado, agora numa neblina espessa cheia de rochedos que bloqueiam a visão das torres — e com 10% menos salmões para trabalhar.": "Impossible map: the same two parallel tracks from Forked Valley, now in thick fog full of boulders that block your towers' line of sight — and with 10% less salmon to work with.",
+  "Festa na Igreja": "Church Festival",
+  "Mapa Impossível: duas procissões entram por portas diferentes e se cruzam no centro da igreja. Os pilares bloqueiam a visão, mas gatinhos colocados sobre os bancos enxergam por cima deles.": "Impossible map: two processions enter through different doors and cross in the middle of the church. The pillars block line of sight, but kittens placed on the pews can see over them.",
+  "Iniciantes": "Beginner",
+  "6 mapas de aprendizado com pressão crescente: rotas simples no começo e mais obstáculos/economia apertada perto do final.": "6 learning maps with rising pressure: simple tracks at first, then more obstacles and a tighter economy near the end.",
+  "Medianos": "Medium",
+  "4 mapas com mais densidade, rotas longas, bloqueios de visão e decisões de posicionamento mais exigentes.": "4 maps with more density, long tracks, line-of-sight blockers and more demanding placement decisions.",
+  "Difíceis": "Hard",
+  "2 mapas de duas rotas: a defesa precisa ser dividida e pouco espaço pode ser desperdiçado.": "2 dual-track maps: your defense has to be split and there is little space to waste.",
+  "Impossíveis": "Impossible",
+  "2 desafios máximos de duas rotas: neblina ou caminhos em cruz, visão bloqueada, pouca economia e inimigos mais fortes.": "2 ultimate dual-track challenges: fog or crossing paths, blocked vision, a tight economy and stronger enemies.",
+  "Vermelho": "Red",
+  "Azul": "Blue",
+  "Verde": "Green",
+  "Amarelo": "Yellow",
+  "Rosa": "Pink",
+  "Preto": "Black",
+  "Gatinho Dardo": "Dart Cat",
+  "Versátil / 3 caminhos": "Versatile / 3 paths",
+  "Possui árvore própria de upgrades: Arqueiro, Lanceiro de Fogo ou Suporte. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.": "Has its own upgrade tree: Archer, Fire Lancer or Support. Can use up to 2 paths; one reaches T5 and the secondary reaches T3.",
+  "Gato Gelinho": "Frosty Cat",
+  "Controle em área": "Area control",
+  "FULL AOE: a cada ataque acerta e reduz a velocidade de todos os alvos válidos dentro do alcance.": "FULL AOE: every attack hits and slows all valid targets within range.",
+  "Gato Bombinha": "Bomb Cat",
+  "Blindagem + área / 3 caminhos": "Armor + area / 3 paths",
+  "Sempre quebra blindagem (incluindo pesados e camuflados-revelados) e causa dano em área. Possui árvore própria: Barril Reforçado, Fragmentação ou Nuvem Tóxica. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.": "Always breaks armor (including heavy and revealed camo) and deals area damage. Has its own tree: Reinforced Barrel, Fragmentation or Toxic Cloud. Can use up to 2 paths; one reaches T5 and the secondary reaches T3.",
+  "Gato Laser": "Laser Cat",
+  "Ataque muito rápido / 3 caminhos": "Very fast attack / 3 paths",
+  "Alta cadência para limpar grupos de balões comuns. Possui árvore própria: Foco de Precisão, Superaquecimento ou Grade de Plasma. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.": "High fire rate to clear groups of regular balloons. Has its own tree: Precision Focus, Overheat or Plasma Grid. Can use up to 2 paths; one reaches T5 and the secondary reaches T3.",
+  "Gato Ninja": "Ninja Cat",
+  "Dano explosivo / 3 caminhos": "Burst damage / 3 paths",
+  "Ataques rápidos com alto dano por alvo. Possui árvore própria: Lâminas Afiadas, Kunai Envenenado ou Sombra Assassina. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.": "Fast attacks with high single-target damage. Has its own tree: Sharp Blades, Poisoned Kunai or Assassin Shadow. Can use up to 2 paths; one reaches T5 and the secondary reaches T3.",
+  "Gato Mago": "Wizard Cat",
+  "Magia em área / 3 caminhos": "Area magic / 3 paths",
+  "Projéteis mágicos com splash e controle leve. Possui árvore própria: Arcano Amplificado, Chamas Arcanas ou Runas de Fraqueza. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.": "Magic projectiles with splash and light control. Has its own tree: Amplified Arcana, Arcane Flames or Runes of Weakness. Can use up to 2 paths; one reaches T5 and the secondary reaches T3.",
+  "Gato Volts": "Volts Cat",
+  "Dano em cadeia / 3 caminhos": "Chain damage / 3 paths",
+  "O raio salta entre até 4 alvos próximos. Possui árvore própria: Sobrecarga, Corrente Ampliada ou Tempestade Estática. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.": "The lightning jumps between up to 4 nearby targets. Has its own tree: Overload, Amplified Current or Static Storm. Can use up to 2 paths; one reaches T5 and the secondary reaches T3.",
+  "Gato Cipó": "Vine Cat",
+  "Controle pesado": "Heavy control",
+  "Imobiliza até 3 inimigos comuns ou 1 boss por 2 segundos. Recarga começa em 6s e cai até 4s no nível máximo.": "Roots up to 3 regular enemies or 1 boss for 2 seconds. Cooldown starts at 6s and drops to 4s at max level.",
+  "Gato Pescador de Salmão": "Salmon Fisher Cat",
+  "Farm / economia": "Farm / economy",
+  "Não ataca. A cada rodada concluída, pesca salmões para a partida. Upgrades aumentam a renda.": "Doesn't attack. After each completed round, it fishes salmon for the match. Upgrades increase income.",
+  "Gato Sniper": "Sniper Cat",
+  "Especialista / 3 caminhos": "Specialist / 3 paths",
+  "Possui árvore própria: Atirador de Elite, Caçador ou Observador. O Sniper sempre enxerga Camo para si; revelar Camo para TODA a defesa passa a ser função do caminho Observador.": "Has its own tree: Marksman, Hunter or Spotter. The Sniper always sees Camo for itself; revealing Camo for the WHOLE defense is the Spotter path's job.",
+  "Gato Bumerangue": "Boomerang Cat",
+  "Perfuração / retorno": "Piercing / return",
+  "Gatinho secreto. O bumerangue atravessa vários inimigos e volta causando um segundo impacto. Quanto mais evoluído, mais alvos alcança e mais forte fica o retorno.": "Secret kitten. The boomerang pierces several enemies and comes back for a second hit. The more it is upgraded, the more targets it reaches and the stronger the return.",
+  "Gato Alquimista": "Alchemist Cat",
+  "Combos / dano contínuo": "Combos / damage over time",
+  "Gatinho secreto. Alterna Veneno → Fraqueza → Explosão no mesmo alvo. No terceiro estágio detona uma área e reinicia o ciclo.": "Secret kitten. Cycles Poison → Weakness → Explosion on the same target. On the third stage it detonates an area and restarts the cycle.",
+  "Gato Cronomante": "Chronomancer Cat",
+  "Controle temporal": "Time control",
+  "Gatinho secreto. Marca o inimigo no tempo e, após alguns segundos, o devolve à posição em que estava. Chefões sofrem um retorno reduzido.": "Secret kitten. Marks an enemy in time and, after a few seconds, sends it back to where it was. Bosses get a reduced rewind.",
+  "Gatinho Rei Demônio": "Demon King Kitten",
+  "Área / Medo / Invocação": "Area / Fear / Summoning",
+  "Secreto do modo Impossível. Dispara Fogo Sombrio em área; sua aura causa Medo periodicamente, recua inimigos e aumenta o dano que recebem. Inimigos que morrem amedrontados renascem como Balões Sombrios aliados.": "Impossible-tier secret. Shoots Shadow Fire in an area; its aura periodically causes Fear, pushing enemies back and increasing the damage they take. Enemies that die frightened are reborn as allied Shadow Balloons.",
+  "Gato Celestial": "Celestial Cat",
+  "Drones / suporte ofensivo": "Drones / offensive support",
+  "Gatinho Exclusivo da Roleta Celestial. Ele não ataca diretamente: comanda drones que perseguem os balões. A cada 2 upgrades em um caminho ganha +1 drone. Caminhos: Ataque Orbital, Bombardeio e Purificação.": "Exclusive kitten from the Celestial Wheel. It doesn't attack directly: it commands drones that chase the balloons. Every 2 upgrades in one path grant +1 drone. Paths: Orbital Strike, Bombardment and Purification.",
+  "Rei Bigodes": "King Whiskers",
+  "Comandante / suporte": "Commander / support",
+  "Comando Real: gatinhos dentro da aura recebem +10% Range e +10% velocidade de ataque.": "Royal Command: kittens inside the aura get +10% Range and +10% attack speed.",
+  "Ordem Real": "Royal Order",
+  "Por 8s, gatinhos dentro da aura recebem +25% dano e +25% velocidade de ataque.": "For 8s, kittens inside the aura get +25% damage and +25% attack speed.",
+  "Decreto da Coroa": "Crown Decree",
+  "Por 10s, TODA a defesa recebe +20% dano, +20% Range e +20% velocidade de ataque.": "For 10s, the WHOLE defense gets +20% damage, +20% Range and +20% attack speed.",
+  "Miaurício": "Meowricio",
+  "Guerreiro / dano": "Warrior / damage",
+  "Instinto de Execução: ataques causam 2,5× dano em inimigos comuns abaixo de 12% da vida.": "Execution Instinct: attacks deal 2.5× damage to regular enemies below 12% health.",
+  "Golpe Heroico": "Heroic Strike",
+  "Ataca o inimigo mais forte no alcance causando 5× o dano atual.": "Attacks the strongest enemy in range for 5× current damage.",
+  "Mil Cortes": "Thousand Cuts",
+  "Quatro cortes em todos os inimigos no alcance, cada um causando 125% do dano atual.": "Four slashes on every enemy in range, each dealing 125% of current damage.",
+  "Feiticeira / controle": "Sorceress / control",
+  "Maldição Lunar: cada ataque desacelera o alvo e o deixa 10% mais vulnerável por alguns segundos.": "Lunar Curse: every attack slows the target and makes it 10% more vulnerable for a few seconds.",
+  "Passo Lunar": "Lunar Step",
+  "Empurra até 3 inimigos fortes no alcance para trás na rota.": "Pushes up to 3 strong enemies in range back along the track.",
+  "Eclipse Total": "Total Eclipse",
+  "Por 8s, todos os inimigos ficam extremamente lentos e recebem +25% de dano de toda a defesa.": "For 8s, all enemies become extremely slow and take +25% damage from the whole defense.",
+  "Dom Salmão": "Don Salmon",
+  "Mercador / economia": "Merchant / economy",
+  "Mercado de Peixes: Pescadores próximos recebem +20% de renda e Dom Salmão gera salmões ao fim de cada rodada.": "Fish Market: nearby Fishers get +20% income and Don Salmon generates salmon at the end of each round.",
+  "Barganha Real": "Royal Bargain",
+  "Gera salmões instantaneamente para a partida.": "Instantly generates salmon for the match.",
+  "Tesouro Real": "Royal Treasure",
+  "Gera um grande tesouro e dobra a renda dos Pescadores nas próximas 2 rodadas concluídas.": "Generates a big treasure and doubles the Fishers' income for the next 2 completed rounds.",
+  "Tempestade Congelante": "Freezing Storm",
+  "Volts atingindo inimigos desacelerados pelo Gelinho descarrega uma explosão elétrica gelada em área.": "Volts hitting enemies slowed by Frosty discharges an icy electric blast in an area.",
+  "Caçada Silenciosa": "Silent Hunt",
+  "Ninja causa +50% de dano em alvos que estejam marcados especificamente por um Sniper.": "Ninja deals +50% damage to targets specifically marked by a Sniper.",
+  "Artilharia Improvisada": "Makeshift Artillery",
+  "Bombinha deixa pólvora nos alvos; o próximo acerto de Dardo consome a pólvora e espalha estilhaços ao redor.": "Bomb leaves gunpowder on targets; the next Dart hit consumes the gunpowder and scatters shrapnel around.",
+  "Floresta Encantada": "Enchanted Forest",
+  "Magias lançadas contra inimigos presos pelo Cipó florescem em uma explosão arcana ao redor do alvo.": "Spells cast at enemies held by Vine bloom into an arcane explosion around the target.",
+  "Mercado de Peixes": "Fish Market",
+  "A cada 5 rodadas concluídas, Pescadores + Dom Salmão realizam um Festival do Salmão e ganham +35% de renda naquele pagamento.": "Every 5 completed rounds, Fishers + Don Salmon hold a Salmon Festival and get +35% income on that payout.",
+  "Catalisador de Plasma": "Plasma Catalyst",
+  "Quatro acertos de Laser em um alvo preparado pelo Alquimista detonam uma reação química em área.": "Four Laser hits on a target prepared by the Alchemist detonate an area chemical reaction.",
+  "Paradoxo Arcano": "Arcane Paradox",
+  "Magias acumulam energia em alvos marcados no tempo; quando o rewind acontece, a energia explode no ponto de retorno.": "Spells build up energy on time-marked targets; when the rewind happens, the energy explodes at the return point.",
+  "Retorno Glacial": "Glacial Return",
+  "A volta do Bumerangue causa +35% de dano em inimigos desacelerados e reforça a lentidão por um instante.": "The Boomerang's return deals +35% damage to slowed enemies and briefly reinforces the slow.",
+  "preço normal": "normal price",
+  "% no preço": "% price",
+  "Arqueiro": "Archer",
+  "Bandana de Caça": "Hunting Bandana",
+  "+dano e +alcance. O Dardo recebe uma bandana.": "+damage and +range. The Dart gets a bandana.",
+  "Arco Felino": "Feline Bow",
+  "Troca o dardo por arco. Ataca mais rápido e a flecha salta em cadeia; dano-base 2.": "Swaps the dart for a bow. Attacks faster and the arrow chains; base damage 2.",
+  "Flecha Reforçada": "Reinforced Arrow",
+  "+alcance e +1 de dano (3 de dano-base no arco).": "+range and +1 damage (3 base damage on the bow).",
+  "Flechas Gêmeas": "Twin Arrows",
+  "Dispara 2 flechas por ataque.": "Shoots 2 arrows per attack.",
+  "Mestre Arqueiro": "Master Archer",
+  "+velocidade de ataque e +alcance.": "+attack speed and +range.",
+  "Lanceiro": "Lancer",
+  "Olhos de Caçador": "Hunter's Eyes",
+  "Visão Camuflada": "Camo Vision",
+  "Passa a enxergar Camo e recebe mais alcance.": "Can now see Camo and gets more range.",
+  "Lança Pesada": "Heavy Spear",
+  "Usa uma lança: 4 de dano bruto na cadência do Dardo normal.": "Uses a spear: 4 raw damage at the normal Dart's fire rate.",
+  "Lança Brutal": "Brutal Spear",
+  "+2 de dano e +alcance (6 de dano-base).": "+2 damage and +range (6 base damage).",
+  "Lança de Fogo": "Fire Spear",
+  "6 de dano + Burn: 1 de dano a cada 2s por 4 ticks.": "6 damage + Burn: 1 damage every 2s for 4 ticks.",
+  "Suporte": "Support",
+  "Comando Felino": "Feline Command",
+  "+alcance próprio e +10% de dano aos gatinhos próximos.": "+own range and +10% damage to nearby kittens.",
+  "Salmão Extra": "Extra Salmon",
+  "+15% na renda dos Pescadores de Salmão próximos.": "+15% income for nearby Salmon Fishers.",
+  "Olho de Equipe": "Team Eye",
+  "+10% de alcance aos gatinhos próximos.": "+10% range to nearby kittens.",
+  "Ritmo de Batalha": "Battle Rhythm",
+  "+10% de velocidade de ataque aos gatinhos próximos.": "+10% attack speed to nearby kittens.",
+  "Banquete da Tropa": "Troop Feast",
+  "Salmão sobe para +30%; dano/range/velocidade passam a +15%.": "Salmon goes up to +30%; damage/range/speed go to +15%.",
+  "Atirador de Elite": "Marksman",
+  "Munição Magnum": "Magnum Ammo",
+  "+3 de dano bruto por disparo.": "+3 raw damage per shot.",
+  "Projétil Perfurante": "Piercing Round",
+  "+3 de dano e o tiro atravessa até 2 inimigos.": "+3 damage and the shot pierces up to 2 enemies.",
+  "Mira Crítica": "Critical Aim",
+  "20% de crítico (2× dano) e perfuração sobe para 3 alvos.": "20% crit (2× damage) and piercing goes up to 3 targets.",
+  "Canhão de Precisão": "Precision Cannon",
+  "+6 de dano, 30% de crítico (2,5×) e atravessa até 4 alvos.": "+6 damage, 30% crit (2.5×) and pierces up to 4 targets.",
+  "Atirador Supremo": "Supreme Marksman",
+  "+8 de dano, +20% velocidade, 40% de crítico (3×) e atravessa até 6 alvos.": "+8 damage, +20% speed, 40% crit (3×) and pierces up to 6 targets.",
+  "Caçador": "Hunter",
+  "Olhos na Sombra": "Eyes in the Shadow",
+  "+35% de dano contra Camo e inimigos especiais.": "+35% damage against Camo and special enemies.",
+  "Caça de Elite": "Elite Hunt",
+  "+50% contra especiais e +15% contra Boss.": "+50% against specials and +15% against Bosses.",
+  "Marca do Caçador": "Hunter's Mark",
+  "Cada acerto marca o alvo por 6s: ele recebe +15% de dano de TODA a defesa.": "Every hit marks the target for 6s: it takes +15% damage from the WHOLE defense.",
+  "Munição Anti-Couraça": "Anti-Armor Ammo",
+  "Passa a quebrar blindagem; +75% contra especiais, +30% contra Boss e marca +25%.": "Now breaks armor; +75% against specials, +30% against Bosses and mark +25%.",
+  "Predador de Chefões": "Boss Predator",
+  "+100% contra especiais, +75% contra Boss e marca +35% por 8s.": "+100% against specials, +75% against Bosses and mark +35% for 8s.",
+  "Observador": "Spotter",
+  "Telêmetro Global": "Global Rangefinder",
+  "Todos os gatinhos recebem +5% de range.": "All kittens get +5% range.",
+  "Radar de Camuflagem": "Camo Radar",
+  "Camo avistado pelo Sniper fica revelado para TODA a defesa.": "Camo spotted by the Sniper is revealed to the WHOLE defense.",
+  "Coordenadas Precisas": "Precise Coordinates",
+  "Buff global sobe para +10% range e +5% dano de precisão.": "Global buff goes up to +10% range and +5% precision damage.",
+  "Designador de Alvos": "Target Designator",
+  "Acertos marcam o alvo por 5s (+15% dano recebido) e precisão global sobe para +7% dano.": "Hits mark the target for 5s (+15% damage taken) and global precision goes up to +7% damage.",
+  "Comando Aéreo": "Air Command",
+  "+15% range, +10% dano global e chama um avião a cada 2 rodadas OU 25s de combate para bombardear o inimigo mais forte.": "+15% range, +10% global damage and calls a plane every 2 rounds OR 25s of combat to bomb the strongest enemy.",
+  "Nevasca": "Blizzard",
+  "Rajada Gelada": "Icy Gust",
+  "+dano em cada ataque (o Gelinho continua acertando todos os alvos válidos no alcance).": "+damage on every attack (Frosty still hits all valid targets in range).",
+  "Nevasca Intensa": "Intense Blizzard",
+  "Explosão de Gelo": "Ice Blast",
+  "+dano; inimigos que já estavam lentos recebem +25% de dano deste ataque.": "+damage; enemies that were already slowed take +25% damage from this attack.",
+  "+dano considerável e cadência mais rápida.": "Considerable +damage and a faster fire rate.",
+  "Nevasca Absoluta": "Absolute Blizzard",
+  "Dano no máximo; um alvo já lento é congelado quase por completo por 1s a cada acerto.": "Maximum damage; an already slowed target is almost completely frozen for 1s on every hit.",
+  "Ventania Ártica": "Arctic Gale",
+  "Correntes de Vento": "Wind Currents",
+  "Rajada Contínua": "Continuous Gust",
+  "Ataca mais rápido.": "Attacks faster.",
+  "Vórtice Gélido": "Icy Vortex",
+  "+alcance; cada alvo atingido fica marcado (+12% de dano recebido de TODA a defesa por alguns segundos).": "+range; every target hit is marked (+12% damage taken from the WHOLE defense for a few seconds).",
+  "Ventania Total": "Total Gale",
+  "+alcance considerável e mais velocidade de ataque.": "Considerable +range and more attack speed.",
+  "Olho da Tempestade": "Eye of the Storm",
+  "Alcance cobre praticamente o mapa inteiro e a marca sobe para +20% de dano.": "Range covers practically the whole map and the mark goes up to +20% damage.",
+  "Coração Glacial": "Glacial Heart",
+  "Gelo Espesso": "Thick Ice",
+  "A lentidão dura mais tempo.": "The slow lasts longer.",
+  "Frio Penetrante": "Piercing Cold",
+  "A lentidão fica mais forte (o inimigo anda mais devagar do que antes).": "The slow gets stronger (the enemy walks slower than before).",
+  "Núcleo Congelante": "Freezing Core",
+  "Lentidão ainda mais forte e mais duradoura.": "An even stronger and longer slow.",
+  "Estase": "Stasis",
+  "Inimigos atingidos ficam quase parados enquanto durar o efeito.": "Enemies hit are almost stopped while the effect lasts.",
+  "Pulso Glacial": "Glacial Pulse",
+  "Cada acerto imobiliza quase por completo — a linha de frente praticamente para.": "Every hit almost fully immobilizes — the front line practically stops.",
+  "Raízes Profundas": "Deep Roots",
+  "Raízes Longas": "Long Roots",
+  "A prisão dura mais tempo.": "The hold lasts longer.",
+  "Enraizamento Amplo": "Wide Rooting",
+  "Prende +1 inimigo comum por vez (ou continua prendendo 1 Boss sozinho).": "Holds +1 regular enemy at a time (or still holds 1 Boss alone).",
+  "Garras da Selva": "Jungle Claws",
+  "+duração da prisão e recarrega mais rápido.": "+hold duration and faster cooldown.",
+  "Floresta Prendedora": "Snaring Forest",
+  "Prende ainda mais inimigos comuns de uma vez e +duração.": "Holds even more regular enemies at once and +duration.",
+  "Domínio da Selva": "Jungle Dominion",
+  "Prende um grupo bem maior, por mais tempo, com a recarga mais curta possível.": "Holds a much larger group, for longer, with the shortest possible cooldown.",
+  "Espinhos Venenosos": "Poison Thorns",
+  "Espinhos": "Thorns",
+  "Quem fica preso sofre um veneno leve enquanto dura a prisão.": "Held enemies take light poison while the hold lasts.",
+  "Seiva Tóxica": "Toxic Sap",
+  "+dano do veneno.": "+poison damage.",
+  "Toxina Concentrada": "Concentrated Toxin",
+  "O veneno tica mais vezes e mais rápido.": "The poison ticks more times and faster.",
+  "Praga Verde": "Green Plague",
+  "+dano do veneno bem mais forte.": "Much stronger +poison damage.",
+  "Floração Mortal": "Deadly Bloom",
+  "Veneno no auge: dano máximo, tica muitas vezes enquanto o inimigo estiver preso.": "Poison at its peak: maximum damage, ticking many times while the enemy is held.",
+  "Vinha Selvagem": "Wild Vine",
+  "Vinhas Fracas": "Weakening Vines",
+  "Quem fica preso recebe +dano de TODA a defesa por alguns segundos.": "Held enemies take +damage from the WHOLE defense for a few seconds.",
+  "Amarras Sufocantes": "Choking Bonds",
+  "+dano recebido enquanto marcado.": "+damage taken while marked.",
+  "Estrangulamento": "Strangle",
+  "+dano recebido e a marca dura mais.": "+damage taken and the mark lasts longer.",
+  "Vinha Predatória": "Predatory Vine",
+  "+dano recebido bem mais alto e marca ainda mais duradoura.": "Much higher +damage taken and an even longer mark.",
+  "Fúria da Selva": "Jungle Fury",
+  "Quem é preso pelo Cipó fica extremamente vulnerável ao resto da defesa.": "Anything held by Vine becomes extremely vulnerable to the rest of the defense.",
+  "Barril Reforçado": "Reinforced Barrel",
+  "+dano e +raio da explosão.": "+damage and +blast radius.",
+  "Carga Dupla": "Double Charge",
+  "+dano e +raio da explosão, de novo.": "+damage and +blast radius, again.",
+  "Casco de Aço": "Steel Shell",
+  "+raio da explosão e recarrega mais rápido.": "+blast radius and faster reload.",
+  "Bomba Sísmica": "Seismic Bomb",
+  "+dano considerável, +raio da explosão e ainda mais rápido para recarregar.": "Considerable +damage, +blast radius and an even faster reload.",
+  "Barril Colossal": "Colossal Barrel",
+  "Explosão no tamanho e dano máximos, com a recarga mais rápida do caminho.": "Maximum blast size and damage, with the fastest reload of the path.",
+  "Fragmentação": "Fragmentation",
+  "Estilhaços em Chamas": "Flaming Shrapnel",
+  "Quem é atingido pega fogo e sofre dano contínuo leve; recarrega um pouco mais rápido.": "Targets hit catch fire and take light damage over time; reloads a little faster.",
+  "Napalm Leve": "Light Napalm",
+  "+dano do fogo.": "+fire damage.",
+  "Barril Incendiário": "Incendiary Barrel",
+  "+dano do fogo, tica mais vezes e recarrega mais rápido.": "+fire damage, ticks more times and reloads faster.",
+  "Inferno Compacto": "Compact Inferno",
+  "+dano do fogo bem mais forte e recarrega ainda mais rápido.": "Much stronger +fire damage and an even faster reload.",
+  "Chuva de Estilhaços": "Shrapnel Rain",
+  "Fogo no auge: dano alto, tica muitas vezes, além de +dano no impacto direto.": "Fire at its peak: high damage, ticking many times, plus +damage on direct impact.",
+  "Nuvem Tóxica": "Toxic Cloud",
+  "Gás Lacrimogêneo": "Tear Gas",
+  "O impacto direto deixa o alvo mais lento por um tempo.": "The direct impact slows the target for a while.",
+  "Névoa Corrosiva": "Corrosive Mist",
+  "O alvo atingido fica marcado e recebe mais dano de TODA a defesa por alguns segundos.": "The target hit is marked and takes more damage from the WHOLE defense for a few seconds.",
+  "Gás Mostarda": "Mustard Gas",
+  "A lentidão fica bem mais forte e dura mais.": "The slow gets much stronger and lasts longer.",
+  "Nuvem Densa": "Dense Cloud",
+  "Lentidão e marca mais fortes e mais duradouras.": "Stronger and longer slow and mark.",
+  "Zona Morta": "Dead Zone",
+  "O alvo atingido quase para no lugar e fica extremamente vulnerável ao resto da defesa.": "The target hit almost stops in place and becomes extremely vulnerable to the rest of the defense.",
+  "Lâminas Afiadas": "Sharp Blades",
+  "Ataques mais rápidos e um pouco mais de dano.": "Faster attacks and a bit more damage.",
+  "Kit de Arremesso": "Throwing Kit",
+  "Reflexos de Sombra": "Shadow Reflexes",
+  "+dano e ainda mais velocidade de ataque.": "+damage and even more attack speed.",
+  "Fúria Silenciosa": "Silent Fury",
+  "+dano considerável, +alcance e mais velocidade de ataque.": "Considerable +damage, +range and more attack speed.",
+  "Tempestade de Lâminas": "Blade Storm",
+  "Dano e velocidade de ataque no máximo — praticamente uma chuva de shurikens.": "Maximum damage and attack speed — practically a shuriken rain.",
+  "Kunai Envenenado": "Poisoned Kunai",
+  "O alvo atingido diretamente sofre veneno leve.": "The target hit directly takes light poison.",
+  "Veneno Reforçado": "Reinforced Poison",
+  "Lâminas Corrosivas": "Corrosive Blades",
+  "+dano do veneno, tica mais vezes e mais rápido; recarrega um pouco mais rápido.": "+poison damage, ticks more times and faster; reloads a little faster.",
+  "Toxina Mortal": "Deadly Toxin",
+  "Veneno Ancestral": "Ancient Poison",
+  "Veneno no auge, tica muitas vezes, além de +dano no impacto direto.": "Poison at its peak, ticking many times, plus +damage on direct impact.",
+  "Sombra Assassina": "Assassin Shadow",
+  "Olhos na Escuridão": "Eyes in the Dark",
+  "O Ninja passa a enxergar inimigos Camuflados.": "The Ninja can now see Camo enemies.",
+  "Golpe Certeiro": "Precise Strike",
+  "+dano contra inimigos especiais (Camuflado, Blindado, Rápido, Regenerador, Elite).": "+damage against special enemies (Camo, Armored, Fast, Regen, Elite).",
+  "Marca da Sombra": "Shadow Mark",
+  "Cada acerto marca o alvo por alguns segundos: ele recebe mais dano de TODA a defesa.": "Every hit marks the target for a few seconds: it takes more damage from the WHOLE defense.",
+  "Caçador Noturno": "Night Hunter",
+  "+dano contra especiais e contra Boss; a marca fica mais forte.": "+damage against specials and Bosses; the mark gets stronger.",
+  "Lâmina Fantasma": "Phantom Blade",
+  "Passa a quebrar blindagem; dano máximo contra especiais e Boss, e a marca no auge.": "Now breaks armor; maximum damage against specials and Bosses, and the mark at its peak.",
+  "Foco de Precisão": "Precision Focus",
+  "+dano e dispara mais rápido.": "+damage and fires faster.",
+  "Lente Refinada": "Refined Lens",
+  "+dano e dispara ainda mais rápido.": "+damage and fires even faster.",
+  "Emissor Duplo": "Dual Emitter",
+  "+dano e mais velocidade de disparo.": "+damage and more fire rate.",
+  "Núcleo Instável": "Unstable Core",
+  "+dano considerável e mais velocidade de disparo.": "Considerable +damage and more fire rate.",
+  "Raio Contínuo": "Continuous Beam",
+  "Dano e cadência no máximo — quase um feixe contínuo.": "Maximum damage and fire rate — almost a continuous beam.",
+  "Superaquecimento": "Overheat",
+  "O alvo atingido diretamente sofre queimadura leve.": "The target hit directly takes a light burn.",
+  "Feixe Térmico": "Thermal Beam",
+  "+dano da queimadura.": "+burn damage.",
+  "+dano da queimadura, tica mais vezes e mais rápido; dispara mais rápido.": "+burn damage, ticks more times and faster; fires faster.",
+  "Fusão Parcial": "Partial Meltdown",
+  "+dano da queimadura bem mais forte.": "Much stronger +burn damage.",
+  "Plasma Ardente": "Blazing Plasma",
+  "Queimadura no auge, tica muitas vezes, além de +dano no impacto direto.": "Burn at its peak, ticking many times, plus +damage on direct impact.",
+  "Grade de Plasma": "Plasma Grid",
+  "O raio passa a saltar para um segundo alvo próximo.": "The beam now jumps to a second nearby target.",
+  "Condutor Amplo": "Wide Conductor",
+  "O salto alcança alvos um pouco mais distantes.": "The jump reaches slightly farther targets.",
+  "Tripla Descarga": "Triple Discharge",
+  "O raio salta para um terceiro alvo.": "The beam jumps to a third target.",
+  "Grade Expandida": "Expanded Grid",
+  "Salta para mais um alvo (4 no total) e alcança mais longe.": "Jumps to one more target (4 in total) and reaches farther.",
+  "Grade de Plasma Total": "Total Plasma Grid",
+  "O salto alcança bem mais longe e ganha +dano no impacto — cada um dos 4 alvos continua recebendo o dano cheio, sem redução.": "The jump reaches much farther and gains +impact damage — each of the 4 targets keeps taking full damage, with no reduction.",
+  "Arcano Amplificado": "Amplified Arcana",
+  "+dano e +raio da explosão mágica.": "+damage and +magic blast radius.",
+  "Prisma de Poder": "Power Prism",
+  "Ressonância": "Resonance",
+  "Convergência": "Convergence",
+  "+dano considerável, +raio da explosão e mais velocidade de disparo.": "Considerable +damage, +blast radius and more fire rate.",
+  "Explosão Cósmica": "Cosmic Blast",
+  "Dano e raio da explosão no máximo do caminho.": "Maximum damage and blast radius for the path.",
+  "Chamas Arcanas": "Arcane Flames",
+  "O alvo atingido diretamente pega fogo mágico.": "The target hit directly catches magic fire.",
+  "Fogo Fátuo": "Will-o'-the-Wisp",
+  "Combustão": "Combustion",
+  "+dano do fogo, tica mais vezes; dispara mais rápido.": "+fire damage, ticks more times; fires faster.",
+  "Inferno Arcano": "Arcane Inferno",
+  "+dano do fogo bem mais forte.": "Much stronger +fire damage.",
+  "Chamas Eternas": "Eternal Flames",
+  "Fogo no auge, tica muitas vezes, além de +dano no impacto direto.": "Fire at its peak, ticking many times, plus +damage on direct impact.",
+  "Runas de Fraqueza": "Runes of Weakness",
+  "Runa de Fraqueza": "Rune of Weakness",
+  "Grimório Gélido": "Frozen Grimoire",
+  "A lentidão do Mago fica mais forte.": "The Wizard's slow gets stronger.",
+  "Marca Arcana": "Arcane Mark",
+  "+dano recebido pela marca; a lentidão dura mais.": "+damage taken from the mark; the slow lasts longer.",
+  "Selo do Vazio": "Void Seal",
+  "Lentidão ainda mais forte e marca mais duradoura.": "An even stronger slow and a longer mark.",
+  "Colapso Dimensional": "Dimensional Collapse",
+  "Sobrecarga": "Overload",
+  "+dano do raio.": "+lightning damage.",
+  "Amperagem Alta": "High Amperage",
+  "Núcleo Voltaico": "Voltaic Core",
+  "Descarga Bruta": "Raw Discharge",
+  "Tempestade Voltaica": "Voltaic Storm",
+  "Dano e cadência no máximo do caminho.": "Maximum damage and fire rate for the path.",
+  "Corrente Ampliada": "Amplified Current",
+  "O raio alcança alvos um pouco mais distantes.": "The lightning reaches slightly farther targets.",
+  "Elo Extra": "Extra Link",
+  "O raio salta para +1 alvo e alcança mais longe.": "The lightning jumps to +1 target and reaches farther.",
+  "Condutor Reforçado": "Reinforced Conductor",
+  "Alcança bem mais longe; dispara mais rápido.": "Reaches much farther; fires faster.",
+  "Malha Elétrica": "Electric Mesh",
+  "O raio salta para +1 alvo e alcança ainda mais longe.": "The lightning jumps to +1 target and reaches even farther.",
+  "Rede Total": "Total Network",
+  "O raio salta para +2 alvos, alcançando o máximo, além de +dano no impacto direto.": "The lightning jumps to +2 targets, reaching the maximum, plus +damage on direct impact.",
+  "Tempestade Estática": "Static Storm",
+  "Estática Residual": "Residual Static",
+  "Todo alvo atingido pelo raio fica marcado e recebe mais dano de TODA a defesa por alguns segundos.": "Every target hit by the lightning is marked and takes more damage from the WHOLE defense for a few seconds.",
+  "Choque Prolongado": "Prolonged Shock",
+  "+dano recebido pela marca.": "+damage taken from the mark.",
+  "Campo Eletrizado": "Electrified Field",
+  "+dano recebido e a marca dura mais; o raio alcança um pouco mais longe.": "+damage taken and the mark lasts longer; the lightning reaches a little farther.",
+  "Paralisia Parcial": "Partial Paralysis",
+  "Todo alvo atingido também fica mais lento por um instante; marca mais forte.": "Every target hit is also briefly slowed; stronger mark.",
+  "A lentidão e a marca chegam ao auge em todos os alvos atingidos pelo raio.": "The slow and the mark reach their peak on every target hit by the lightning.",
+  "Ataque Orbital": "Orbital Strike",
+  "Canhões Reforçados": "Reinforced Cannons",
+  "+1 de dano por disparo dos drones.": "+1 damage per drone shot.",
+  "Propulsores Celestes": "Celestial Thrusters",
+  "+velocidade de voo e +1 drone.": "+flight speed and +1 drone.",
+  "Canhão de Pulso": "Pulse Cannon",
+  "+2 de dano e drones atacam mais rápido.": "+2 damage and drones attack faster.",
+  "Hiperpropulsão": "Hyperdrive",
+  "Muito mais velocidade de voo e +1 drone.": "Much more flight speed and +1 drone.",
+  "Esquadrão Celestial": "Celestial Squadron",
+  "Dano e cadência chegam ao auge do caminho.": "Damage and fire rate reach the path's peak.",
+  "Bombardeio": "Bombardment",
+  "Scanner de Longo Alcance": "Long-Range Scanner",
+  "+25 de range do Gato Celestial.": "+25 range for the Celestial Cat.",
+  "Micromísseis": "Micromissiles",
+  "Ataques ganham dano em área e +1 drone.": "Attacks gain area damage and +1 drone.",
+  "Matriz Expandida": "Expanded Matrix",
+  "+range e explosões maiores.": "+range and bigger explosions.",
+  "Chuva de Meteoros": "Meteor Shower",
+  "Explosões muito maiores e +1 drone.": "Much bigger explosions and +1 drone.",
+  "Bombardeio Orbital": "Orbital Bombardment",
+  "Máximo range e dano em área do caminho.": "Maximum range and area damage for the path.",
+  "Purificação": "Purification",
+  "Radar Espectral": "Spectral Radar",
+  "Drones passam a detectar Camuflados.": "Drones can now detect Camo.",
+  "Sinal Revelador": "Revealing Signal",
+  "Camo atingido é revelado para toda a defesa e +1 drone.": "Camo hit is revealed to the whole defense and +1 drone.",
+  "Pulso Antiblindagem": "Anti-Armor Pulse",
+  "Drones passam a quebrar blindagem.": "Drones can now break armor.",
+  "Desmaterializador": "Dematerializer",
+  "A cada 3 acertos dos drones no mesmo Blindado, remove a blindagem. +1 drone.": "Every 3 drone hits on the same Armored enemy remove its armor. +1 drone.",
+  "Campo de Normalização": "Normalization Field",
+  "A cada 1,5s normaliza 1 Camo/Blindado no alcance, exceto chefões e especiais.": "Every 1.5s normalizes 1 Camo/Armored in range, except bosses and specials.",
+  "Patinhas Frenéticas": "Frantic Paws",
+  "Todas as torres atacam 2× mais rápido por 10 segundos.": "All towers attack 2× faster for 10 seconds.",
+  "Instinto Predador": "Predator Instinct",
+  "Todas as torres causam 2× de dano por 10 segundos.": "All towers deal 2× damage for 10 seconds.",
+  "Nevasca Felina": "Feline Blizzard",
+  "Todos os inimigos ficam com 35% da velocidade por 8 segundos.": "All enemies move at 35% speed for 8 seconds.",
+  "Cofre de Sardinhas": "Sardine Vault",
+  "Receba +350 salmões imediatamente dentro da partida.": "Get +350 salmon immediately in the match.",
+  "Nove Vidas": "Nine Lives",
+  "Recupera até 6 vidas perdidas no mapa atual.": "Restores up to 6 lives lost on the current map.",
+  "Gata Maga Élfica": "Elven Mage Cat",
+  "Visual experimental do Gato Mago com pelagem clara, cabelos prateados, traje verde-petróleo e magia azul-dourada.": "Experimental look for the Wizard Cat with light fur, silver hair, teal outfit and blue-and-gold magic.",
+  "Chuva de Dardos": "Dart Rain",
+  "Todos os inimigos no mapa recebem 50% do dano atual deste Dardo.": "Every enemy on the map takes 50% of this Dart's current damage.",
+  "Tiro de Execução": "Execution Shot",
+  "Dispara no inimigo de maior vida e causa 10× o dano atual do Sniper.": "Shoots the highest-health enemy for 10× the Sniper's current damage.",
+  "Zero Absoluto": "Absolute Zero",
+  "Congela inimigos comuns por 3s; chefões ficam extremamente lentos por 4s.": "Freezes regular enemies for 3s; bosses become extremely slow for 4s.",
+  "Bombardeio Felino": "Feline Bombardment",
+  "Cinco explosões atingem a região do inimigo mais forte, cada uma com 100% do dano atual.": "Five explosions hit the strongest enemy's area, each dealing 100% of current damage.",
+  "Tempestade Elétrica": "Electric Storm",
+  "Quatro pulsos globais de raio causam 75% do dano atual por pulso.": "Four global lightning pulses deal 75% of current damage per pulse.",
+  "Floresta Prisional": "Prison Forest",
+  "Prende todos os inimigos comuns por 4s e chefões por 2s.": "Holds all regular enemies for 4s and bosses for 2s.",
+  "Pesca Milagrosa": "Miraculous Catch",
+  "Gera instantaneamente 3× a renda atual por rodada deste Pescador.": "Instantly generates 3× this Fisher's current per-round income.",
+  "Clones das Sombras": "Shadow Clones",
+  "Por 10s, dois clones atacam junto: o dano total do Ninja fica aproximadamente 2× maior.": "For 10s, two clones attack alongside: the Ninja's total damage becomes roughly 2× higher.",
+  "Cataclismo Arcano": "Arcane Cataclysm",
+  "Explode a área do inimigo mais forte e causa 300% do dano atual em grande área.": "Blows up the strongest enemy's area, dealing 300% of current damage in a large area.",
+  "Por 8s, dobra a cadência do Laser e faz seus disparos saltarem entre mais inimigos.": "For 8s, doubles the Laser's fire rate and makes its shots jump between more enemies.",
+  "Tornado de Bumerangues": "Boomerang Tornado",
+  "Uma tempestade de bumerangues atravessa o mapa em 5 rajadas, atingindo todos os inimigos.": "A storm of boomerangs sweeps the map in 5 bursts, hitting every enemy.",
+  "Pedra Filosofal": "Philosopher's Stone",
+  "Por 10s, cada ataque aplica Veneno, Fraqueza e Explosão de uma vez.": "For 10s, every attack applies Poison, Weakness and Explosion at once.",
+  "Reverter o Tempo": "Rewind Time",
+  "Todos os inimigos voltam aproximadamente 5 segundos na rota; chefões voltam menos.": "All enemies go back roughly 5 seconds along the track; bosses go back less.",
+  "Reino do Rei Demônio": "Demon King's Realm",
+  "Espalha Medo por todo o mapa, intensifica o Fogo Sombrio e fortalece o exército de sombras.": "Spreads Fear across the whole map, intensifies Shadow Fire and strengthens the shadow army.",
+  "Frota Celestial": "Celestial Fleet",
+  "Por 12s, ganha +2 drones temporários, drones atacam 35% mais rápido e o campo revela Camo no alcance.": "For 12s, gains +2 temporary drones, drones attack 35% faster and the field reveals Camo in range.",
+  "Dano • -": "Damage • -",
+  "% intervalo de ataque": "% attack interval",
+  "Um novo Gatinho Secreto foi descoberto e agora pode ser usado nas partidas.": "A new Secret Kitten has been discovered and can now be used in matches.",
+  "Todos os gatinhos atuais já foram liberados.": "All current kittens are already unlocked.",
+  "Próximo:": "Next:",
+  "no nível": "at level",
+  "concluído": "completed",
+  "não concluído": "not completed",
+  "Nível": "Level",
+  "Estrelas de dificuldade": "Difficulty stars",
+  "Vitórias": "Wins",
+  "Moedas": "Coins",
+  "em breve": "coming soon",
+  "Mapas": "Maps",
+  "em desenvolvimento": "in development",
+  "Esta categoria já está preparada para receber novos mapas sem misturar com os três mapas Iniciantes.": "This category is ready to receive new maps without mixing them with the three Beginner maps.",
+  "∞ sem limite • recorde": "∞ no limit • record",
+  "Infinito: não existe rodada final. A vida, velocidade e composição dos inimigos escalam continuamente; a cada 10 rodadas concluídas você recebe moedas permanentes.": "Infinite: there is no final round. Enemy health, speed and composition scale continuously; every 10 completed rounds you earn permanent coins.",
+  "Campanha: conclua a fase, derrote o dirigível boss e conquiste a estrela da dificuldade.": "Campaign: clear the stage, defeat the boss blimp and earn the difficulty star.",
+  "Escalada mais lenta e mais vidas; no Infinito todas as cores aparecem e blindados entram só depois da rodada 20.": "Slower scaling and more lives; in Infinite all colors appear and armored enemies only show up after round 20.",
+  "Escalada padrão do Infinito, com blindados e ameaças especiais chegando mais cedo.": "Standard Infinite scaling, with armored enemies and special threats arriving earlier.",
+  "Escalada mais agressiva, menos salmões/vidas e crescimento de vida/velocidade mais rápido.": "More aggressive scaling, less salmon/lives and faster health/speed growth.",
+  "∞ Recorde: rodada": "∞ Record: round",
+  "A dificuldade define sua economia inicial, vidas e velocidade de escalada.": "Difficulty sets your starting economy, lives and scaling speed.",
+  "Cada mapa pode ser jogado em Fácil, Normal ou Difícil; a categoria do mapa é independente da dificuldade escolhida.": "Every map can be played on Easy, Normal or Hard; the map category is independent of the chosen difficulty.",
+  "Escolha uma categoria com mapas disponíveis para selecionar a dificuldade.": "Pick a category with available maps to select the difficulty.",
+  "Jogar Infinito": "Play Infinite",
+  "Entrar no mapa": "Enter map",
+  "• em desenvolvimento": "• in development",
+  "SKIN MAESTRIA DOURADA": "GOLDEN MASTERY SKIN",
+  "VISUAL DO GATINHO": "KITTEN LOOK",
+  "MAESTRIA INDIVIDUAL": "INDIVIDUAL MASTERY",
+  "⭐ MÁX 50": "⭐ MAX 50",
+  "Maestria concluída": "Mastery complete",
+  "🎣 Bônus atual:": "🎣 Current bonus:",
+  "💥 Dano:": "💥 Damage:",
+  "% no intervalo": "% interval",
+  "🔒 Desbloqueia no nível 50": "🔒 Unlocks at level 50",
+  "✨ Skin dourada equipada automaticamente • recompensa de nível 50 recebida": "✨ Golden skin equipped automatically • level 50 reward received",
+  "🎁 Nível 50: skin dourada + habilidade exclusiva + 🪙": "🎁 Level 50: golden skin + exclusive ability + 🪙",
+  "⭐ Maestria Máxima • Skin Dourada": "⭐ Max Mastery • Golden Skin",
+  "Maestria": "Mastery",
+  "✓ Liberado para jogar": "✓ Unlocked to play",
+  "🔒 Libera no nível": "🔒 Unlocks at level",
+  "• você está no": "• you are at",
+  "HERÓI GATINHO": "HERO KITTEN",
+  "✨ Passiva": "✨ Passive",
+  "🔓 Nv.5 •": "🔓 Lv.5 •",
+  "⭐ Nv.10 •": "⭐ Lv.10 •",
+  "Cada partida começa no nível 1. XP do herói é ganho durante o mapa e não substitui a Maestria dos gatinhos normais.": "Every match starts at level 1. Hero XP is earned during the map and doesn't replace regular kittens' Mastery.",
+  "✓ Herói equipado": "✓ Hero equipped",
+  "Equipar": "Equip",
+  "base • habilidade Nv.5 • Ultimate Nv.10": "base • ability Lv.5 • Ultimate Lv.10",
+  "neste mapa • Nv.5": "on this map • Lv.5",
+  "• Nv.10": "• Lv.10",
+  "Barato e flexível — boa escolha logo no início em qualquer mapa. O caminho Lanceiro é a única forma de enxergar Camuflados fora do Sniper e do Ninja.": "Cheap and flexible — a good early pick on any map. The Lancer path is the only way to see Camo besides the Sniper and the Ninja.",
+  "Não escolhe um alvo: atinge todos os inimigos válidos no alcance a cada ataque. Ótimo pra segurar grupos e deixa todo mundo mais lento.": "Doesn't pick a target: hits every valid enemy in range on each attack. Great for holding groups and slows everyone down.",
+  "Sempre quebra blindagem, mesmo sem investir em nenhum caminho — a primeira escolha natural contra Blindados e Blindados Pesados.": "Always breaks armor, even without investing in any path — the natural first pick against Armored and Heavy Armored.",
+  "A maior cadência de tiro do jogo. Forte contra muitos balões fracos ao mesmo tempo, principalmente com o caminho Grade de Plasma.": "The highest fire rate in the game. Strong against many weak balloons at once, especially with the Plasma Grid path.",
+  "O maior dano por acerto entre as torres rápidas. O caminho Sombra Assassina é a única forma, além do Sniper, de enxergar Camuflado e quebrar blindagem ao mesmo tempo.": "The highest damage per hit among the fast towers. The Assassin Shadow path is the only way, besides the Sniper, to see Camo and break armor at the same time.",
+  "Dano em área com uma lentidão leve já de fábrica — caro, mas já nasce pronto pra ajudar contra grupos.": "Area damage with a light built-in slow — pricey, but ready to help against groups from the start.",
+  "O raio salta entre vários alvos próximos sozinho — ótimo contra balões enfileirados ou agrupados.": "The lightning jumps between several nearby targets on its own — great against lined-up or grouped balloons.",
+  "Não causa dano por padrão: imobiliza inimigos por alguns segundos. Combine com torres de dano pra aproveitar a deixa parada.": "Deals no damage by default: it roots enemies for a few seconds. Combine it with damage towers to take advantage of the opening.",
+  "Não ataca — gera salmões extras a cada rodada concluída. Ajuda a bancar as outras torres mais caras.": "Doesn't attack — generates extra salmon after each completed round. Helps pay for the pricier towers.",
+  "Alcance cobre o mapa inteiro e sempre enxerga Camuflados sozinho. Caro, mas nunca precisa se preocupar com posicionamento.": "Range covers the whole map and it always sees Camo on its own. Pricey, but never needs to worry about placement.",
+  "Não ataca diretamente: os drones fazem o trabalho. A cada 2 upgrades no mesmo caminho a frota ganha +1 drone.": "Doesn't attack directly: the drones do the work. Every 2 upgrades in the same path give the fleet +1 drone.",
+  "Camuflado": "Camo",
+  "Invisível para a maioria das torres — passa despercebido até ser detectado.": "Invisible to most towers — goes unnoticed until it is detected.",
+  "Detectado por: Sniper (sempre), Dardo (caminho Lanceiro, T2+), Ninja (caminho Sombra Assassina, T1+) e pelo Observador do Sniper (T2+, revela pra toda a defesa).": "Detected by: Sniper (always), Dart (Lancer path, T2+), Ninja (Assassin Shadow path, T1+) and the Sniper's Spotter (T2+, reveals for the whole defense).",
+  "Blindado": "Armored",
+  "Tem uma camada extra de blindagem por fora. A maioria dos ataques não avança até ela quebrar.": "Has an extra outer layer of armor. Most attacks don't get through until it breaks.",
+  "Quebra blindagem: Bombinha (sempre), Sniper (caminho Caçador, T4+), Ninja (caminho Sombra Assassina, T5).": "Breaks armor: Bomb (always), Sniper (Hunter path, T4+), Ninja (Assassin Shadow path, T5).",
+  "Blindado Pesado": "Heavy Armored",
+  "A versão reforçada do Blindado — a camada externa aguenta bem mais dano antes de quebrar. Aparece a partir da dificuldade Normal.": "The reinforced version of Armored — the outer layer takes much more damage before breaking. Appears from Normal difficulty on.",
+  "As mesmas fontes que quebram blindagem comum funcionam, só que leva mais tempo pra derrubar a camada.": "The same sources that break regular armor work, it just takes longer to bring the layer down.",
+  "Camuflado + Blindado": "Camo + Armored",
+  "Combina os dois ao mesmo tempo: invisível E blindado.": "Combines both at once: invisible AND armored.",
+  "Precisa de detecção de Camuflado E de uma fonte que quebre blindagem — nem sempre é a mesma torre.": "Needs Camo detection AND an armor-breaking source — not always the same tower.",
+  "Rápido": "Fast",
+  "Menos vida que o normal, mas atravessa a rota bem mais rápido — passa rápido pelo alcance das torres.": "Less health than normal, but crosses the track much faster — it passes through tower range quickly.",
+  "Lentidão (Gelinho, Cipó, Mago) ajuda a mantê-lo no alcance por mais tempo.": "Slows (Frosty, Vine, Wizard) help keep it in range longer.",
+  "Regenerador": "Regen",
+  "Recupera vida aos poucos quando fica um tempo sem ser atingido.": "Slowly recovers health when it goes a while without being hit.",
+  "Dano constante e rápido (Laser, Dardo, Ninja) não dá espaço pra ele regenerar.": "Constant, fast damage (Laser, Dart, Ninja) leaves it no room to regenerate.",
+  "Curandeiro": "Healer",
+  "Regenera 1 camada por segundo dos balões próximos em um raio pequeno.": "Regenerates 1 layer per second for nearby balloons in a small radius.",
+  "Priorize o Curandeiro antes que uma formação inteira comece a recuperar camadas.": "Prioritize the Healer before a whole formation starts recovering layers.",
+  "Atrapalhão": "Bumbler",
+  "Pode estourar 1 camada do balão à frente, mas o impacto atordoa gatinhos próximos por 1,2s.": "Can pop 1 layer of the balloon in front, but the impact stuns nearby kittens for 1.2s.",
+  "Evite concentrar toda a defesa colada no mesmo ponto quando ele estiver chegando.": "Avoid stacking your whole defense on the same spot when it is coming.",
+  "Bobo da Corte": "Court Jester",
+  "Tem apenas 1 de vida. O dano do tiro que o acerta tira salmões da partida.": "Has only 1 health. The damage of the shot that hits it takes salmon from the match.",
+  "O prejuízo é limitado a 500 salmões por acerto. Torres fracas/rápidas podem ser mais econômicas do que um tiro enorme de Sniper.": "The loss is capped at 500 salmon per hit. Weak/fast towers can be cheaper than a huge Sniper shot.",
+  "Anjo": "Angel",
+  "Dá 1 escudo a um balão próximo. O escudo bloqueia um ataque inteiro, mas reduz em 18% a velocidade do protegido.": "Gives 1 shield to a nearby balloon. The shield blocks a whole attack, but slows the protected one by 18%.",
+  "Ataques baratos e rápidos quebram o escudo antes dos seus golpes pesados.": "Cheap, fast attacks break the shield before your heavy hits.",
+  "Demônio": "Demon",
+  "Rouba até 1 camada de balões próximos e converte isso em vida máxima própria.": "Steals up to 1 layer from nearby balloons and turns it into its own max health.",
+  "Mate cedo: ele pode crescer até 2× a vida máxima original se ficar cercado de aliados.": "Kill it early: it can grow to 2× its original max health if surrounded by allies.",
+  "Não é bem um tipo novo — é uma versão fortalecida (+45% de vida) de qualquer balão comum ou especial, a partir da rodada 3.": "Not exactly a new type — it is a strengthened version (+45% health) of any regular or special balloon, from round 3 on.",
+  "Fica mais fácil de notar pela barra de vida maior; trate como o tipo base, só que mais resistente.": "Easier to spot by its bigger health bar; treat it like the base type, just tougher.",
+  "Na rodada 15 do Normal e do Difícil surge com 30× a vida do inimigo regular mais resistente disponível até ali.": "On round 15 of Normal and Hard it appears with 30× the health of the toughest regular enemy available so far.",
+  "É um teste de dano no meio da fase. Se escapar, tira 8 vidas em vez de encerrar a partida inteira.": "It is a damage check mid-stage. If it escapes, it takes 8 lives instead of ending the whole match.",
+  "Chefão": "Boss",
+  "Aparece na última rodada de cada mapa. Tem 75× a vida do inimigo regular mais resistente e anda 30% mais devagar do que antes.": "Appears on the last round of every map. Has 75× the health of the toughest regular enemy and walks 30% slower than before.",
+  "É um tanque de verdade. Se escapar, tira TODAS as suas vidas restantes na hora.": "A real tank. If it escapes, it takes ALL your remaining lives at once.",
+  "Economia • não ataca": "Economy • doesn't attack",
+  "Controle • imobiliza": "Control • roots",
+  "Dano": "Damage",
+  "range GLOBAL": "GLOBAL range",
+  "• resistência": "• toughness",
+  "Disponível agora": "Available now",
+  "🎁 Seu giro gratuito diário está disponível.": "🎁 Your free daily spin is available.",
+  "⏳ Próximo giro grátis em": "⏳ Next free spin in",
+  "🎁 Giro gratuito": "🎁 Free spin",
+  "ROLETA CELESTIAL": "CELESTIAL WHEEL",
+  "1,5% Gatinho Exclusivo • 30% moedas • 68,5% XP de Maestria para um gatinho à escolha.": "1.5% Exclusive Kitten • 30% coins • 68.5% Mastery XP for a kitten of your choice.",
+  "Aplicar XP": "Apply XP",
+  "Gato Celestial desbloqueado": "Celestial Cat unlocked",
+  "1,5% • Gato Celestial": "1.5% • Celestial Cat",
+  "⭐ Você tem": "⭐ You have",
+  "esperando para ser aplicado.": "waiting to be applied.",
+  "Você recebe 1 giro grátis a cada 24h. Giros extras custam moedas do jogo.": "You get 1 free spin every 24h. Extra spins cost in-game coins.",
+  "Faltam": "You need",
+  "moedas para girar novamente.": "more coins to spin again.",
+  "🛸 O Gato Celestial já era seu: duplicata convertida em 🪙 500 moedas.": "🛸 You already had the Celestial Cat: duplicate converted into 🪙 500 coins.",
+  "🛸✨ GARANTIA DO 50º GIRO! Gato Celestial desbloqueado permanentemente!": "🛸✨ 50TH SPIN GUARANTEE! Celestial Cat permanently unlocked!",
+  "🛸✨ PRÊMIO MÁXIMO! Gato Celestial desbloqueado permanentemente!": "🛸✨ TOP PRIZE! Celestial Cat permanently unlocked!",
+  "🪙 Você ganhou": "🪙 You won",
+  "moedas permanentes.": "permanent coins.",
+  "⭐ Você ganhou": "⭐ You won",
+  "XP de Maestria. Escolha abaixo quem recebe.": "Mastery XP. Choose below who gets it.",
+  "Na mochila:": "In your bag:",
+  "• Comprar 1 carga": "• Buy 1 charge",
+  "instantâneo": "instant",
+  "XP • próximo nível exige": "XP • next level requires",
+  "Skin de:": "Skin for:",
+  "Adquirida": "Owned",
+  "Teste gratuito": "Free trial",
+  "🪙 0 • Adquirir grátis": "🪙 0 • Get for free",
+  "GATINHOS • MÁX 4 •": "KITTENS • MAX 4 •",
+  "Bloqueado:": "Locked:",
+  "libera no nível": "unlocks at level",
+  ": limite de": ": limit of",
+  "unidade": "unit",
+  "atingido.": "reached.",
+  "salmões (": "salmon (",
+  "no mapa •": "on the map •",
+  "Apagar moedas, nível, XP, estrelas, vitórias e poderes comprados?": "Erase coins, level, XP, stars, wins and purchased powers?",
+  "🗗 Sair da tela cheia": "🗗 Exit fullscreen",
+  "🖥️ Tela cheia": "🖥️ Fullscreen",
+  "Não foi possível entrar em tela cheia neste navegador.": "Couldn't enter fullscreen in this browser.",
+  "✓ Save exportado. Guarde o arquivo .json em um lugar seguro.": "✓ Save exported. Keep the .json file somewhere safe.",
+  "Não foi possível exportar o save.": "Couldn't export the save.",
+  "✓ Save importado: nível": "✓ Save imported: level",
+  "moedas,": "coins,",
+  "estrelas.": "stars.",
+  "Arquivo inválido — não parece um save do Catoons TD.": "Invalid file — this doesn't look like a Catoons TD save.",
+  "Comece escolhendo um gatinho na barra. O Dardo é barato e ótimo para aprender.": "Start by choosing a kitten from the bar. The Dart is cheap and great for learning.",
+  "Escolha qualquer gatinho na barra da direita.": "Choose any kitten from the bar on the right.",
+  "Agora coloque o gatinho fora da estrada e longe de obstáculos. A área válida é confirmada no próprio mapa.": "Now place the kitten off the road and away from obstacles. The valid area is confirmed right on the map.",
+  "Clique em um ponto válido do mapa para posicionar.": "Click a valid spot on the map to place it.",
+  "Clique no gatinho que você acabou de colocar. É aqui que você abre upgrades, venda, reposicionamento e Maestria.": "Click the kitten you just placed. This is where you open upgrades, selling, repositioning and Mastery.",
+  "Clique em uma torre já colocada.": "Click a tower you already placed.",
+  "Sua defesa está pronta. Chame a primeira rodada; depois você pode usar 2×/3× ou até sobrepor ondas quando quiser mais ritmo.": "Your defense is ready. Call the first round; later you can use 2×/3× or even overlap waves when you want a faster pace.",
+  "Clique em Rodada 1.": "Click Round 1.",
+  "O Herói equipado é único por partida. Ele sobe do Nv.1 ao Nv.10 no próprio mapa, libera habilidade no Nv.5 e Ultimate no Nv.10.": "The equipped Hero is unique per match. It goes from Lv.1 to Lv.10 on the map itself, unlocking an ability at Lv.5 and an Ultimate at Lv.10.",
+  "Herói: 1 por partida. Você pode colocá-lo quando tiver salmões.": "Hero: 1 per match. You can place it when you have enough salmon.",
+  "Poderes gastam cargas da mochila e são temporários. Guarde-os para uma onda difícil, um Boss ou quando a defesa estiver perto de romper.": "Powers spend charges from your bag and are temporary. Save them for a hard wave, a Boss or when your defense is about to break.",
+  "Poderes são consumíveis; usar é opcional.": "Powers are consumables; using them is optional.",
+  "Por fim, o Menu pausa a partida e dá acesso a som, tamanho da interface, save e saída. Pronto: o resto você descobre jogando. 🐱": "Finally, the Menu pauses the match and gives access to sound, interface size, save and exit. That's it: you'll figure out the rest by playing. 🐱",
+  "Tutorial concluído.": "Tutorial complete.",
+  "Treinamento •": "Training •",
+  "Faça a ação destacada": "Do the highlighted action",
+  "Concluir tutorial 🐱": "Finish tutorial 🐱",
+  "Próximo →": "Next →",
+  "Dica: gatinhos Sniper enxergam qualquer camuflado do mapa, de qualquer posição.": "Tip: Sniper kittens see any camo on the map, from any position.",
+  "Dica: só o Gato Bombinha quebra a blindagem dos balões blindados.": "Tip: only the Bomb Cat breaks armored balloons' armor.",
+  "Dica: o Gato Gelinho é FULL AOE — cada ataque acerta todos os alvos no alcance.": "Tip: the Frosty Cat is FULL AOE — every attack hits all targets in range.",
+  "Dica: quanto mais forte o balão, mais salmões ele rende ao estourar.": "Tip: the stronger the balloon, the more salmon it gives when popped.",
+  "Dica: a cor do balão mostra quantos tiros ele aguenta — Vermelho é 1, e vai subindo até o Preto. Uma torre bem upada pode estourar várias cores de uma vez.": "Tip: a balloon's color shows how many hits it can take — Red is 1, going up to Black. A well-upgraded tower can pop several colors at once.",
+  "Dica: as rodadas ficam mais difíceis com o tempo — reforce a defesa antes de avançar.": "Tip: rounds get harder over time — reinforce your defense before moving on.",
+  "Dica: você pode chamar a próxima rodada mesmo com inimigos ainda em campo.": "Tip: you can call the next round even with enemies still on the field.",
+  "Dica: use a velocidade 2× ou 3× para acelerar rodadas mais tranquilas.": "Tip: use 2× or 3× speed to speed up calmer rounds.",
+  "Dica: poderes da mochila só duram alguns segundos — use no momento certo.": "Tip: bag powers only last a few seconds — use them at the right moment.",
+  "Dica: árvores, pedras e obstáculos grandes bloqueiam a linha de visão dos gatinhos. Posicionamento agora importa mais.": "Tip: trees, rocks and large obstacles block your kittens' line of sight. Placement matters more now.",
+  "∞ Infinito •": "∞ Infinite •",
+  "• sem rodada final": "• no final round",
+  "Escolha um mapa e uma dificuldade no lobby Play.": "Pick a map and a difficulty in the Play lobby.",
+  "🧪 Painel de playtest ativado. Pressione F8 para ocultar.": "🧪 Playtest panel enabled. Press F8 to hide.",
+  "⚠ FPS baixo": "⚠ Low FPS",
+  "Velocidade": "Speed",
+  "Rodada": "Round",
+  "Vidas": "Lives",
+  "Salmões": "Salmon",
+  "Inimigos": "Enemies",
+  "Torres": "Towers",
+  "Projéteis": "Projectiles",
+  "Efeitos": "Effects",
+  "Memória JS": "JS Memory",
+  "Herói": "Hero",
+  "Sinergias:": "Synergies:",
+  "🔗 SINERGIAS ATIVAS": "🔗 ACTIVE SYNERGIES",
+  "🔗 SINERGIA ATIVADA:": "🔗 SYNERGY ACTIVATED:",
+  "🦸 NÍVEL": "🦸 LEVEL",
+  "chegou ao nível": "reached level",
+  "Coloque um Herói em campo antes de upar com salmões.": "Place a Hero on the field before leveling up with salmon.",
+  "🦸 Herói já está no nível máximo.": "🦸 Hero is already at max level.",
+  "Faltam 🐟": "You need 🐟",
+  "para upar": "more to level up",
+  "PARTIDA PAUSADA": "MATCH PAUSED",
+  "Ajuste o som ou escolha o que fazer com a partida atual.": "Adjust the sound or choose what to do with the current match.",
+  "Continuar": "Resume",
+  "Pausar": "Pause",
+  "CONFIGURAÇÕES": "SETTINGS",
+  "Som": "Sound",
+  "Ajuste o volume dos efeitos e da música — vale pra qualquer tela do jogo.": "Adjust effects and music volume — applies to every screen in the game.",
+  "Próxima fase:": "Next stage:",
+  "Próxima dificuldade:": "Next difficulty:",
+  "FASE CONCLUÍDA": "STAGE CLEARED",
+  "MODO INFINITO ENCERRADO": "INFINITE MODE OVER",
+  "DEFESA ROMPIDA": "DEFENSE BROKEN",
+  "Vitória!": "Victory!",
+  "Fim do Infinito": "End of Infinite",
+  "Derrota": "Defeat",
+  "concluído.": "completed.",
+  "Você chegou até a rodada": "You reached round",
+  ". Seu recorde fica salvo para a próxima tentativa.": ". Your record is saved for the next attempt.",
+  "Os inimigos atravessaram sua defesa. Reorganize as torres e tente novamente.": "The enemies broke through your defense. Rearrange your towers and try again.",
+  "/3 no mapa": "/3 on the map",
+  "XP conta +": "Account XP +",
+  "🐾 Maestria +": "🐾 Mastery +",
+  "rodadas concluídas": "rounds completed",
+  "∞ Recorde": "∞ Record",
+  "Próxima fase →": "Next stage →",
+  "↻ Jogar novamente": "↻ Play again",
+  "↻ Tentar novamente": "↻ Try again",
+  "📊 Renda gerada 🐟": "📊 Income generated 🐟",
+  "• Maestria": "• Mastery",
+  "/50 • Investido 🐟": "/50 • Invested 🐟",
+  "• Venda 🐟": "• Sell 🐟",
+  "📊 Dano causado": "📊 Damage dealt",
+  "• Eliminações": "• Kills",
+  "Posicionamento de": "Placing",
+  "cancelado.": "canceled.",
+  "Reposicionamento de": "Repositioning",
+  "já está em campo. Só é permitido 1 herói por partida.": "is already on the field. Only 1 hero is allowed per match.",
+  "Painel de upgrades fechado.": "Upgrade panel closed.",
+  ": escolha um novo ponto válido. Reposicionar é grátis. ESC cancela.": ": choose a new valid spot. Repositioning is free. ESC cancels.",
+  "vendido por": "sold for",
+  "salmões — 50% dos": "salmon — 50% of the",
+  "investidos.": "invested.",
+  "↔ Reposicionamento: muito perto da estrada. Escolha outro ponto.": "↔ Repositioning: too close to the road. Choose another spot.",
+  "↔ Reposicionamento: há um obstáculo nesse ponto.": "↔ Repositioning: there is an obstacle at that spot.",
+  "↔ Reposicionamento: muito perto de outra torre.": "↔ Repositioning: too close to another tower.",
+  "reposicionado sobre um banco: visão elevada, sem bloqueio dos pilares.": "repositioned onto a pew: elevated view, no pillar blocking.",
+  "reposicionado sem custo.": "repositioned for free.",
+  "Nível máximo": "Max level",
+  "Máximo de 2 caminhos": "Max of 2 paths",
+  "Secundário limitado ao T": "Secondary limited to T",
+  "Ainda não escolhido.": "Not chosen yet.",
+  "• caminho completo": "• path complete",
+  "Nenhuma torre selecionada": "No tower selected",
+  "Clique em um gatinho colocado para abrir os upgrades aqui.": "Click a placed kitten to open its upgrades here.",
+  "⭐ Habilidade Nv.50": "⭐ Lv.50 Ability",
+  "🔥 Lança de Fogo": "🔥 Fire Spear",
+  "🗡️ Lança": "🗡️ Spear",
+  "🥷 vê Camo": "🥷 sees Camo",
+  "projéteis": "projectiles",
+  "aura dano +": "damage aura +",
+  "salmão +": "salmon +",
+  "aura range +": "range aura +",
+  "aura vel. +": "speed aura +",
+  "• Vel.": "• Spd.",
+  "/s • caminhos": "/s • paths",
+  "/2 escolhidos": "/2 chosen",
+  "crítico": "crit",
+  "💥 quebra blindagem": "💥 breaks armor",
+  "👁 revela Camo p/ todos": "👁 reveals Camo for all",
+  "global precisão +": "global precision +",
+  "✈ avião 2 rodadas/25s": "✈ plane 2 rounds/25s",
+  "• árvore de especialização": "• specialization tree",
+  "• Range GLOBAL • Vel.": "• GLOBAL Range • Spd.",
+  "% vs. já lentos": "% vs. already slowed",
+  "❄️ congela quem já está lento": "❄️ freezes already slowed enemies",
+  "lentidão": "slow",
+  "% da velocidade": "% of speed",
+  "/s • lentidão": "/s • slow",
+  "s • caminhos": "s • paths",
+  "☠️ veneno": "☠️ poison",
+  "vulnerável +": "vulnerable +",
+  "Prende": "Holds",
+  "(ou 1 Boss) • Duração": "(or 1 Boss) • Duration",
+  "s • Recarga": "s • Cooldown",
+  "🔥 queimadura": "🔥 burn",
+  "🧪 veneno": "🧪 poison",
+  "♨️ queimadura": "♨️ burn",
+  "🔥 fogo": "🔥 fire",
+  "• Cadeia": "• Chain",
+  "alvos (raio": "targets (radius",
+  "👁 detecta Camo": "👁 detects Camo",
+  "revela Camo": "reveals Camo",
+  "✨ normaliza Camo/Blindado": "✨ normalizes Camo/Armored",
+  "• comandante de drones": "• drone commander",
+  "drone(s) • Dano": "drone(s) • Damage",
+  "• Cadência": "• Fire rate",
+  "/s • voo": "/s • flight",
+  "• caminhos": "• paths",
+  "• área": "• area",
+  "por rodada": "per round",
+  "• 🎯 Range GLOBAL": "• 🎯 GLOBAL Range",
+  "• 💥 Quebra blindagem": "• 💥 Breaks armor",
+  "• 🌿 Segura": "• 🌿 Holds",
+  "ou 1 boss por": "or 1 boss for",
+  "alvos + retorno ×": "targets + return ×",
+  "• 🧪 Veneno → Fraqueza → Explosão": "• 🧪 Poison → Weakness → Explosion",
+  "• ⏳ Retorno temporal em": "• ⏳ Time rewind in",
+  "• ⚡ 2× velocidade ATIVO": "• ⚡ 2× speed ACTIVE",
+  "• 🔥 2× dano ATIVO": "• 🔥 2× damage ACTIVE",
+  "• 🐟 buff de Suporte ativo": "• 🐟 Support buff active",
+  "• 🛰️ buff de Observador ativo": "• 🛰️ Spotter buff active",
+  "• nível": "• level",
+  "Renda 🐟": "Income 🐟",
+  "/rodada": "/round",
+  "Recarga": "Cooldown",
+  "Vel.": "Spd.",
+  "• não ataca •": "• doesn't attack •",
+  "• limite": "• limit",
+  "por tipo •": "per type •",
+  "nível máximo": "max level",
+  "próximo upgrade 🐟": "next upgrade 🐟",
+  "Controle": "Control",
+  "Range GLOBAL": "GLOBAL Range",
+  "🔥 2× dano •": "🔥 2× damage •",
+  "🌨️ inimigos a 35% da velocidade •": "🌨️ enemies at 35% speed •",
+  "A cada 1s regenera 1 camada dos balões próximos em um raio pequeno.": "Every 1s regenerates 1 layer of nearby balloons in a small radius.",
+  "Às vezes estoura 1 camada do balão da frente e atordoa gatinhos próximos por 1,2s.": "Sometimes pops 1 layer of the balloon in front and stuns nearby kittens for 1.2s.",
+  "Tem apenas 1 de vida. O dano do tiro que o acerta vira perda de salmões, limitada a 500.": "Has only 1 health. The damage of the shot that hits it becomes a salmon loss, capped at 500.",
+  "Concede 1 escudo a um balão próximo. O escudo bloqueia um ataque, mas deixa o protegido 18% mais lento.": "Grants 1 shield to a nearby balloon. The shield blocks one attack, but makes the protected one 18% slower.",
+  "Rouba camadas de balões próximos para aumentar permanentemente sua vida máxima, até 2× a vida original.": "Steals layers from nearby balloons to permanently increase its max health, up to 2× its original health.",
+  "⚡ Rápido": "⚡ Fast",
+  "🤡 Atrapalhão": "🤡 Bumbler",
+  "🃏 Bobo da Corte": "🃏 Court Jester",
+  "😈 Demônio": "😈 Demon",
+  "Última rodada chamada": "Last round called",
+  "Termine os inimigos restantes.": "Finish off the remaining enemies.",
+  "moedas permanentes ao concluir": "permanent coins when completed",
+  ": marco do Infinito": ": Infinite milestone",
+  ": vem coisa nova": ": something new is coming",
+  ": sem novos tipos": ": no new types",
+  "As ameaças conhecidas continuam, só ficam mais numerosas/fortes.": "Known threats continue, just in greater numbers/strength.",
+  "Em campo • Nv.": "On the field • Lv.",
+  "• pronto para entrar": "• ready to deploy",
+  "Ultimate liberada": "Ultimate unlocked",
+  "• Renda própria: +🐟": "• Own income: +🐟",
+  "🐟 Upar com salmões •": "🐟 Level up with salmon •",
+  "• ∞ Infinito": "• ∞ Infinite",
+  "• recorde": "• record",
+  "• moedas permanentes a cada 10 rodadas.": "• permanent coins every 10 rounds.",
+  "• estrelas do mapa": "• map stars",
+  "∞ Modo Infinito •": "∞ Infinite Mode •",
+  "• melhor: rodada": "• best: round",
+  "⭐ já concluída": "⭐ already completed",
+  "☆ estrela ainda não conquistada": "☆ star not yet earned",
+  "Mapa concluído": "Map completed",
+  "Concluído": "Completed",
+  "Final em campo": "Boss on the field",
+  "Finalizando": "Finishing",
+  "Chamar rodada": "Call round",
+  "agora": "now",
+  "Iniciar rodada": "Start round",
+  ". Não existe rodada final: a dificuldade sobe continuamente e cada 10 rodadas concluídas rende moedas permanentes.": ". There is no final round: difficulty rises continuously and every 10 completed rounds give permanent coins.",
+  ". ⛪ Coloque gatinhos nos bancos marcados com patinhas para enxergar por cima dos pilares. As duas rotas se cruzam no centro.": ". ⛪ Place kittens on the pews marked with paws to see over the pillars. The two tracks cross in the center.",
+  ". Obstáculos grandes bloqueiam a visão. Chame as rodadas no seu ritmo — você pode sobrepor ondas.": ". Large obstacles block line of sight. Call rounds at your own pace — you can overlap waves.",
+  "Sem cargas de": "No charges of",
+  ". Compre no lobby Poderes.": ". Buy some in the Powers lobby.",
+  "é temporário. Inicie uma rodada antes de usar.": "is temporary. Start a round before using it.",
+  "já está ativo.": "is already active.",
+  "Suas vidas já estão cheias.": "Your lives are already full.",
+  "Dirigível do Bosque": "Grove Blimp",
+  "Dirigível do Prado": "Meadow Blimp",
+  "Dirigível do Riacho": "Creek Blimp",
+  "Dirigível da Neblina": "Fog Blimp",
+  "Dirigível das Lanternas": "Lantern Blimp",
+  "Dirigível do Pedágio": "Tollbooth Blimp",
+  "Dirigível do Porto": "Harbor Blimp",
+  "Dirigível do Desfiladeiro": "Canyon Blimp",
+  "Dirigível Ancestral": "Ancient Blimp",
+  "Dirigível Mecânico": "Mechanical Blimp",
+  "Dirigível Gêmeo": "Twin Blimp",
+  "Dirigível da Tempestade": "Storm Blimp",
+  "Dirigível das Sombras": "Shadow Blimp",
+  "Dirigível do Sino Partido": "Broken Bell Blimp",
+  "Mini Dirigível": "Mini Blimp",
+  "já foi concluído. Reinicie ou escolha outra dificuldade.": "is already completed. Restart or choose another difficulty.",
+  "A rodada final já foi chamada. Termine os inimigos restantes.": "The final round has already been called. Finish off the remaining enemies.",
+  "rápido(s)": "fast",
+  "🪙 MARCO: conclua a rodada": "🪙 MILESTONE: complete round",
+  "para receber +": "to get +",
+  "🚀 Rodada chamada antecipadamente!": "🚀 Round called early!",
+  "com": "with",
+  "HP — 30× o inimigo mais resistente até aqui.": "HP — 30× the toughest enemy so far.",
+  "RODADA FINAL! 👑": "FINAL ROUND! 👑",
+  "chegou com": "arrived with",
+  "HP — 75× a vida do inimigo regular mais resistente e anda a 55% da velocidade-base!": "HP — 75× the health of the toughest regular enemy and moves at 55% of base speed!",
+  "🐾 Limite atingido: no máximo": "🐾 Limit reached: at most",
+  "por mapa.": "per map.",
+  "salmões para": "salmon for",
+  "neste tier de mapa.": "on this map tier.",
+  "Muito perto da estrada. Escolha outro ponto para confirmar.": "Too close to the road. Choose another spot to confirm.",
+  "🌳 Esse obstáculo ocupa o espaço e também bloquearia a visão. Escolha outro ponto.": "🌳 That obstacle takes up the space and would also block line of sight. Choose another spot.",
+  "Muito perto de outra unidade. Escolha outro ponto.": "Too close to another unit. Choose another spot.",
+  "posicionado.": "placed.",
+  "deste tipo. Para colocar outro, selecione o gatinho novamente na barra.": "of this type. To place another one, select the kitten again in the bar.",
+  "🦸 Só é permitido 1 Herói Gatinho por partida.": "🦸 Only 1 Hero Kitten is allowed per match.",
+  "para colocar": "to place",
+  "O herói está muito perto da estrada. Escolha outro ponto.": "The hero is too close to the road. Choose another spot.",
+  "🌳 Esse obstáculo ocupa o espaço do herói. Escolha outro ponto.": "🌳 That obstacle takes up the hero's space. Choose another spot.",
+  "Muito perto de outro gatinho. Escolha outro ponto.": "Too close to another kitten. Choose another spot.",
+  "entrou em campo! Ele sobe do nível 1 ao 10 nesta partida. Habilidade no Nv.5 e Ultimate no Nv.10.": "has entered the field! It goes from level 1 to 10 in this match. Ability at Lv.5 and Ultimate at Lv.10.",
+  "Selecione um Gatinho Dardo para usar os caminhos de upgrade.": "Select a Dart Cat to use the upgrade paths.",
+  "Selecione um Gato Sniper para usar os caminhos de upgrade.": "Select a Sniper Cat to use the upgrade paths.",
+  "Selecione um Gato Gelinho para usar os caminhos de upgrade.": "Select a Frosty Cat to use the upgrade paths.",
+  "Selecione um Gato Cipó para usar os caminhos de upgrade.": "Select a Vine Cat to use the upgrade paths.",
+  "Selecione um Gato Bombinha para usar os caminhos de upgrade.": "Select a Bomb Cat to use the upgrade paths.",
+  "Selecione um Gato Ninja para usar os caminhos de upgrade.": "Select a Ninja Cat to use the upgrade paths.",
+  "Selecione um Gato Laser para usar os caminhos de upgrade.": "Select a Laser Cat to use the upgrade paths.",
+  "Selecione um Gato Mago para usar os caminhos de upgrade.": "Select a Wizard Cat to use the upgrade paths.",
+  "Selecione um Gato Volts para usar os caminhos de upgrade.": "Select a Volts Cat to use the upgrade paths.",
+  "Selecione um Gato Celestial para usar os caminhos de upgrade.": "Select a Celestial Cat to use the upgrade paths.",
+  "Clique primeiro em um gatinho já posicionado.": "First click a kitten that's already placed.",
+  "usa a árvore de 3 caminhos na aba de upgrades da direita.": "uses the 3-path tree in the upgrades tab on the right.",
+  "já está no nível máximo.": "is already at max level.",
+  "salmões para o upgrade.": "salmon for the upgrade.",
+  "⬆ nível": "⬆ level",
+  "→ nível": "→ level",
+  ": renda 🐟": ": income 🐟",
+  "por rodada concluída.": "per completed round.",
+  ": recarga": ": cooldown",
+  "s • imobiliza por": "s • roots for",
+  ": dano": ": damage",
+  "• velocidade": "• speed",
+  "• range continua GLOBAL": "• range stays GLOBAL",
+  "recarrega em": "recharges in",
+  "Não há inimigos no mapa para usar essa habilidade.": "There are no enemies on the map to use this ability.",
+  "💥 EXECUÇÃO ×10": "💥 EXECUTION ×10",
+  "está atordoado por mais": "is stunned for another",
+  "libera no nível 5 do herói.": "unlocks at hero level 5.",
+  "Nenhum inimigo no alcance para o Golpe Heroico.": "No enemy in range for Heroic Strike.",
+  "Nenhum inimigo no alcance para o Passo Lunar.": "No enemy in range for Lunar Step.",
+  "libera no nível 10 do herói.": "unlocks at hero level 10.",
+  "Nenhum inimigo no alcance para Mil Cortes.": "No enemy in range for Thousand Cuts.",
+  "👁 Camo revelado!": "👁 Camo revealed!",
+  "Primeiro": "First",
+  "Último": "Last",
+  "Mais forte": "Strongest",
+  "Mais fraco": "Weakest",
+  "Camuflado primeiro": "Camo first",
+  "Blindado primeiro": "Armored first",
+  "✈ COMANDO AÉREO": "✈ AIR COMMAND",
+  ": avião enviado contra o inimigo mais forte da rodada.": ": plane sent against the round's strongest enemy.",
+  "💨 camada perdida": "💨 layer lost",
+  "❤️ +1 camada ×": "❤️ +1 layer ×",
+  "🛡 ESCUDO DIVINO": "🛡 DIVINE SHIELD",
+  "VIDA MÁX": "MAX HP",
+  "🌑 ×3 SOMBRAS": "🌑 ×3 SHADOWS",
+  "🌑 SOMBRA INVOCADA": "🌑 SHADOW SUMMONED",
+  "💥 Blindagem quebrada: saiu um balão normal de dentro!": "💥 Armor broken: a normal balloon came out of it!",
+  "👑 Você derrotou": "👑 You defeated",
+  "na partida e +🪙": "in the match and +🪙",
+  "🎣🐟 Mercado de Peixes: Festival do Salmão! +": "🎣🐟 Fish Market: Salmon Festival! +",
+  "salmões de renda extra na rodada": "bonus salmon income this round",
+  "🪙 Marco do Infinito! Rodada": "🪙 Infinite Milestone! Round",
+  "concluída: +": "completed: +",
+  "moedas permanentes. Próximo prêmio na rodada": "permanent coins. Next prize at round",
+  "• 🎖️ Subiu para o nível": "• 🎖️ Reached level",
+  "concluído!": "completed!",
+  "⭐ Nova estrela!": "⭐ New star!",
+  "💀 Chefão escapou!": "💀 Boss escaped!",
+  "✨ BLINDAGEM REMOVIDA": "✨ ARMOR REMOVED",
+  "🌿 BOSS preso": "🌿 BOSS held",
+  "🎯 CRÍTICO!": "🎯 CRITICAL!",
+  "🎯 ALVO DA CAÇADA": "🎯 HUNT TARGET",
+  "🐱💥 ESTILHAÇOS": "🐱💥 SHRAPNEL",
+  "🌿✨ FLOR ARCANA": "🌿✨ ARCANE BLOOM",
+  "🪃❄️ RETORNO GLACIAL": "🪃❄️ GLACIAL RETURN",
+  "💥 REAÇÃO!": "💥 REACTION!",
+  "🔥🌑 FOGO SOMBRIO": "🔥🌑 SHADOW FIRE",
+  "🎣 Pescadores renderam +🐟": "🎣 Fishers earned +🐟",
+  "ao concluir": "on completing",
+  "• 🎖️ Nível": "• 🎖️ Level",
+  "moedas permanentes": "permanent coins",
+  "dos Pescadores": "from Fishers",
+  "Campo limpo após a rodada": "Field clear after round",
+  "Você pode chamar a próxima.": "You can call the next one.",
+  "∞ Fim do Infinito. Você concluiu": "∞ End of Infinite. You completed",
+  "rodadas.": "rounds.",
+  "Fim de jogo. Reinicie o mapa e tente outra estratégia.": "Game over. Restart the map and try another strategy.",
+  "PEDÁGIO": "TOLLBOOTH",
+  "FESTA FELINA": "FELINE FEAST",
+  "⏩ Velocidade": "⏩ Speed",
+  "🏆 MAPA CONCLUÍDO": "🏆 MAP COMPLETED",
+  "/3 dificuldades concluídas neste mapa": "/3 difficulties completed on this map",
+  "Conta: nível": "Account: level",
+  "Fim de jogo": "Game over",
+  "Reinicie e reposicione seus gatinhos.": "Restart and reposition your kittens.",
+  "• Nv.": "• Lv.",
+  "• eliminações": "• kills",
+  ". XP e habilidades ficam no painel HERÓI à direita.": ". XP and abilities are in the HERO panel on the right.",
+  "selecionado •": "selected •",
+  "• os caminhos estão na aba da direita.": "• the paths are in the tab on the right.",
+  "• escolha Atirador, Caçador ou Observador na aba da direita.": "• choose Marksman, Hunter or Spotter in the tab on the right.",
+  "nível": "level",
+  "selecionado. Farm econômico •": "selected. Economy farm •",
+  "• upgrades na aba da direita.": "• upgrades in the tab on the right.",
+  "selecionado.": "selected.",
+  ". Upgrades na aba da direita.": ". Upgrades in the tab on the right.",
+  "Painel de upgrades fechado. Clique em um gatinho para posicionar ou em uma unidade para abrir seus upgrades.": "Upgrade panel closed. Click a kitten to place it or a unit to open its upgrades.",
+  "Painel do Herói fechado. Clique no herói em campo para reabrir o XP e as habilidades.": "Hero panel closed. Click the hero on the field to reopen its XP and abilities.",
+  "Nenhum gatinho ou herói está pronto para posicionar. Selecione uma unidade na barra da direita primeiro.": "No kitten or hero is ready to place. Select a unit from the bar on the right first.",
+  "Jogo rodando em": "Game running at",
+  "Partida pausada.": "Match paused.",
+  "📋 Código Pix copiado.": "📋 Pix code copied.",
+  "Não foi possível copiar automaticamente.": "Couldn't copy automatically.",
+  "✓ Tutorial guiado será mostrado ao entrar na próxima partida.": "✓ The guided tutorial will be shown when you enter the next match.",
+  "Velocidade alterada para": "Speed changed to",
+  "já está em campo. O limite é 1 herói por partida.": "is already on the field. The limit is 1 hero per match.",
+  "pronto para posicionar por 🐟": "ready to place for 🐟",
+  ". Limite: 1 Herói Gatinho por partida.": ". Limit: 1 Hero Kitten per match.",
+  "por rodada concluída e não ataca.": "per completed round and doesn't attack.",
+  "Alcance GLOBAL e detecção de CAMUFLADOS.": "GLOBAL range and CAMO detection.",
+  "FULL AOE: atinge todos os alvos válidos no alcance.": "FULL AOE: hits every valid target in range.",
+  "Quebra BLINDADOS.": "Breaks ARMORED.",
+  "Clique UMA vez em um local válido do mapa. Depois da colocação, a seleção será cancelada.": "Click ONCE on a valid spot on the map. After placing, the selection is canceled.",
+  "🐾 Preparando mapa...": "🐾 Preparing map...",
+  "NAVEGADOR • v0.28.5 BETA HOTFIX": "BROWSER • v0.29.0 BETA",
+  "Escolha um lobby, evolua sua conta e monte sua defesa felina.": "Choose a lobby, level up your account and build your feline defense.",
+  "🎖️ Nível": "🎖️ Level",
+  "🐱 Gatinhos": "🐱 Kittens",
+  "🦸 Heróis": "🦸 Heroes",
+  "⚡ Poderes": "⚡ Powers",
+  "Configurações de som": "Settings",
+  "⚙️ Som": "⚙️ Settings",
+  "CENTRAL FELINA": "FELINE HQ",
+  "Escolha para onde ir": "Choose where to go",
+  "O progresso é salvo localmente. Vitórias rendem XP e moedas; cada dificuldade concluída acende uma estrela do mapa.": "Progress is saved locally. Wins give XP and coins; every completed difficulty lights up a map star.",
+  "Próximo gatinho no nível 2": "Next kitten at level 2",
+  "Campanha, modo infinito e dificuldades": "Campaign, infinite mode and difficulties",
+  "Gatinhos": "Kittens",
+  "Coleção e desbloqueios por nível": "Collection and level unlocks",
+  "Poderes": "Powers",
+  "Comprar cargas com moedas": "Buy charges with coins",
+  "Heróis": "Heroes",
+  "Escolha 1 Herói Gatinho para liderar cada partida": "Choose 1 Hero Kitten to lead each match",
+  "RESUMO DA CONTA": "ACCOUNT SUMMARY",
+  "Seu progresso": "Your progress",
+  "Apagar progresso": "Erase progress",
+  "Escolha o mapa": "Choose the map",
+  "Escolha uma categoria de mapa, depois o mapa, o modo de jogo e a dificuldade. Iniciantes e Medianos ensinam o básico; Difíceis e Impossíveis trazem caminhos duplos e mais desafio.": "Choose a map category, then the map, the game mode and the difficulty. Beginner and Medium teach the basics; Hard and Impossible bring dual tracks and more challenge.",
+  "Bosque dos Gatinhos • Campanha • Fácil": "Kitten Grove • Campaign • Easy",
+  "Categorias de mapas": "Map categories",
+  "MODO DE JOGO": "GAME MODE",
+  "Campanha: conclua a fase, derrube o dirigível boss final e conquiste a estrela da dificuldade.": "Campaign: clear the stage, take down the final boss blimp and earn the difficulty star.",
+  "🏁 Campanha": "🏁 Campaign",
+  "Fases com boss tanque 75×": "Stages with a 75× tank boss",
+  "∞ Infinito": "∞ Infinite",
+  "Sem rodada final • moedas a cada 10": "No final round • coins every 10",
+  "HERÓI EQUIPADO": "EQUIPPED HERO",
+  "🦸 Trocar herói": "🦸 Change hero",
+  "DIFICULDADE": "DIFFICULTY",
+  "Escolha a estrela que quer conquistar.": "Choose the star you want to earn.",
+  "EM CAMPO": "ON THE FIELD",
+  "Campanha • Fácil • 1 estrela": "Campaign • Easy • 1 star",
+  "salmões": "salmon",
+  "alvos": "targets",
+  "Abrir menu da partida": "Open match menu",
+  "PODERES": "POWERS",
+  "Cargas da mochila.": "Bag charges.",
+  "Rodada 1": "Round 1",
+  "Carregando previsão...": "Loading preview...",
+  "F8 fecha": "F8 closes",
+  "Aguardando métricas...": "Waiting for metrics...",
+  "Clique em um gatinho na barra da direita; depois clique uma vez em um local válido para posicioná-lo.": "Click a kitten in the bar on the right; then click once on a valid spot to place it.",
+  "Barra de gatinhos, upgrades e controle de rodada": "Kitten bar, upgrades and round control",
+  "GATINHOS • MÁX 4": "KITTENS • MAX 4",
+  "Escolha um gatinho": "Choose a kitten",
+  "Dardo, 77 salmões": "Dart, 77 salmon",
+  "Dardo • 77 salmões": "Dart • 77 salmon",
+  "Gelinho, 105 salmões": "Frosty, 105 salmon",
+  "Gelinho • 105 salmões": "Frosty • 105 salmon",
+  "Bombinha, 154 salmões": "Bomb, 154 salmon",
+  "Bombinha • 154 salmões": "Bomb • 154 salmon",
+  "Laser, 193 salmões": "Laser, 193 salmon",
+  "Laser • 193 salmões": "Laser • 193 salmon",
+  "Ninja, 231 salmões": "Ninja, 231 salmon",
+  "Ninja • 231 salmões": "Ninja • 231 salmon",
+  "Mago, 286 salmões": "Wizard, 286 salmon",
+  "Mago • 286 salmões": "Wizard • 286 salmon",
+  "Volts, 259 salmões": "Volts, 259 salmon",
+  "Volts • 259 salmões": "Volts • 259 salmon",
+  "Cipó, 248 salmões": "Vine, 248 salmon",
+  "Cipó • 248 salmões": "Vine • 248 salmon",
+  "Pescador de Salmão, 198 salmões": "Salmon Fisher, 198 salmon",
+  "Pescador de Salmão • 198 salmões": "Salmon Fisher • 198 salmon",
+  "Sniper, 352 salmões": "Sniper, 352 salmon",
+  "Sniper • 352 salmões": "Sniper • 352 salmon",
+  "Herói Gatinho da partida": "Match Hero Kitten",
+  "HERÓI • LIMITE 1": "HERO • LIMIT 1",
+  "🐟 350 • pronto para entrar": "🐟 350 • ready to deploy",
+  "Nv. 1": "Lv. 1",
+  "Passiva do herói": "Hero passive",
+  "Gasta salmões da partida para completar o XP do nível atual na hora": "Spends match salmon to instantly complete the current level's XP",
+  "🐟 Upar com salmões • 180": "🐟 Level up with salmon • 180",
+  "🔒 Habilidade Nv.5": "🔒 Lv.5 Ability",
+  "🔒 Ultimate Nv.10": "🔒 Lv.10 Ultimate",
+  "Upgrades do gatinho selecionado": "Selected kitten upgrades",
+  "Fechar upgrades": "Close upgrades",
+  "Gatinho selecionado": "Selected kitten",
+  "Escolha um upgrade.": "Choose an upgrade.",
+  "🎯 Foco de ataque": "🎯 Attack focus",
+  "Primeiro (padrão)": "First (default)",
+  "⭐ Habilidade": "⭐ Ability",
+  "↔ Reposicionar": "↔ Reposition",
+  "🐟 Vender": "🐟 Sell",
+  "Chamar próxima rodada": "Call next round",
+  "Velocidade do jogo": "Game speed",
+  "Pausar ou continuar": "Pause or resume",
+  "Texto do passo.": "Step text.",
+  "Ação do tutorial.": "Tutorial action.",
+  "Pular tutorial": "Skip tutorial",
+  "LÍDER DA DEFESA": "DEFENSE LEADER",
+  "Heróis Gatinhos": "Hero Kittens",
+  "Escolha": "Choose",
+  "1 herói por partida": "1 hero per match",
+  ". O herói sobe do nível 1 ao 10 dentro do mapa, libera uma habilidade no nível 5 e uma Ultimate no nível 10.": ". The hero goes from level 1 to 10 within the map, unlocking an ability at level 5 and an Ultimate at level 10.",
+  "🦸 Equipado: Rei Bigodes": "🦸 Equipped: King Whiskers",
+  "Visualização do herói selecionado": "Selected hero preview",
+  "COLEÇÃO": "COLLECTION",
+  "Cada gatinho possui": "Every kitten has",
+  "Maestria própria até o nível 50": "its own Mastery up to level 50",
+  ". Use-o nas partidas para ganhar XP, aumentar seus atributos e desbloquear uma habilidade exclusiva + skin dourada no nível máximo.": ". Use it in matches to earn XP, boost its stats and unlock an exclusive ability + golden skin at max level.",
+  "Visualização do gatinho selecionado": "Selected kitten preview",
+  "NÍVEL DA CONTA": "ACCOUNT LEVEL",
+  "Experiência": "Experience",
+  "A cada nível, a experiência necessária aumenta em": "Each level, the required experience increases by",
+  "ARSENAL DE PODERES": "POWER ARSENAL",
+  "Moedas são permanentes. Comprar adiciona uma carga à mochila; usar durante a partida consome essa carga.": "Coins are permanent. Buying adds a charge to your bag; using it during a match spends that charge.",
+  "VISUAIS DOS GATINHOS": "KITTEN LOOKS",
+  "Skins mudam apenas a aparência. Os atributos e caminhos de melhoria continuam iguais.": "Skins only change the look. Stats and upgrade paths stay the same.",
+  "EXCLUSIVO": "EXCLUSIVE",
+  "Roleta Celestial": "Celestial Wheel",
+  "Uma chance rara de desbloquear o Gato Celestial. Depois do giro gratuito, novos giros usam moedas permanentes do jogo.": "A rare chance to unlock the Celestial Cat. After the free spin, new spins use permanent in-game coins.",
+  "GUIA RÁPIDO": "QUICK GUIDE",
+  "Cada gatinho tem um papel diferente. Os que têm árvore própria (🌳) podem investir em até 2 dos 3 caminhos: um vai até o T5, o outro para no T3.": "Each kitten has a different role. Those with their own tree (🌳) can invest in up to 2 of the 3 paths: one goes up to T5, the other stops at T3.",
+  "Balões": "Balloons",
+  "Todo balão comum segue a mesma escala de cor: quanto mais escura, mais resistente. É a mesma cor que define quantas vidas você perde se ele escapar (Vermelho = 1 até Preto = 6). Alguns também têm um comportamento especial além da cor.": "Every regular balloon follows the same color scale: the darker, the tougher. It's the same color that defines how many lives you lose if it escapes (Red = 1 up to Black = 6). Some also have a special behavior on top of the color.",
+  "🔊 Efeitos": "🔊 Effects",
+  "🎵 Música": "🎵 Music",
+  "🔍 Tamanho da interface": "🔍 Interface size",
+  "Pequena — 80%": "Small — 80%",
+  "Compacta — 90%": "Compact — 90%",
+  "Padrão — 100%": "Default — 100%",
+  "Grande — 110%": "Large — 110%",
+  "Extra grande — 125%": "Extra large — 125%",
+  "📖 Rever tutorial guiado": "📖 Replay guided tutorial",
+  "💜 Apoie o criador": "💜 Support the creator",
+  "Baixa um arquivo .json com todo o seu progresso": "Downloads a .json file with all your progress",
+  "⬇️ Exportar save": "⬇️ Export save",
+  "Carrega um arquivo .json de save exportado antes": "Loads a previously exported .json save file",
+  "⬆️ Importar save": "⬆️ Import save",
+  "Informações do beta": "Beta info",
+  "🧪 Beta v0.28.5": "🧪 Beta v0.29.0",
+  "O progresso fica salvo somente neste navegador. Exporte seu save regularmente para não perder a evolução ao limpar os dados do navegador ou trocar de computador.": "Progress is saved only in this browser. Export your save regularly so you don't lose it when clearing browser data or switching computers.",
+  "🐞 Enviar feedback ou relatar bug": "🐞 Send feedback or report a bug",
+  "ℹ Guia dos inimigos": "ℹ Enemy guide",
+  "🔴 1 tiro": "🔴 1 hit",
+  "🔵 2 tiros": "🔵 2 hits",
+  "🟢 3 tiros": "🟢 3 hits",
+  "🟡 4 tiros": "🟡 4 hits",
+  "🩷 5 tiros": "🩷 5 hits",
+  "⚫ 6+ tiros": "⚫ 6+ hits",
+  "🛡 Blindado: Bombinha": "🛡 Armored: Bomb",
+  "➕ Regenerador": "➕ Regen",
+  "🛡🛡 Pesado": "🛡🛡 Heavy",
+  "🎈 Boss final: 75× e mais lento": "🎈 Final boss: 75× and slower",
+  "🌳 Obstáculo: bloqueia visão": "🌳 Obstacle: blocks vision",
+  "⚡ Volts: dano em cadeia": "⚡ Volts: chain damage",
+  "🌿 Cipó: imobiliza": "🌿 Vine: roots",
+  "Cada balão que escapa tira vidas conforme a cor dele no momento (Vermelho = 1 até Preto = 6). O Mini Boss da rodada 15 tira 8 vidas se escapar; o Boss final tira TODAS as vidas restantes.": "Every balloon that escapes takes lives based on its current color (Red = 1 up to Black = 6). The round 15 Mini Boss takes 8 lives if it escapes; the final Boss takes ALL remaining lives.",
+  "🎬 Créditos": "🎬 Credits",
+  "Criado por": "Created by",
+  "Trilha sonora, efeitos sonoros e toda a arte das torres, heróis e mapas são originais, feitos direto no jogo.": "Soundtrack, sound effects and all the art for towers, heroes and maps are original, made right in the game.",
+  "Obrigado por jogar! 🐾": "Thanks for playing! 🐾",
+  "▶ Continuar": "▶ Resume",
+  "↻ Reiniciar fase": "↻ Restart stage",
+  "⌂ Voltar para o lobby": "⌂ Back to lobby",
+  "✕ Fechar": "✕ Close",
+  "Atalho: Esc abre e fecha este menu.": "Shortcut: Esc opens and closes this menu.",
+  "💜 APOIE O CRIADOR": "💜 SUPPORT THE CREATOR",
+  "Gostou do Catoons TD?": "Enjoying Catoons TD?",
+  "O apoio é totalmente opcional e não concede vantagem, giro ou recompensa dentro do jogo.": "Support is completely optional and gives no advantage, spin or reward in the game.",
+  "QR Code Pix para apoiar o criador": "Pix QR Code to support the creator",
+  "Escaneie o QR Code para apoiar o criador via Pix. O apoio é opcional e não concede vantagem no jogo.": "Scan the QR Code to support the creator via Pix (Brazil). Support is optional and gives no advantage in the game.",
+  "📋 Copiar código Pix": "📋 Copy Pix code",
+  "Fechar": "Close",
+  "⚠️ Atenção": "⚠️ Warning",
+  "Apagar todo o progresso?": "Erase all progress?",
+  "Isso apaga moedas, nível, XP, estrelas, vitórias, Maestria e poderes comprados desta conta. Essa ação não pode ser desfeita. Se quiser manter uma cópia, cancele e use \"Exportar save\" na tela de Configurações antes.": "This erases this account's coins, level, XP, stars, wins, Mastery and purchased powers. This can't be undone. If you want to keep a copy, cancel and use \"Export save\" in Settings first.",
+  "Cancelar": "Cancel",
+  "Apagar tudo": "Erase everything",
+  "✨ SEGREDO DESCOBERTO": "✨ SECRET DISCOVERED",
+  "Gatinho Secreto": "Secret Kitten",
+  "Função especial": "Special role",
+  "Um novo Gatinho Secreto foi descoberto.": "A new Secret Kitten has been discovered.",
+  "Descobrir gatinho": "Discover kitten",
+  "Você concluiu a fase.": "You cleared the stage.",
+  "Dica: gatinhos Sniper enxergam qualquer camuflado do mapa.": "Tip: Sniper kittens see any camo on the map.",
+  "Configurações": "Settings",
+  "⚙️ Configurações": "⚙️ Settings",
+  "Ajuste som, idioma, tela e save — vale pra qualquer tela do jogo.": "Adjust sound, language, display and save — applies to every screen in the game.",
+  "🌐 Idioma": "🌐 Language",
+  "Troque o idioma no lobby (a página recarrega).": "Change the language from the lobby (the page reloads).",
+  "NAVEGADOR • v0.29.0 BETA": "BROWSER • v0.29.0 BETA",
+  "+alcance.": "+range.",
+  "+dano e +alcance.": "+damage and +range.",
+  "% renda": "% income",
+  "• 🐾 Gatinhos:": "• 🐾 Kittens:",
+  "rodadas": "rounds",
+  "✓ Desbloqueada • cooldown": "✓ Unlocked • cooldown",
+  "moedas": "coins",
+  "✓ EQUIPADO": "✓ EQUIPPED",
+  "🦸 Equipado:": "🦸 Equipped:",
+  "ataque(s)/s": "attack(s)/s",
+  "recarga": "cooldown",
+  "🎰 Girar • 🪙": "🎰 Spin • 🪙",
+  "✨ Garantia": "✨ Guarantee",
+  "✓ Equipada": "✓ Equipped",
+  "✓ Feito!": "✓ Done!",
+  "✓ Certo!": "✓ Nice!",
+  "liberada!": "unlocked!",
+  "• PRINCIPAL": "• MAIN",
+  "T5 completo": "T5 complete",
+  "➤ Dardo": "➤ Dart",
+  "🏹 Arco": "🏹 Bow",
+  "• principal C": "• main P",
+  "especiais +": "specials +",
+  "marca +": "mark +",
+  "designador +": "designator +",
+  "• ⚡ Cadeia": "• ⚡ Chain",
+  "s • 🌑 sombras": "s • 🌑 shadows",
+  "• 😨 Medo": "• 😨 Fear",
+  "🛡 Blindado": "🛡 Armored",
+  "🥷🛡 Camo+Blindado": "🥷🛡 Camo+Armored",
+  "❤️ Curandeiro": "❤️ Healer",
+  "😇 Anjo": "😇 Angel",
+  "• Dano": "• Damage",
+  "😵 Atordoado •": "😵 Stunned •",
+  "🏁 Campanha •": "🏁 Campaign •",
+  "ativado!": "activated!",
+  "regenerador(es)": "regen",
+  "alvos •": "targets •",
+  "blindado(s) •": "armored •",
+  "ativada!": "activated!",
+  "🌙 RECUO": "🌙 PUSHBACK",
+  "🎯 MARCADO +": "🎯 MARKED +",
+  "-1 camada": "-1 layer",
+  "😈 -1 camada": "😈 -1 layer",
+  "😨 MEDO": "😨 FEAR",
+  "🛡 BLOQUEADO": "🛡 BLOCKED",
+  "LIMITE 🐟 500": "CAP 🐟 500",
+  "🔥 queimando": "🔥 burning",
+  "✨ PARADOXO!": "✨ PARADOX!",
+  "vidas": "lives",
+  "👁 NORMALIZADO": "👁 NORMALIZED",
+  "🌿 preso": "🌿 held",
+  "🔴🧪 CATALISADO!": "🔴🧪 CATALYZED!",
+  "🧪 VENENO": "🧪 POISON",
+  "⚗️ FRAQUEZA": "⚗️ WEAKNESS",
+  "⏳ MARCADO": "⏳ MARKED",
+  "👁 REVELADO": "👁 REVEALED",
+  "✨ DESBLINDADO": "✨ ARMOR STRIPPED",
+  "a rodada": "round",
+  "PESADO": "HEAVY",
+  "ataques/s": "attacks/s",
+  "⭐ Nv. 10 MAX": "⭐ Lv. 10 MAX",
+  "escolhidos": "chosen",
+  "carga": "charge",
+  "mapas": "maps"
+};
+const I18N_CACHE=new Map();
+const I18N_TCACHE=new WeakMap();
+function i18nCore(text){
+  const m=/^(\s*)([\s\S]*?)(\s*)$/.exec(text);
+  if(!m[2])return text;
+  const en=I18N_EN[m[2].replace(/\s+/g,' ')];
+  return en===undefined?text:m[1]+en+m[3];
+}
+function i18nSeg(s){
+  if(I18N_LANG!=='en'||typeof s!=='string'||!s)return s;
+  const hit=I18N_CACHE.get(s);if(hit!==undefined)return hit;
+  const parts=s.split(/(<[^>]*>|^[^<>]*>|<[^<>]*$)/);
+  for(let i=0;i<parts.length;i++){
+    const p=parts[i];if(!p)continue;
+    parts[i]=i%2===1
+      ?p.replace(/((?:title|aria-label|alt|placeholder|data-tip)=")([^"]*)(")/g,(_,a,v,b)=>a+i18nCore(v)+b)
+      :i18nCore(p);
+  }
+  const out=parts.join('');I18N_CACHE.set(s,out);return out;
+}
+function $t(s){return i18nSeg(s);}
+function $T(strings,...vals){
+  let tr=I18N_TCACHE.get(strings);
+  if(!tr){tr=I18N_LANG==='en'?strings.map(i18nSeg):strings;I18N_TCACHE.set(strings,tr);}
+  let out=tr[0];
+  for(let i=0;i<vals.length;i++)out+=String(vals[i])+tr[i+1];
+  return out;
+}
+function i18nTranslateDom(root){
+  if(I18N_LANG!=='en'||!root)return;
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  nodes.forEach(n=>{const v=n.nodeValue;if(v&&v.trim()){const t=i18nCore(v);if(t!==v)n.nodeValue=t;}});
+  root.querySelectorAll('[title],[aria-label],[alt],[placeholder],[data-tip]').forEach(el=>{
+    ['title','aria-label','alt','placeholder','data-tip'].forEach(a=>{const v=el.getAttribute(a);if(v){const t=i18nCore(v);if(t!==v)el.setAttribute(a,t);}});
+  });
+}
+function setGameLanguage(lang){
+  if(lang!=='pt'&&lang!=='en')return;
+  try{localStorage.setItem(I18N_LANG_KEY,lang);}catch(e){}
+  if(lang!==I18N_LANG)location.reload();
+}
+document.documentElement.lang=I18N_LANG==='pt'?'pt-BR':'en';
+i18nTranslateDom(document.body);
+// ===== fim i18n =====
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => Array.from(document.querySelectorAll(selector));
@@ -7,9 +1334,9 @@ const SAVE_KEY = 'catoonsTD_v066';
 const PREVIOUS_SAVE_KEYS = ['catoonsTD_v065','catoonsTD_v064','catoonsTD_v063','catoonsTD_v062','catoonsTD_v061','catoonsTD_v060','catoonsTD_v050','luanCatDefense_v030','luanCatDefense_v020'];
 
 const difficulties = {
-  easy:   {name:'Fácil',  star:'★', hp:.90, speed:1.00, startMoney:1.00, extraLives:3, waveReward:.78, xpMultiplier:1.00, coinMultiplier:1.00, clearXp:80,  roundsDelta:-4, description:'Começa com 🐟 350 salmões. +3 vidas, menos rodadas e sem blindados.'},
-  normal: {name:'Normal', star:'★', hp:1.00, speed:1.12, startMoney:.90, extraLives:0, waveReward:.86, xpMultiplier:1.25, coinMultiplier:1.35, clearXp:130, roundsDelta:0,  description:'Começa com 🐟 350 salmões. Ondas mais cheias, inimigos mais rápidos e blindados a partir daqui.'},
-  hard:   {name:'Difícil',star:'★', hp:1.16, speed:1.28, startMoney:.78, extraLives:-3,waveReward:.95, xpMultiplier:1.55, coinMultiplier:1.75, clearXp:210, roundsDelta:5,  description:'Começa com 🐟 350 salmões. Inimigos muito rápidos, mais rodadas e margem pequena para erro.'}
+  easy:   {name:$t('Fácil'),  star:'★', hp:.90, speed:1.00, startMoney:1.00, extraLives:3, waveReward:.78, xpMultiplier:1.00, coinMultiplier:1.00, clearXp:80,  roundsDelta:-4, description:$t('Começa com 🐟 350 salmões. +3 vidas, menos rodadas e sem blindados.')},
+  normal: {name:'Normal', star:'★', hp:1.00, speed:1.12, startMoney:.90, extraLives:0, waveReward:.86, xpMultiplier:1.25, coinMultiplier:1.35, clearXp:130, roundsDelta:0,  description:$t('Começa com 🐟 350 salmões. Ondas mais cheias, inimigos mais rápidos e blindados a partir daqui.')},
+  hard:   {name:$t('Difícil'),star:'★', hp:1.16, speed:1.28, startMoney:.78, extraLives:-3,waveReward:.95, xpMultiplier:1.55, coinMultiplier:1.75, clearXp:210, roundsDelta:5,  description:$t('Começa com 🐟 350 salmões. Inimigos muito rápidos, mais rodadas e margem pequena para erro.')}
 };
 const difficultyOrder = ['easy','normal','hard'];
 const TOWER_LIMIT_PER_TYPE = 4;
@@ -18,12 +1345,12 @@ const GLOBAL_UPGRADE_PRICE_MULTIPLIER = 1.10;
 const MATCH_START_MONEY = 350;
 const CELESTIAL_SPIN_COST = 150;
 const CELESTIAL_FREE_SPIN_MS = 24*60*60*1000;
-const CREATOR_PIX_PAYLOAD = '00020126330014br.gov.bcb.pix0111439914522075204000053039865802BR5913LUAN HENRIQUE6008LONDRINA62070503***6304298D';
+const CREATOR_PIX_PAYLOAD = '00020126580014BR.GOV.BCB.PIX013651006471-ff57-4ea9-a7f2-60465c8ccd615204000053039865802BR5925Luan Henrique Carvalho Pe6009SAO PAULO62140510FvcLnGIFLM6304F652';
 
 const maps = {
   grove: {
-    name:'Bosque dos Gatinhos', rounds:15, startMoney:260, lives:20, hpMultiplier:1, speedMultiplier:1.05, rewardMultiplier:1, clearCoins:40,
-    description:'Curvas abertas, árvores iluminadas e um grande gancho ao redor do bosque central — o mapa mais simples para aprender as tropas.',
+    name:$t('Bosque dos Gatinhos'), rounds:15, startMoney:260, lives:20, hpMultiplier:1, speedMultiplier:1.05, rewardMultiplier:1, clearCoins:40,
+    description:$t('Curvas abertas, árvores iluminadas e um grande gancho ao redor do bosque central — o mapa mais simples para aprender as tropas.'),
     obstacles:[
       {x:320,y:280,r:34,type:'tree'},{x:80,y:110,r:26,type:'tree'},
       {x:610,y:340,r:28,type:'tree'},{x:860,y:40,r:22,type:'tree'}
@@ -33,8 +1360,8 @@ const maps = {
     path:[{x:-40,y:200},{x:170,y:200},{x:170,y:400},{x:460,y:400},{x:460,y:150},{x:700,y:110},{x:960,y:170}]
   },
   ridge: {
-    name:'Serra Felina', rounds:20, startMoney:290, lives:18, hpMultiplier:1.08, speedMultiplier:1.12, rewardMultiplier:1.05, clearCoins:65,
-    description:'Montanhas, neblina e uma estrada de montanha com duas curvas fechadas em ziguezague.',
+    name:$t('Serra Felina'), rounds:20, startMoney:290, lives:18, hpMultiplier:1.08, speedMultiplier:1.12, rewardMultiplier:1.05, clearCoins:65,
+    description:$t('Montanhas, neblina e uma estrada de montanha com duas curvas fechadas em ziguezague.'),
     obstacles:[
       {x:340,y:130,r:29,type:'pine'},{x:60,y:420,r:31,type:'rock'},
       {x:700,y:250,r:30,type:'pine'},{x:60,y:220,r:27,type:'rock'}
@@ -44,8 +1371,8 @@ const maps = {
     path:[{x:-40,y:90},{x:160,y:90},{x:260,y:220},{x:150,y:340},{x:280,y:460},{x:470,y:460},{x:560,y:300},{x:430,y:170},{x:620,y:110},{x:820,y:200},{x:960,y:150}]
   },
   toll: {
-    name:'Pedágio da Meia-Noite', rounds:25, startMoney:320, lives:16, hpMultiplier:1.14, speedMultiplier:1.18, rewardMultiplier:1.10, clearCoins:90,
-    description:'Cidade ao fundo, postes de luz e uma volta quase completa ao redor da praça do pedágio — o trecho mais pesado dos mapas Iniciantes.',
+    name:$t('Pedágio da Meia-Noite'), rounds:25, startMoney:320, lives:16, hpMultiplier:1.14, speedMultiplier:1.18, rewardMultiplier:1.10, clearCoins:90,
+    description:$t('Cidade ao fundo, postes de luz e uma volta quase completa ao redor da praça do pedágio — o trecho mais pesado dos mapas Iniciantes.'),
     obstacles:[
       {x:600,y:40,r:26,type:'rock'},{x:80,y:430,r:31,type:'rock'},
       {x:750,y:300,r:26,type:'rock'},{x:780,y:150,r:27,type:'rock'}
@@ -56,8 +1383,8 @@ const maps = {
     path:[{x:300,y:-40},{x:300,y:120},{x:440,y:210},{x:440,y:340},{x:300,y:430},{x:160,y:360},{x:160,y:200},{x:280,y:110},{x:520,y:120},{x:640,y:250},{x:600,y:400},{x:960,y:430}]
   },
   meadow: {
-    name:'Prado das Patinhas', rounds:17, startMoney:275, lives:20, hpMultiplier:1.03, speedMultiplier:1.07, rewardMultiplier:1.01, clearCoins:50,
-    description:'Pradaria aberta com curvas largas e poucos bloqueios. Introduz posicionamento em ambos os lados da rota sem apertar demais a economia.',
+    name:$t('Prado das Patinhas'), rounds:17, startMoney:275, lives:20, hpMultiplier:1.03, speedMultiplier:1.07, rewardMultiplier:1.01, clearCoins:50,
+    description:$t('Pradaria aberta com curvas largas e poucos bloqueios. Introduz posicionamento em ambos os lados da rota sem apertar demais a economia.'),
     obstacles:[
       {x:120,y:110,r:24,type:'tree'},{x:350,y:390,r:24,type:'tree'},{x:630,y:120,r:22,type:'tree'},{x:800,y:410,r:22,type:'rock'}
     ],
@@ -65,8 +1392,8 @@ const maps = {
     path:[{x:-40,y:310},{x:120,y:310},{x:210,y:210},{x:340,y:210},{x:420,y:330},{x:560,y:330},{x:650,y:220},{x:760,y:220},{x:960,y:300}]
   },
   creek: {
-    name:'Riacho do Novelo', rounds:19, startMoney:285, lives:19, hpMultiplier:1.06, speedMultiplier:1.10, rewardMultiplier:1.03, clearCoins:58,
-    description:'Uma rota sinuosa acompanha um riacho. As curvas aumentam o tempo no alcance, mas pedras começam a criar pontos cegos importantes.',
+    name:$t('Riacho do Novelo'), rounds:19, startMoney:285, lives:19, hpMultiplier:1.06, speedMultiplier:1.10, rewardMultiplier:1.03, clearCoins:58,
+    description:$t('Uma rota sinuosa acompanha um riacho. As curvas aumentam o tempo no alcance, mas pedras começam a criar pontos cegos importantes.'),
     obstacles:[
       {x:175,y:115,r:27,type:'rock'},{x:330,y:325,r:24,type:'tree'},{x:545,y:165,r:25,type:'rock'},{x:730,y:365,r:25,type:'tree'}
     ],
@@ -74,8 +1401,8 @@ const maps = {
     path:[{x:-40,y:145},{x:130,y:145},{x:230,y:260},{x:150,y:390},{x:335,y:445},{x:460,y:335},{x:420,y:190},{x:610,y:125},{x:720,y:245},{x:835,y:390},{x:960,y:345}]
   },
   garden: {
-    name:'Jardim das Lanternas', rounds:23, startMoney:310, lives:17, hpMultiplier:1.11, speedMultiplier:1.15, rewardMultiplier:1.07, clearCoins:78,
-    description:'O último treino antes dos mapas Médios: rota longa ao redor de jardins e lanternas, com vários bloqueios de visão próximos às melhores curvas.',
+    name:$t('Jardim das Lanternas'), rounds:23, startMoney:310, lives:17, hpMultiplier:1.11, speedMultiplier:1.15, rewardMultiplier:1.07, clearCoins:78,
+    description:$t('O último treino antes dos mapas Médios: rota longa ao redor de jardins e lanternas, com vários bloqueios de visão próximos às melhores curvas.'),
     obstacles:[
       {x:280,y:245,r:30,type:'tree'},{x:470,y:245,r:33,type:'tree'},{x:650,y:260,r:30,type:'tree'},{x:820,y:115,r:22,type:'rock'}
     ],
@@ -83,8 +1410,8 @@ const maps = {
     path:[{x:-40,y:410},{x:120,y:410},{x:180,y:280},{x:170,y:130},{x:370,y:95},{x:520,y:155},{x:540,y:350},{x:690,y:435},{x:825,y:350},{x:790,y:185},{x:960,y:120}]
   },
   canyon: {
-    name:'Desfiladeiro Escaldante', rounds:28, startMoney:340, lives:15, hpMultiplier:1.20, speedMultiplier:1.22, rewardMultiplier:1.15, clearCoins:115, enemyDensity:1.15,
-    description:'Mapa mediano: rota bem mais longa e sinuosa entre as rochas, mais rodadas e mais balões por onda que os mapas iniciantes.',
+    name:$t('Desfiladeiro Escaldante'), rounds:28, startMoney:340, lives:15, hpMultiplier:1.20, speedMultiplier:1.22, rewardMultiplier:1.15, clearCoins:115, enemyDensity:1.15,
+    description:$t('Mapa mediano: rota bem mais longa e sinuosa entre as rochas, mais rodadas e mais balões por onda que os mapas iniciantes.'),
     obstacles:[
       {x:480,y:260,r:95,type:'rock'},
       {x:80,y:150,r:27,type:'rock'},{x:850,y:150,r:28,type:'rock'},
@@ -96,8 +1423,8 @@ const maps = {
     path:[{x:-40,y:260},{x:150,y:260},{x:310,y:260},{x:360,y:140},{x:480,y:90},{x:600,y:140},{x:650,y:260},{x:600,y:380},{x:480,y:430},{x:360,y:380},{x:250,y:470},{x:960,y:470}]
   },
   harbor: {
-    name:'Porto das Sardinhas', rounds:27, startMoney:335, lives:15, hpMultiplier:1.18, speedMultiplier:1.20, rewardMultiplier:1.12, clearCoins:105, enemyDensity:1.10,
-    description:'Cais estreitos e contêineres criam corredores de tiro. Mais balões por onda e uma rota que muda de direção várias vezes.',
+    name:$t('Porto das Sardinhas'), rounds:27, startMoney:335, lives:15, hpMultiplier:1.18, speedMultiplier:1.20, rewardMultiplier:1.12, clearCoins:105, enemyDensity:1.10,
+    description:$t('Cais estreitos e contêineres criam corredores de tiro. Mais balões por onda e uma rota que muda de direção várias vezes.'),
     obstacles:[
       {x:190,y:165,r:31,type:'rock'},{x:370,y:355,r:34,type:'rock'},{x:610,y:160,r:32,type:'rock'},{x:790,y:360,r:34,type:'rock'}
     ],
@@ -105,8 +1432,8 @@ const maps = {
     path:[{x:-40,y:390},{x:145,y:390},{x:145,y:250},{x:300,y:250},{x:300,y:115},{x:500,y:115},{x:555,y:300},{x:700,y:300},{x:700,y:445},{x:840,y:445},{x:840,y:240},{x:960,y:240}]
   },
   ruins: {
-    name:'Ruínas do Ronrom', rounds:30, startMoney:350, lives:14, hpMultiplier:1.23, speedMultiplier:1.24, rewardMultiplier:1.16, clearCoins:125, enemyDensity:1.16,
-    description:'Ruínas antigas dividem as melhores linhas de tiro. A rota faz um grande oito e exige coberturas que funcionem em mais de uma passagem.',
+    name:$t('Ruínas do Ronrom'), rounds:30, startMoney:350, lives:14, hpMultiplier:1.23, speedMultiplier:1.24, rewardMultiplier:1.16, clearCoins:125, enemyDensity:1.16,
+    description:$t('Ruínas antigas dividem as melhores linhas de tiro. A rota faz um grande oito e exige coberturas que funcionem em mais de uma passagem.'),
     obstacles:[
       {x:300,y:150,r:44,type:'rock'},{x:300,y:370,r:44,type:'rock'},{x:585,y:260,r:56,type:'rock'},{x:810,y:120,r:28,type:'rock'}
     ],
@@ -114,8 +1441,8 @@ const maps = {
     path:[{x:-40,y:250},{x:130,y:250},{x:230,y:120},{x:410,y:120},{x:500,y:260},{x:410,y:400},{x:220,y:400},{x:165,y:300},{x:420,y:260},{x:650,y:120},{x:805,y:210},{x:760,y:390},{x:960,y:430}]
   },
   factory: {
-    name:'Fábrica de Brinquedos', rounds:32, startMoney:360, lives:14, hpMultiplier:1.28, speedMultiplier:1.27, rewardMultiplier:1.18, clearCoins:140, enemyDensity:1.20,
-    description:'Esteiras imaginárias, máquinas e curvas de 90°. É o mapa Mediano mais pesado e prepara o jogador para defender setores separados.',
+    name:$t('Fábrica de Brinquedos'), rounds:32, startMoney:360, lives:14, hpMultiplier:1.28, speedMultiplier:1.27, rewardMultiplier:1.18, clearCoins:140, enemyDensity:1.20,
+    description:$t('Esteiras imaginárias, máquinas e curvas de 90°. É o mapa Mediano mais pesado e prepara o jogador para defender setores separados.'),
     obstacles:[
       {x:220,y:165,r:36,type:'rock'},{x:420,y:350,r:38,type:'rock'},{x:625,y:155,r:40,type:'rock'},{x:790,y:365,r:38,type:'rock'}
     ],
@@ -123,8 +1450,8 @@ const maps = {
     path:[{x:-40,y:100},{x:160,y:100},{x:160,y:310},{x:330,y:310},{x:330,y:455},{x:535,y:455},{x:535,y:235},{x:705,y:235},{x:705,y:80},{x:855,y:80},{x:855,y:330},{x:960,y:330}]
   },
   fork: {
-    name:'Vale Bifurcado', rounds:24, startMoney:370, lives:14, hpMultiplier:1.26, speedMultiplier:1.26, rewardMultiplier:1.20, clearCoins:145, enemyDensity:1.20,
-    description:'Mapa Difícil: duas trilhas separadas por uma cordilheira central, cada uma exigindo sua própria defesa. As 2 primeiras rodadas vêm só pela trilha de cima, as 2 seguintes só pela de baixo — a partir da rodada 5 as duas trilhas recebem balões ao mesmo tempo.',
+    name:$t('Vale Bifurcado'), rounds:24, startMoney:370, lives:14, hpMultiplier:1.26, speedMultiplier:1.26, rewardMultiplier:1.20, clearCoins:145, enemyDensity:1.20,
+    description:$t('Mapa Difícil: duas trilhas separadas por uma cordilheira central, cada uma exigindo sua própria defesa. As 2 primeiras rodadas vêm só pela trilha de cima, as 2 seguintes só pela de baixo — a partir da rodada 5 as duas trilhas recebem balões ao mesmo tempo.'),
     obstacles:[
       {x:320,y:150,r:26,type:'tree'},{x:650,y:200,r:24,type:'tree'},
       {x:340,y:380,r:26,type:'rock'},{x:660,y:330,r:24,type:'rock'},
@@ -138,8 +1465,8 @@ const maps = {
     ]
   },
   storm: {
-    name:'Ponte da Tempestade', rounds:29, startMoney:350, lives:13, hpMultiplier:1.31, speedMultiplier:1.29, rewardMultiplier:1.18, clearCoins:155, enemyDensity:1.24,
-    description:'Mapa Difícil: duas pontes longas atravessam a tempestade. As rotas pressionam lados opostos e os rochedos centrais reduzem as linhas de tiro cruzadas.',
+    name:$t('Ponte da Tempestade'), rounds:29, startMoney:350, lives:13, hpMultiplier:1.31, speedMultiplier:1.29, rewardMultiplier:1.18, clearCoins:155, enemyDensity:1.24,
+    description:$t('Mapa Difícil: duas pontes longas atravessam a tempestade. As rotas pressionam lados opostos e os rochedos centrais reduzem as linhas de tiro cruzadas.'),
     obstacles:[
       {x:270,y:255,r:38,type:'rock'},{x:450,y:255,r:42,type:'rock'},{x:630,y:255,r:38,type:'rock'},{x:810,y:255,r:34,type:'rock'}
     ],
@@ -150,8 +1477,8 @@ const maps = {
     ]
   },
   blind: {
-    name:'Passagem Cega', rounds:26, startMoney:300, lives:15, hpMultiplier:1.34, speedMultiplier:1.30, rewardMultiplier:0.90, clearCoins:160, enemyDensity:1.25,
-    description:'Mapa Impossível: as mesmas duas trilhas paralelas do Vale Bifurcado, agora numa neblina espessa cheia de rochedos que bloqueiam a visão das torres — e com 10% menos salmões para trabalhar.',
+    name:$t('Passagem Cega'), rounds:26, startMoney:300, lives:15, hpMultiplier:1.34, speedMultiplier:1.30, rewardMultiplier:0.90, clearCoins:160, enemyDensity:1.25,
+    description:$t('Mapa Impossível: as mesmas duas trilhas paralelas do Vale Bifurcado, agora numa neblina espessa cheia de rochedos que bloqueiam a visão das torres — e com 10% menos salmões para trabalhar.'),
     obstacles:[
       {x:250,y:100,r:36,type:'rock'},{x:420,y:190,r:34,type:'pine'},{x:560,y:110,r:32,type:'rock'},
       {x:260,y:420,r:36,type:'rock'},{x:420,y:340,r:34,type:'pine'},{x:560,y:420,r:32,type:'rock'},
@@ -166,8 +1493,8 @@ const maps = {
     ]
   },
   church: {
-    name:'Festa na Igreja', rounds:31, startMoney:285, lives:11, hpMultiplier:1.42, speedMultiplier:1.34, rewardMultiplier:.92, clearCoins:190, enemyDensity:1.34,
-    description:'Mapa Impossível: duas procissões entram por portas diferentes e se cruzam no centro da igreja. Os pilares bloqueiam a visão, mas gatinhos colocados sobre os bancos enxergam por cima deles.',
+    name:$t('Festa na Igreja'), rounds:31, startMoney:285, lives:11, hpMultiplier:1.42, speedMultiplier:1.34, rewardMultiplier:.92, clearCoins:190, enemyDensity:1.34,
+    description:$t('Mapa Impossível: duas procissões entram por portas diferentes e se cruzam no centro da igreja. Os pilares bloqueiam a visão, mas gatinhos colocados sobre os bancos enxergam por cima deles.'),
     obstacles:[
       {x:275,y:145,r:31,type:'pillar'},{x:645,y:145,r:31,type:'pillar'},
       {x:275,y:375,r:31,type:'pillar'},{x:645,y:375,r:31,type:'pillar'},
@@ -199,10 +1526,10 @@ Object.values(maps).forEach(map=>{
 });
 
 const MAP_CATEGORIES=[
-  {id:'beginner',name:'Iniciantes',icon:'🌱',maps:['grove','meadow','creek','ridge','garden','toll'],description:'6 mapas de aprendizado com pressão crescente: rotas simples no começo e mais obstáculos/economia apertada perto do final.'},
-  {id:'medium',name:'Medianos',icon:'🧭',maps:['harbor','canyon','ruins','factory'],description:'4 mapas com mais densidade, rotas longas, bloqueios de visão e decisões de posicionamento mais exigentes.'},
-  {id:'hardmaps',name:'Difíceis',icon:'🔥',maps:['fork','storm'],description:'2 mapas de duas rotas: a defesa precisa ser dividida e pouco espaço pode ser desperdiçado.'},
-  {id:'impossible',name:'Impossíveis',icon:'💀',maps:['blind','church'],description:'2 desafios máximos de duas rotas: neblina ou caminhos em cruz, visão bloqueada, pouca economia e inimigos mais fortes.'}
+  {id:'beginner',name:$t('Iniciantes'),icon:'🌱',maps:['grove','meadow','creek','ridge','garden','toll'],description:$t('6 mapas de aprendizado com pressão crescente: rotas simples no começo e mais obstáculos/economia apertada perto do final.')},
+  {id:'medium',name:$t('Medianos'),icon:'🧭',maps:['harbor','canyon','ruins','factory'],description:$t('4 mapas com mais densidade, rotas longas, bloqueios de visão e decisões de posicionamento mais exigentes.')},
+  {id:'hardmaps',name:$t('Difíceis'),icon:'🔥',maps:['fork','storm'],description:$t('2 mapas de duas rotas: a defesa precisa ser dividida e pouco espaço pode ser desperdiçado.')},
+  {id:'impossible',name:$t('Impossíveis'),icon:'💀',maps:['blind','church'],description:$t('2 desafios máximos de duas rotas: neblina ou caminhos em cruz, visão bloqueada, pouca economia e inimigos mais fortes.')}
 ];
 
 const SECRET_TOWER_RULES={
@@ -220,12 +1547,12 @@ function categoryMasteredForProfile(p,categoryId){
 // quantos tiros de dano-base ele aguenta. A vida real do balão pode passar de 6
 // (elite/blindado/dificuldade), mas visualmente ele nunca passa da cor Preta (a última).
 const TIERS=[
-  {name:'Vermelho', color:'#ff5b5b', ring:'#ffb3b3'},
-  {name:'Azul',      color:'#3fa9f5', ring:'#bfe3ff'},
-  {name:'Verde',     color:'#3fd47a', ring:'#b8f5d0'},
-  {name:'Amarelo',   color:'#ffd93f', ring:'#fff0b3'},
-  {name:'Rosa',      color:'#ff7fd1', ring:'#ffd6f0'},
-  {name:'Preto',     color:'#33323d', ring:'#8f8fa8'}
+  {name:$t('Vermelho'), color:'#ff5b5b', ring:'#ffb3b3'},
+  {name:$t('Azul'),      color:'#3fa9f5', ring:'#bfe3ff'},
+  {name:$t('Verde'),     color:'#3fd47a', ring:'#b8f5d0'},
+  {name:$t('Amarelo'),   color:'#ffd93f', ring:'#fff0b3'},
+  {name:$t('Rosa'),      color:'#ff7fd1', ring:'#ffd6f0'},
+  {name:$t('Preto'),     color:'#33323d', ring:'#8f8fa8'}
 ];
 function tierIndex(hp){return Math.max(0,Math.min(TIERS.length-1,Math.ceil(hp)-1));}
 function tierOf(hp){return TIERS[tierIndex(hp)];}
@@ -237,51 +1564,51 @@ function mapRounds(mapId,diffId){
 }
 
 const types = {
-  dart:   {name:'Gatinho Dardo', icon:'🐱', role:'Versátil / 3 caminhos', special:'Possui árvore própria de upgrades: Arqueiro, Lanceiro de Fogo ou Suporte. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.', cost:70, unlockLevel:1, range:116, rate:.56, damage:1.55, color:'#f3bf67', fur:'#d8a56f', accent:'#f3bf67', shot:'dart'},
-  frost:  {name:'Gato Gelinho', icon:'❄️', role:'Controle em área', special:'FULL AOE: a cada ataque acerta e reduz a velocidade de todos os alvos válidos dentro do alcance.', cost:95, unlockLevel:1, range:104, rate:.94, damage:.84, slow:2.0, fullAoe:true, color:'#70caea', fur:'#ffffff', accent:'#70caea', shot:'snow'},
-  burst:  {name:'Gato Bombinha', icon:'💥', role:'Blindagem + área / 3 caminhos', special:'Sempre quebra blindagem (incluindo pesados e camuflados-revelados) e causa dano em área. Possui árvore própria: Barril Reforçado, Fragmentação ou Nuvem Tóxica. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.', cost:140, unlockLevel:1, range:138, rate:1.12, damage:3.10, splash:58, color:'#ff7180', fur:'#6f6265', accent:'#ff7180', shot:'bomb', breaksArmor:true},
-  laser:  {name:'Gato Laser', icon:'🔴', role:'Ataque muito rápido / 3 caminhos', special:'Alta cadência para limpar grupos de balões comuns. Possui árvore própria: Foco de Precisão, Superaquecimento ou Grade de Plasma. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.', cost:175, unlockLevel:2, range:165, rate:.20, damage:.88, color:'#ff5d6c', fur:'#c99b78', accent:'#ff5d6c', shot:'laser'},
-  ninja:  {name:'Gato Ninja', icon:'🥷', role:'Dano explosivo / 3 caminhos', special:'Ataques rápidos com alto dano por alvo. Possui árvore própria: Lâminas Afiadas, Kunai Envenenado ou Sombra Assassina. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.', cost:210, unlockLevel:4, range:112, rate:.34, damage:2.85, color:'#b58cff', fur:'#3d3b47', accent:'#b58cff', shot:'shuriken'},
-  wizard: {name:'Gato Mago', icon:'✨', role:'Magia em área / 3 caminhos', special:'Projéteis mágicos com splash e controle leve. Possui árvore própria: Arcano Amplificado, Chamas Arcanas ou Runas de Fraqueza. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.', cost:260, unlockLevel:6, range:154, rate:.92, damage:3.20, slow:.75, splash:72, color:'#c9adff', fur:'#8e78ae', accent:'#c9adff', shot:'magic'},
-  electric:{name:'Gato Volts', icon:'⚡', role:'Dano em cadeia / 3 caminhos', special:'O raio salta entre até 4 alvos próximos. Possui árvore própria: Sobrecarga, Corrente Ampliada ou Tempestade Estática. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.', cost:235, unlockLevel:3, range:150, rate:.82, damage:2.15, chainTargets:4, chainRadius:96, color:'#ffe66d', fur:'#c4ab72', accent:'#ffe66d', shot:'electric'},
-  vine:   {name:'Gato Cipó', icon:'🌿', role:'Controle pesado', special:'Imobiliza até 3 inimigos comuns ou 1 boss por 2 segundos. Recarga começa em 6s e cai até 4s no nível máximo.', cost:225, unlockLevel:5, range:145, rate:6, minRate:4, damage:0, rootHold:true, rootDuration:2, rootCount:3, color:'#69d17d', fur:'#98775d', accent:'#69d17d', shot:'vine'},
-  salmon: {name:'Gato Pescador de Salmão', icon:'🎣', role:'Farm / economia', special:'Não ataca. A cada rodada concluída, pesca salmões para a partida. Upgrades aumentam a renda.', cost:180, unlockLevel:2, range:0, rate:0, damage:0, farm:true, farmIncome:18, color:'#ff9b73', fur:'#c58b66', accent:'#72c6dd', shot:'salmon'},
-  sniper: {name:'Gato Sniper', icon:'🎯', role:'Especialista / 3 caminhos', special:'Possui árvore própria: Atirador de Elite, Caçador ou Observador. O Sniper sempre enxerga Camo para si; revelar Camo para TODA a defesa passa a ser função do caminho Observador.', cost:320, unlockLevel:1, range:285, rate:1.72, damage:9.40, globalRange:true, color:'#8fe7a8', fur:'#a79072', accent:'#8fe7a8', shot:'sniper', detectsCamo:true},
-  boomerang:{name:'Gato Bumerangue',icon:'🪃',role:'Perfuração / retorno',special:'Gatinho secreto. O bumerangue atravessa vários inimigos e volta causando um segundo impacto. Quanto mais evoluído, mais alvos alcança e mais forte fica o retorno.',cost:285,unlockLevel:1,secret:true,range:158,rate:.78,damage:4.15,color:'#e6a95d',fur:'#b77849',accent:'#f3c168',shot:'boomerang',boomerangTargets:3,returnMultiplier:.58},
-  alchemist:{name:'Gato Alquimista',icon:'🧪',role:'Combos / dano contínuo',special:'Gatinho secreto. Alterna Veneno → Fraqueza → Explosão no mesmo alvo. No terceiro estágio detona uma área e reinicia o ciclo.',cost:345,unlockLevel:1,secret:true,range:154,rate:1.02,damage:3.35,splash:58,color:'#8be07b',fur:'#806aa2',accent:'#b7ff75',shot:'alchemist',alchemyPoison:.65,alchemyMark:.14,alchemyExplosion:1.45},
-  chronomancer:{name:'Gato Cronomante',icon:'⏳',role:'Controle temporal',special:'Gatinho secreto. Marca o inimigo no tempo e, após alguns segundos, o devolve à posição em que estava. Chefões sofrem um retorno reduzido.',cost:515,unlockLevel:1,secret:true,range:176,rate:1.18,damage:5.10,slow:1.3,color:'#7fd8ff',fur:'#5d638c',accent:'#b7ecff',shot:'chronomancer',temporalDelay:3.2,slowFactor:.72},
-  demonking:{name:'Gatinho Rei Demônio',icon:'👑',role:'Área / Medo / Invocação',special:'Secreto do modo Impossível. Dispara Fogo Sombrio em área; sua aura causa Medo periodicamente, recua inimigos e aumenta o dano que recebem. Inimigos que morrem amedrontados renascem como Balões Sombrios aliados.',cost:650,unlockLevel:1,secret:true,limit:1,range:168,rate:1.05,damage:6.20,splash:78,color:'#a64dff',fur:'#211b2b',accent:'#d45cff',shot:'demonking',burn:{damage:1.15,interval:1,ticks:4},fearInterval:11,fearRadius:158,fearBack:52,fearVuln:.15,fearDuration:5,shadowCap:8,shadowDamageMult:1},
-  celestial:{name:'Gato Celestial',icon:'🛸',role:'Drones / suporte ofensivo',special:'Gatinho Exclusivo da Roleta Celestial. Ele não ataca diretamente: comanda drones que perseguem os balões. A cada 2 upgrades em um caminho ganha +1 drone. Caminhos: Ataque Orbital, Bombardeio e Purificação.',cost:420,unlockLevel:1,exclusive:true,range:158,rate:1.05,damage:2.5,splash:0,color:'#8fdcff',fur:'#eef5ff',accent:'#9ee7ff',shot:'celestial',droneSpeed:520,droneCount:1}
+  dart:   {name:$t('Gatinho Dardo'), icon:'🐱', role:$t('Versátil / 3 caminhos'), special:$t('Possui árvore própria de upgrades: Arqueiro, Lanceiro de Fogo ou Suporte. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.'), cost:70, unlockLevel:1, range:116, rate:.56, damage:1.55, color:'#f3bf67', fur:'#d8a56f', accent:'#f3bf67', shot:'dart'},
+  frost:  {name:$t('Gato Gelinho'), icon:'❄️', role:$t('Controle em área'), special:$t('FULL AOE: a cada ataque acerta e reduz a velocidade de todos os alvos válidos dentro do alcance.'), cost:95, unlockLevel:1, range:104, rate:.94, damage:.84, slow:2.0, fullAoe:true, color:'#70caea', fur:'#ffffff', accent:'#70caea', shot:'snow'},
+  burst:  {name:$t('Gato Bombinha'), icon:'💥', role:$t('Blindagem + área / 3 caminhos'), special:$t('Sempre quebra blindagem (incluindo pesados e camuflados-revelados) e causa dano em área. Possui árvore própria: Barril Reforçado, Fragmentação ou Nuvem Tóxica. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.'), cost:140, unlockLevel:1, range:138, rate:1.12, damage:3.10, splash:58, color:'#ff7180', fur:'#6f6265', accent:'#ff7180', shot:'bomb', breaksArmor:true},
+  laser:  {name:$t('Gato Laser'), icon:'🔴', role:$t('Ataque muito rápido / 3 caminhos'), special:$t('Alta cadência para limpar grupos de balões comuns. Possui árvore própria: Foco de Precisão, Superaquecimento ou Grade de Plasma. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.'), cost:175, unlockLevel:2, range:165, rate:.20, damage:.88, color:'#ff5d6c', fur:'#c99b78', accent:'#ff5d6c', shot:'laser'},
+  ninja:  {name:$t('Gato Ninja'), icon:'🥷', role:$t('Dano explosivo / 3 caminhos'), special:$t('Ataques rápidos com alto dano por alvo. Possui árvore própria: Lâminas Afiadas, Kunai Envenenado ou Sombra Assassina. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.'), cost:210, unlockLevel:4, range:112, rate:.34, damage:2.85, color:'#b58cff', fur:'#3d3b47', accent:'#b58cff', shot:'shuriken'},
+  wizard: {name:$t('Gato Mago'), icon:'✨', role:$t('Magia em área / 3 caminhos'), special:$t('Projéteis mágicos com splash e controle leve. Possui árvore própria: Arcano Amplificado, Chamas Arcanas ou Runas de Fraqueza. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.'), cost:260, unlockLevel:6, range:154, rate:.92, damage:3.20, slow:.75, splash:72, color:'#c9adff', fur:'#8e78ae', accent:'#c9adff', shot:'magic'},
+  electric:{name:$t('Gato Volts'), icon:'⚡', role:$t('Dano em cadeia / 3 caminhos'), special:$t('O raio salta entre até 4 alvos próximos. Possui árvore própria: Sobrecarga, Corrente Ampliada ou Tempestade Estática. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.'), cost:235, unlockLevel:3, range:150, rate:.82, damage:2.15, chainTargets:4, chainRadius:96, color:'#ffe66d', fur:'#c4ab72', accent:'#ffe66d', shot:'electric'},
+  vine:   {name:$t('Gato Cipó'), icon:'🌿', role:$t('Controle pesado'), special:$t('Imobiliza até 3 inimigos comuns ou 1 boss por 2 segundos. Recarga começa em 6s e cai até 4s no nível máximo.'), cost:225, unlockLevel:5, range:145, rate:6, minRate:4, damage:0, rootHold:true, rootDuration:2, rootCount:3, color:'#69d17d', fur:'#98775d', accent:'#69d17d', shot:'vine'},
+  salmon: {name:$t('Gato Pescador de Salmão'), icon:'🎣', role:$t('Farm / economia'), special:$t('Não ataca. A cada rodada concluída, pesca salmões para a partida. Upgrades aumentam a renda.'), cost:180, unlockLevel:2, range:0, rate:0, damage:0, farm:true, farmIncome:18, color:'#ff9b73', fur:'#c58b66', accent:'#72c6dd', shot:'salmon'},
+  sniper: {name:$t('Gato Sniper'), icon:'🎯', role:$t('Especialista / 3 caminhos'), special:$t('Possui árvore própria: Atirador de Elite, Caçador ou Observador. O Sniper sempre enxerga Camo para si; revelar Camo para TODA a defesa passa a ser função do caminho Observador.'), cost:320, unlockLevel:1, range:285, rate:1.72, damage:9.40, globalRange:true, color:'#8fe7a8', fur:'#a79072', accent:'#8fe7a8', shot:'sniper', detectsCamo:true},
+  boomerang:{name:$t('Gato Bumerangue'),icon:'🪃',role:$t('Perfuração / retorno'),special:$t('Gatinho secreto. O bumerangue atravessa vários inimigos e volta causando um segundo impacto. Quanto mais evoluído, mais alvos alcança e mais forte fica o retorno.'),cost:285,unlockLevel:1,secret:true,range:158,rate:.78,damage:4.15,color:'#e6a95d',fur:'#b77849',accent:'#f3c168',shot:'boomerang',boomerangTargets:3,returnMultiplier:.58},
+  alchemist:{name:$t('Gato Alquimista'),icon:'🧪',role:$t('Combos / dano contínuo'),special:$t('Gatinho secreto. Alterna Veneno → Fraqueza → Explosão no mesmo alvo. No terceiro estágio detona uma área e reinicia o ciclo.'),cost:345,unlockLevel:1,secret:true,range:154,rate:1.02,damage:3.35,splash:58,color:'#8be07b',fur:'#806aa2',accent:'#b7ff75',shot:'alchemist',alchemyPoison:.65,alchemyMark:.14,alchemyExplosion:1.45},
+  chronomancer:{name:$t('Gato Cronomante'),icon:'⏳',role:$t('Controle temporal'),special:$t('Gatinho secreto. Marca o inimigo no tempo e, após alguns segundos, o devolve à posição em que estava. Chefões sofrem um retorno reduzido.'),cost:515,unlockLevel:1,secret:true,range:176,rate:1.18,damage:5.10,slow:1.3,color:'#7fd8ff',fur:'#5d638c',accent:'#b7ecff',shot:'chronomancer',temporalDelay:3.2,slowFactor:.72},
+  demonking:{name:$t('Gatinho Rei Demônio'),icon:'👑',role:$t('Área / Medo / Invocação'),special:$t('Secreto do modo Impossível. Dispara Fogo Sombrio em área; sua aura causa Medo periodicamente, recua inimigos e aumenta o dano que recebem. Inimigos que morrem amedrontados renascem como Balões Sombrios aliados.'),cost:650,unlockLevel:1,secret:true,limit:1,range:168,rate:1.05,damage:6.20,splash:78,color:'#a64dff',fur:'#211b2b',accent:'#d45cff',shot:'demonking',burn:{damage:1.15,interval:1,ticks:4},fearInterval:11,fearRadius:158,fearBack:52,fearVuln:.15,fearDuration:5,shadowCap:8,shadowDamageMult:1},
+  celestial:{name:$t('Gato Celestial'),icon:'🛸',role:$t('Drones / suporte ofensivo'),special:$t('Gatinho Exclusivo da Roleta Celestial. Ele não ataca diretamente: comanda drones que perseguem os balões. A cada 2 upgrades em um caminho ganha +1 drone. Caminhos: Ataque Orbital, Bombardeio e Purificação.'),cost:420,unlockLevel:1,exclusive:true,range:158,rate:1.05,damage:2.5,splash:0,color:'#8fdcff',fur:'#eef5ff',accent:'#9ee7ff',shot:'celestial',droneSpeed:520,droneCount:1}
 };
 
 const HEROES = {
   king:{
-    name:'Rei Bigodes', icon:'👑', role:'Comandante / suporte', cost:500, color:'#f2cf62', fur:'#d9a873', accent:'#f2cf62',
+    name:$t('Rei Bigodes'), icon:'👑', role:$t('Comandante / suporte'), cost:500, color:'#f2cf62', fur:'#d9a873', accent:'#f2cf62',
     range:145, rate:.92, damage:2.60, auraRange:172,
-    passive:'Comando Real: gatinhos dentro da aura recebem +10% Range e +10% velocidade de ataque.',
-    skill:{name:'Ordem Real',icon:'📯',cooldown:28,description:'Por 8s, gatinhos dentro da aura recebem +25% dano e +25% velocidade de ataque.'},
-    ultimate:{name:'Decreto da Coroa',icon:'👑',cooldown:55,description:'Por 10s, TODA a defesa recebe +20% dano, +20% Range e +20% velocidade de ataque.'}
+    passive:$t('Comando Real: gatinhos dentro da aura recebem +10% Range e +10% velocidade de ataque.'),
+    skill:{name:$t('Ordem Real'),icon:'📯',cooldown:28,description:$t('Por 8s, gatinhos dentro da aura recebem +25% dano e +25% velocidade de ataque.')},
+    ultimate:{name:$t('Decreto da Coroa'),icon:'👑',cooldown:55,description:$t('Por 10s, TODA a defesa recebe +20% dano, +20% Range e +20% velocidade de ataque.')}
   },
   warrior:{
-    name:'Miaurício', icon:'⚔️', role:'Guerreiro / dano', cost:450, color:'#ff8b63', fur:'#b36f52', accent:'#ffcf8a',
+    name:$t('Miaurício'), icon:'⚔️', role:$t('Guerreiro / dano'), cost:450, color:'#ff8b63', fur:'#b36f52', accent:'#ffcf8a',
     range:112, rate:.58, damage:4.40,
-    passive:'Instinto de Execução: ataques causam 2,5× dano em inimigos comuns abaixo de 12% da vida.',
-    skill:{name:'Golpe Heroico',icon:'🗡️',cooldown:22,description:'Ataca o inimigo mais forte no alcance causando 5× o dano atual.'},
-    ultimate:{name:'Mil Cortes',icon:'⚔️',cooldown:48,description:'Quatro cortes em todos os inimigos no alcance, cada um causando 125% do dano atual.'}
+    passive:$t('Instinto de Execução: ataques causam 2,5× dano em inimigos comuns abaixo de 12% da vida.'),
+    skill:{name:$t('Golpe Heroico'),icon:'🗡️',cooldown:22,description:$t('Ataca o inimigo mais forte no alcance causando 5× o dano atual.')},
+    ultimate:{name:$t('Mil Cortes'),icon:'⚔️',cooldown:48,description:$t('Quatro cortes em todos os inimigos no alcance, cada um causando 125% do dano atual.')}
   },
   luna:{
-    name:'Luna', icon:'🌙', role:'Feiticeira / controle', cost:525, color:'#b58cff', fur:'#73628f', accent:'#d7c2ff',
+    name:'Luna', icon:'🌙', role:$t('Feiticeira / controle'), cost:525, color:'#b58cff', fur:'#73628f', accent:'#d7c2ff',
     range:178, rate:1.02, damage:2.15, detectsCamo:true,
-    passive:'Maldição Lunar: cada ataque desacelera o alvo e o deixa 10% mais vulnerável por alguns segundos.',
-    skill:{name:'Passo Lunar',icon:'🌙',cooldown:25,description:'Empurra até 3 inimigos fortes no alcance para trás na rota.'},
-    ultimate:{name:'Eclipse Total',icon:'🌑',cooldown:52,description:'Por 8s, todos os inimigos ficam extremamente lentos e recebem +25% de dano de toda a defesa.'}
+    passive:$t('Maldição Lunar: cada ataque desacelera o alvo e o deixa 10% mais vulnerável por alguns segundos.'),
+    skill:{name:$t('Passo Lunar'),icon:'🌙',cooldown:25,description:$t('Empurra até 3 inimigos fortes no alcance para trás na rota.')},
+    ultimate:{name:$t('Eclipse Total'),icon:'🌑',cooldown:52,description:$t('Por 8s, todos os inimigos ficam extremamente lentos e recebem +25% de dano de toda a defesa.')}
   },
   merchant:{
-    name:'Dom Salmão', icon:'🐟', role:'Mercador / economia', cost:400, color:'#ffcf8a', fur:'#c58b66', accent:'#72c6dd',
+    name:$t('Dom Salmão'), icon:'🐟', role:$t('Mercador / economia'), cost:400, color:'#ffcf8a', fur:'#c58b66', accent:'#72c6dd',
     range:0, rate:0, damage:0, auraRange:185, farm:true,
-    passive:'Mercado de Peixes: Pescadores próximos recebem +20% de renda e Dom Salmão gera salmões ao fim de cada rodada.',
-    skill:{name:'Barganha Real',icon:'🤝',cooldown:35,description:'Gera salmões instantaneamente para a partida.'},
-    ultimate:{name:'Tesouro Real',icon:'💎',cooldown:65,description:'Gera um grande tesouro e dobra a renda dos Pescadores nas próximas 2 rodadas concluídas.'}
+    passive:$t('Mercado de Peixes: Pescadores próximos recebem +20% de renda e Dom Salmão gera salmões ao fim de cada rodada.'),
+    skill:{name:$t('Barganha Real'),icon:'🤝',cooldown:35,description:$t('Gera salmões instantaneamente para a partida.')},
+    ultimate:{name:$t('Tesouro Real'),icon:'💎',cooldown:65,description:$t('Gera um grande tesouro e dobra a renda dos Pescadores nas próximas 2 rodadas concluídas.')}
   }
 };
 
@@ -290,14 +1617,14 @@ const HEROES = {
 // necessários estão realmente em campo. O objetivo é criar interações de comportamento,
 // não apenas empilhar bônus numéricos genéricos.
 const SYNERGIES={
-  frozenCircuit:{icon:'❄️⚡',name:'Tempestade Congelante',towers:['frost','electric'],description:'Volts atingindo inimigos desacelerados pelo Gelinho descarrega uma explosão elétrica gelada em área.'},
-  silentHunt:{icon:'🎯🥷',name:'Caçada Silenciosa',towers:['sniper','ninja'],description:'Ninja causa +50% de dano em alvos que estejam marcados especificamente por um Sniper.'},
-  improvisedArtillery:{icon:'🐱💥',name:'Artilharia Improvisada',towers:['dart','burst'],description:'Bombinha deixa pólvora nos alvos; o próximo acerto de Dardo consome a pólvora e espalha estilhaços ao redor.'},
-  enchantedForest:{icon:'🌿✨',name:'Floresta Encantada',towers:['vine','wizard'],description:'Magias lançadas contra inimigos presos pelo Cipó florescem em uma explosão arcana ao redor do alvo.'},
-  fishMarket:{icon:'🎣🐟',name:'Mercado de Peixes',towers:['salmon'],hero:'merchant',description:'A cada 5 rodadas concluídas, Pescadores + Dom Salmão realizam um Festival do Salmão e ganham +35% de renda naquele pagamento.'},
-  plasmaCatalyst:{icon:'🔴🧪',name:'Catalisador de Plasma',towers:['laser','alchemist'],description:'Quatro acertos de Laser em um alvo preparado pelo Alquimista detonam uma reação química em área.'},
-  arcaneParadox:{icon:'✨⏳',name:'Paradoxo Arcano',towers:['wizard','chronomancer'],description:'Magias acumulam energia em alvos marcados no tempo; quando o rewind acontece, a energia explode no ponto de retorno.'},
-  glacialReturn:{icon:'🪃❄️',name:'Retorno Glacial',towers:['boomerang','frost'],description:'A volta do Bumerangue causa +35% de dano em inimigos desacelerados e reforça a lentidão por um instante.'}
+  frozenCircuit:{icon:'❄️⚡',name:$t('Tempestade Congelante'),towers:['frost','electric'],description:$t('Volts atingindo inimigos desacelerados pelo Gelinho descarrega uma explosão elétrica gelada em área.')},
+  silentHunt:{icon:'🎯🥷',name:$t('Caçada Silenciosa'),towers:['sniper','ninja'],description:$t('Ninja causa +50% de dano em alvos que estejam marcados especificamente por um Sniper.')},
+  improvisedArtillery:{icon:'🐱💥',name:$t('Artilharia Improvisada'),towers:['dart','burst'],description:$t('Bombinha deixa pólvora nos alvos; o próximo acerto de Dardo consome a pólvora e espalha estilhaços ao redor.')},
+  enchantedForest:{icon:'🌿✨',name:$t('Floresta Encantada'),towers:['vine','wizard'],description:$t('Magias lançadas contra inimigos presos pelo Cipó florescem em uma explosão arcana ao redor do alvo.')},
+  fishMarket:{icon:'🎣🐟',name:$t('Mercado de Peixes'),towers:['salmon'],hero:'merchant',description:$t('A cada 5 rodadas concluídas, Pescadores + Dom Salmão realizam um Festival do Salmão e ganham +35% de renda naquele pagamento.')},
+  plasmaCatalyst:{icon:'🔴🧪',name:$t('Catalisador de Plasma'),towers:['laser','alchemist'],description:$t('Quatro acertos de Laser em um alvo preparado pelo Alquimista detonam uma reação química em área.')},
+  arcaneParadox:{icon:'✨⏳',name:$t('Paradoxo Arcano'),towers:['wizard','chronomancer'],description:$t('Magias acumulam energia em alvos marcados no tempo; quando o rewind acontece, a energia explode no ponto de retorno.')},
+  glacialReturn:{icon:'🪃❄️',name:$t('Retorno Glacial'),towers:['boomerang','frost'],description:$t('A volta do Bumerangue causa +35% de dano em inimigos desacelerados e reforça a lentidão por um instante.')}
 };
 
 function heroPrice(heroId,mapId){
@@ -327,38 +1654,38 @@ function towerPrice(typeId,mapId){
 }
 function towerPriceDeltaLabel(mapId){
   const pct=Math.round((towerPriceMultiplier(mapId)-1)*100);
-  return pct===0?'preço normal':`${pct>0?'+':''}${pct}% no preço`;
+  return pct===0?$t('preço normal'):$T`${pct>0?'+':''}${pct}% no preço`;
 }
 
 const DART_PATHS = [
   {
-    id:'bow', icon:'🏹', name:'Arqueiro', color:'#f3bf67',
+    id:'bow', icon:'🏹', name:$t('Arqueiro'), color:'#f3bf67',
     tiers:[
-      {name:'Bandana de Caça', cost:45, description:'+dano e +alcance. O Dardo recebe uma bandana.'},
-      {name:'Arco Felino', cost:85, description:'Troca o dardo por arco. Ataca mais rápido e a flecha salta em cadeia; dano-base 2.'},
-      {name:'Flecha Reforçada', cost:145, description:'+alcance e +1 de dano (3 de dano-base no arco).'},
-      {name:'Flechas Gêmeas', cost:260, description:'Dispara 2 flechas por ataque.'},
-      {name:'Mestre Arqueiro', cost:430, description:'+velocidade de ataque e +alcance.'}
+      {name:$t('Bandana de Caça'), cost:45, description:$t('+dano e +alcance. O Dardo recebe uma bandana.')},
+      {name:$t('Arco Felino'), cost:85, description:$t('Troca o dardo por arco. Ataca mais rápido e a flecha salta em cadeia; dano-base 2.')},
+      {name:$t('Flecha Reforçada'), cost:145, description:$t('+alcance e +1 de dano (3 de dano-base no arco).')},
+      {name:$t('Flechas Gêmeas'), cost:260, description:$t('Dispara 2 flechas por ataque.')},
+      {name:$t('Mestre Arqueiro'), cost:430, description:$t('+velocidade de ataque e +alcance.')}
     ]
   },
   {
-    id:'spear', icon:'🔥', name:'Lanceiro', color:'#ff8b63',
+    id:'spear', icon:'🔥', name:$t('Lanceiro'), color:'#ff8b63',
     tiers:[
-      {name:'Olhos de Caçador', cost:40, description:'+alcance.'},
-      {name:'Visão Camuflada', cost:80, description:'Passa a enxergar Camo e recebe mais alcance.'},
-      {name:'Lança Pesada', cost:165, description:'Usa uma lança: 4 de dano bruto na cadência do Dardo normal.'},
-      {name:'Lança Brutal', cost:285, description:'+2 de dano e +alcance (6 de dano-base).'},
-      {name:'Lança de Fogo', cost:465, description:'6 de dano + Burn: 1 de dano a cada 2s por 4 ticks.'}
+      {name:$t('Olhos de Caçador'), cost:40, description:$t('+alcance.')},
+      {name:$t('Visão Camuflada'), cost:80, description:$t('Passa a enxergar Camo e recebe mais alcance.')},
+      {name:$t('Lança Pesada'), cost:165, description:$t('Usa uma lança: 4 de dano bruto na cadência do Dardo normal.')},
+      {name:$t('Lança Brutal'), cost:285, description:$t('+2 de dano e +alcance (6 de dano-base).')},
+      {name:$t('Lança de Fogo'), cost:465, description:$t('6 de dano + Burn: 1 de dano a cada 2s por 4 ticks.')}
     ]
   },
   {
-    id:'support', icon:'🐟', name:'Suporte', color:'#6fd7a1',
+    id:'support', icon:'🐟', name:$t('Suporte'), color:'#6fd7a1',
     tiers:[
-      {name:'Comando Felino', cost:55, description:'+alcance próprio e +10% de dano aos gatinhos próximos.'},
-      {name:'Salmão Extra', cost:100, description:'+15% na renda dos Pescadores de Salmão próximos.'},
-      {name:'Olho de Equipe', cost:175, description:'+10% de alcance aos gatinhos próximos.'},
-      {name:'Ritmo de Batalha', cost:315, description:'+10% de velocidade de ataque aos gatinhos próximos.'},
-      {name:'Banquete da Tropa', cost:520, description:'Salmão sobe para +30%; dano/range/velocidade passam a +15%.'}
+      {name:$t('Comando Felino'), cost:55, description:$t('+alcance próprio e +10% de dano aos gatinhos próximos.')},
+      {name:$t('Salmão Extra'), cost:100, description:$t('+15% na renda dos Pescadores de Salmão próximos.')},
+      {name:$t('Olho de Equipe'), cost:175, description:$t('+10% de alcance aos gatinhos próximos.')},
+      {name:$t('Ritmo de Batalha'), cost:315, description:$t('+10% de velocidade de ataque aos gatinhos próximos.')},
+      {name:$t('Banquete da Tropa'), cost:520, description:$t('Salmão sobe para +30%; dano/range/velocidade passam a +15%.')}
     ]
   }
 ];
@@ -367,33 +1694,33 @@ const SNIPER_MAX_TIER = 5;
 const SNIPER_SECONDARY_MAX = 3;
 const SNIPER_PATHS = [
   {
-    id:'elite', icon:'🎯', name:'Atirador de Elite', color:'#ffd36b',
+    id:'elite', icon:'🎯', name:$t('Atirador de Elite'), color:'#ffd36b',
     tiers:[
-      {name:'Munição Magnum', cost:130, description:'+3 de dano bruto por disparo.'},
-      {name:'Projétil Perfurante', cost:220, description:'+3 de dano e o tiro atravessa até 2 inimigos.'},
-      {name:'Mira Crítica', cost:360, description:'20% de crítico (2× dano) e perfuração sobe para 3 alvos.'},
-      {name:'Canhão de Precisão', cost:620, description:'+6 de dano, 30% de crítico (2,5×) e atravessa até 4 alvos.'},
-      {name:'Atirador Supremo', cost:980, description:'+8 de dano, +20% velocidade, 40% de crítico (3×) e atravessa até 6 alvos.'}
+      {name:$t('Munição Magnum'), cost:130, description:$t('+3 de dano bruto por disparo.')},
+      {name:$t('Projétil Perfurante'), cost:220, description:$t('+3 de dano e o tiro atravessa até 2 inimigos.')},
+      {name:$t('Mira Crítica'), cost:360, description:$t('20% de crítico (2× dano) e perfuração sobe para 3 alvos.')},
+      {name:$t('Canhão de Precisão'), cost:620, description:$t('+6 de dano, 30% de crítico (2,5×) e atravessa até 4 alvos.')},
+      {name:$t('Atirador Supremo'), cost:980, description:$t('+8 de dano, +20% velocidade, 40% de crítico (3×) e atravessa até 6 alvos.')}
     ]
   },
   {
-    id:'hunter', icon:'🥷', name:'Caçador', color:'#c58cff',
+    id:'hunter', icon:'🥷', name:$t('Caçador'), color:'#c58cff',
     tiers:[
-      {name:'Olhos na Sombra', cost:115, description:'+35% de dano contra Camo e inimigos especiais.'},
-      {name:'Caça de Elite', cost:210, description:'+50% contra especiais e +15% contra Boss.'},
-      {name:'Marca do Caçador', cost:390, description:'Cada acerto marca o alvo por 6s: ele recebe +15% de dano de TODA a defesa.'},
-      {name:'Munição Anti-Couraça', cost:680, description:'Passa a quebrar blindagem; +75% contra especiais, +30% contra Boss e marca +25%.'},
-      {name:'Predador de Chefões', cost:1080, description:'+100% contra especiais, +75% contra Boss e marca +35% por 8s.'}
+      {name:$t('Olhos na Sombra'), cost:115, description:$t('+35% de dano contra Camo e inimigos especiais.')},
+      {name:$t('Caça de Elite'), cost:210, description:$t('+50% contra especiais e +15% contra Boss.')},
+      {name:$t('Marca do Caçador'), cost:390, description:$t('Cada acerto marca o alvo por 6s: ele recebe +15% de dano de TODA a defesa.')},
+      {name:$t('Munição Anti-Couraça'), cost:680, description:$t('Passa a quebrar blindagem; +75% contra especiais, +30% contra Boss e marca +25%.')},
+      {name:$t('Predador de Chefões'), cost:1080, description:$t('+100% contra especiais, +75% contra Boss e marca +35% por 8s.')}
     ]
   },
   {
-    id:'observer', icon:'🛰️', name:'Observador', color:'#70caea',
+    id:'observer', icon:'🛰️', name:$t('Observador'), color:'#70caea',
     tiers:[
-      {name:'Telêmetro Global', cost:120, description:'Todos os gatinhos recebem +5% de range.'},
-      {name:'Radar de Camuflagem', cost:230, description:'Camo avistado pelo Sniper fica revelado para TODA a defesa.'},
-      {name:'Coordenadas Precisas', cost:410, description:'Buff global sobe para +10% range e +5% dano de precisão.'},
-      {name:'Designador de Alvos', cost:720, description:'Acertos marcam o alvo por 5s (+15% dano recebido) e precisão global sobe para +7% dano.'},
-      {name:'Comando Aéreo', cost:1180, description:'+15% range, +10% dano global e chama um avião a cada 2 rodadas OU 25s de combate para bombardear o inimigo mais forte.'}
+      {name:$t('Telêmetro Global'), cost:120, description:$t('Todos os gatinhos recebem +5% de range.')},
+      {name:$t('Radar de Camuflagem'), cost:230, description:$t('Camo avistado pelo Sniper fica revelado para TODA a defesa.')},
+      {name:$t('Coordenadas Precisas'), cost:410, description:$t('Buff global sobe para +10% range e +5% dano de precisão.')},
+      {name:$t('Designador de Alvos'), cost:720, description:$t('Acertos marcam o alvo por 5s (+15% dano recebido) e precisão global sobe para +7% dano.')},
+      {name:$t('Comando Aéreo'), cost:1180, description:$t('+15% range, +10% dano global e chama um avião a cada 2 rodadas OU 25s de combate para bombardear o inimigo mais forte.')}
     ]
   }
 ];
@@ -402,33 +1729,33 @@ const FROST_MAX_TIER = 5;
 const FROST_SECONDARY_MAX = 3;
 const FROST_PATHS = [
   {
-    id:'blizzard', icon:'🌨️', name:'Nevasca', color:'#eaf7ff',
+    id:'blizzard', icon:'🌨️', name:$t('Nevasca'), color:'#eaf7ff',
     tiers:[
-      {name:'Rajada Gelada', cost:50, description:'+dano em cada ataque (o Gelinho continua acertando todos os alvos válidos no alcance).'},
-      {name:'Nevasca Intensa', cost:95, description:'+dano e +alcance.'},
-      {name:'Explosão de Gelo', cost:160, description:'+dano; inimigos que já estavam lentos recebem +25% de dano deste ataque.'},
-      {name:'Avalanche', cost:280, description:'+dano considerável e cadência mais rápida.'},
-      {name:'Nevasca Absoluta', cost:460, description:'Dano no máximo; um alvo já lento é congelado quase por completo por 1s a cada acerto.'}
+      {name:$t('Rajada Gelada'), cost:50, description:$t('+dano em cada ataque (o Gelinho continua acertando todos os alvos válidos no alcance).')},
+      {name:$t('Nevasca Intensa'), cost:95, description:$t('+dano e +alcance.')},
+      {name:$t('Explosão de Gelo'), cost:160, description:$t('+dano; inimigos que já estavam lentos recebem +25% de dano deste ataque.')},
+      {name:'Avalanche', cost:280, description:$t('+dano considerável e cadência mais rápida.')},
+      {name:$t('Nevasca Absoluta'), cost:460, description:$t('Dano no máximo; um alvo já lento é congelado quase por completo por 1s a cada acerto.')}
     ]
   },
   {
-    id:'gale', icon:'💨', name:'Ventania Ártica', color:'#c9f0ff',
+    id:'gale', icon:'💨', name:$t('Ventania Ártica'), color:'#c9f0ff',
     tiers:[
-      {name:'Correntes de Vento', cost:45, description:'+alcance.'},
-      {name:'Rajada Contínua', cost:85, description:'Ataca mais rápido.'},
-      {name:'Vórtice Gélido', cost:150, description:'+alcance; cada alvo atingido fica marcado (+12% de dano recebido de TODA a defesa por alguns segundos).'},
-      {name:'Ventania Total', cost:265, description:'+alcance considerável e mais velocidade de ataque.'},
-      {name:'Olho da Tempestade', cost:440, description:'Alcance cobre praticamente o mapa inteiro e a marca sobe para +20% de dano.'}
+      {name:$t('Correntes de Vento'), cost:45, description:$t('+alcance.')},
+      {name:$t('Rajada Contínua'), cost:85, description:$t('Ataca mais rápido.')},
+      {name:$t('Vórtice Gélido'), cost:150, description:$t('+alcance; cada alvo atingido fica marcado (+12% de dano recebido de TODA a defesa por alguns segundos).')},
+      {name:$t('Ventania Total'), cost:265, description:$t('+alcance considerável e mais velocidade de ataque.')},
+      {name:$t('Olho da Tempestade'), cost:440, description:$t('Alcance cobre praticamente o mapa inteiro e a marca sobe para +20% de dano.')}
     ]
   },
   {
-    id:'heart', icon:'🧊', name:'Coração Glacial', color:'#8fd9ef',
+    id:'heart', icon:'🧊', name:$t('Coração Glacial'), color:'#8fd9ef',
     tiers:[
-      {name:'Gelo Espesso', cost:45, description:'A lentidão dura mais tempo.'},
-      {name:'Frio Penetrante', cost:85, description:'A lentidão fica mais forte (o inimigo anda mais devagar do que antes).'},
-      {name:'Núcleo Congelante', cost:150, description:'Lentidão ainda mais forte e mais duradoura.'},
-      {name:'Estase', cost:265, description:'Inimigos atingidos ficam quase parados enquanto durar o efeito.'},
-      {name:'Pulso Glacial', cost:440, description:'Cada acerto imobiliza quase por completo — a linha de frente praticamente para.'}
+      {name:$t('Gelo Espesso'), cost:45, description:$t('A lentidão dura mais tempo.')},
+      {name:$t('Frio Penetrante'), cost:85, description:$t('A lentidão fica mais forte (o inimigo anda mais devagar do que antes).')},
+      {name:$t('Núcleo Congelante'), cost:150, description:$t('Lentidão ainda mais forte e mais duradoura.')},
+      {name:$t('Estase'), cost:265, description:$t('Inimigos atingidos ficam quase parados enquanto durar o efeito.')},
+      {name:$t('Pulso Glacial'), cost:440, description:$t('Cada acerto imobiliza quase por completo — a linha de frente praticamente para.')}
     ]
   }
 ];
@@ -437,33 +1764,33 @@ const VINE_MAX_TIER = 5;
 const VINE_SECONDARY_MAX = 3;
 const VINE_PATHS = [
   {
-    id:'roots', icon:'🌱', name:'Raízes Profundas', color:'#8fd69a',
+    id:'roots', icon:'🌱', name:$t('Raízes Profundas'), color:'#8fd69a',
     tiers:[
-      {name:'Raízes Longas', cost:70, description:'A prisão dura mais tempo.'},
-      {name:'Enraizamento Amplo', cost:130, description:'Prende +1 inimigo comum por vez (ou continua prendendo 1 Boss sozinho).'},
-      {name:'Garras da Selva', cost:220, description:'+duração da prisão e recarrega mais rápido.'},
-      {name:'Floresta Prendedora', cost:380, description:'Prende ainda mais inimigos comuns de uma vez e +duração.'},
-      {name:'Domínio da Selva', cost:600, description:'Prende um grupo bem maior, por mais tempo, com a recarga mais curta possível.'}
+      {name:$t('Raízes Longas'), cost:70, description:$t('A prisão dura mais tempo.')},
+      {name:$t('Enraizamento Amplo'), cost:130, description:$t('Prende +1 inimigo comum por vez (ou continua prendendo 1 Boss sozinho).')},
+      {name:$t('Garras da Selva'), cost:220, description:$t('+duração da prisão e recarrega mais rápido.')},
+      {name:$t('Floresta Prendedora'), cost:380, description:$t('Prende ainda mais inimigos comuns de uma vez e +duração.')},
+      {name:$t('Domínio da Selva'), cost:600, description:$t('Prende um grupo bem maior, por mais tempo, com a recarga mais curta possível.')}
     ]
   },
   {
-    id:'thorns', icon:'☠️', name:'Espinhos Venenosos', color:'#8bd15a',
+    id:'thorns', icon:'☠️', name:$t('Espinhos Venenosos'), color:'#8bd15a',
     tiers:[
-      {name:'Espinhos', cost:70, description:'Quem fica preso sofre um veneno leve enquanto dura a prisão.'},
-      {name:'Seiva Tóxica', cost:130, description:'+dano do veneno.'},
-      {name:'Toxina Concentrada', cost:220, description:'O veneno tica mais vezes e mais rápido.'},
-      {name:'Praga Verde', cost:380, description:'+dano do veneno bem mais forte.'},
-      {name:'Floração Mortal', cost:600, description:'Veneno no auge: dano máximo, tica muitas vezes enquanto o inimigo estiver preso.'}
+      {name:$t('Espinhos'), cost:70, description:$t('Quem fica preso sofre um veneno leve enquanto dura a prisão.')},
+      {name:$t('Seiva Tóxica'), cost:130, description:$t('+dano do veneno.')},
+      {name:$t('Toxina Concentrada'), cost:220, description:$t('O veneno tica mais vezes e mais rápido.')},
+      {name:$t('Praga Verde'), cost:380, description:$t('+dano do veneno bem mais forte.')},
+      {name:$t('Floração Mortal'), cost:600, description:$t('Veneno no auge: dano máximo, tica muitas vezes enquanto o inimigo estiver preso.')}
     ]
   },
   {
-    id:'wild', icon:'🥀', name:'Vinha Selvagem', color:'#c9a6ff',
+    id:'wild', icon:'🥀', name:$t('Vinha Selvagem'), color:'#c9a6ff',
     tiers:[
-      {name:'Vinhas Fracas', cost:70, description:'Quem fica preso recebe +dano de TODA a defesa por alguns segundos.'},
-      {name:'Amarras Sufocantes', cost:130, description:'+dano recebido enquanto marcado.'},
-      {name:'Estrangulamento', cost:220, description:'+dano recebido e a marca dura mais.'},
-      {name:'Vinha Predatória', cost:380, description:'+dano recebido bem mais alto e marca ainda mais duradoura.'},
-      {name:'Fúria da Selva', cost:600, description:'Quem é preso pelo Cipó fica extremamente vulnerável ao resto da defesa.'}
+      {name:$t('Vinhas Fracas'), cost:70, description:$t('Quem fica preso recebe +dano de TODA a defesa por alguns segundos.')},
+      {name:$t('Amarras Sufocantes'), cost:130, description:$t('+dano recebido enquanto marcado.')},
+      {name:$t('Estrangulamento'), cost:220, description:$t('+dano recebido e a marca dura mais.')},
+      {name:$t('Vinha Predatória'), cost:380, description:$t('+dano recebido bem mais alto e marca ainda mais duradoura.')},
+      {name:$t('Fúria da Selva'), cost:600, description:$t('Quem é preso pelo Cipó fica extremamente vulnerável ao resto da defesa.')}
     ]
   }
 ];
@@ -472,33 +1799,33 @@ const BURST_MAX_TIER = 5;
 const BURST_SECONDARY_MAX = 3;
 const BURST_PATHS = [
   {
-    id:'barrels', icon:'💣', name:'Barril Reforçado', color:'#ffb26b',
+    id:'barrels', icon:'💣', name:$t('Barril Reforçado'), color:'#ffb26b',
     tiers:[
-      {name:'Barril Reforçado', cost:60, description:'+dano e +raio da explosão.'},
-      {name:'Carga Dupla', cost:115, description:'+dano e +raio da explosão, de novo.'},
-      {name:'Casco de Aço', cost:195, description:'+raio da explosão e recarrega mais rápido.'},
-      {name:'Bomba Sísmica', cost:340, description:'+dano considerável, +raio da explosão e ainda mais rápido para recarregar.'},
-      {name:'Barril Colossal', cost:560, description:'Explosão no tamanho e dano máximos, com a recarga mais rápida do caminho.'}
+      {name:$t('Barril Reforçado'), cost:60, description:$t('+dano e +raio da explosão.')},
+      {name:$t('Carga Dupla'), cost:115, description:$t('+dano e +raio da explosão, de novo.')},
+      {name:$t('Casco de Aço'), cost:195, description:$t('+raio da explosão e recarrega mais rápido.')},
+      {name:$t('Bomba Sísmica'), cost:340, description:$t('+dano considerável, +raio da explosão e ainda mais rápido para recarregar.')},
+      {name:$t('Barril Colossal'), cost:560, description:$t('Explosão no tamanho e dano máximos, com a recarga mais rápida do caminho.')}
     ]
   },
   {
-    id:'frag', icon:'🔥', name:'Fragmentação', color:'#ff5f4d',
+    id:'frag', icon:'🔥', name:$t('Fragmentação'), color:'#ff5f4d',
     tiers:[
-      {name:'Estilhaços em Chamas', cost:60, description:'Quem é atingido pega fogo e sofre dano contínuo leve; recarrega um pouco mais rápido.'},
-      {name:'Napalm Leve', cost:115, description:'+dano do fogo.'},
-      {name:'Barril Incendiário', cost:195, description:'+dano do fogo, tica mais vezes e recarrega mais rápido.'},
-      {name:'Inferno Compacto', cost:340, description:'+dano do fogo bem mais forte e recarrega ainda mais rápido.'},
-      {name:'Chuva de Estilhaços', cost:560, description:'Fogo no auge: dano alto, tica muitas vezes, além de +dano no impacto direto.'}
+      {name:$t('Estilhaços em Chamas'), cost:60, description:$t('Quem é atingido pega fogo e sofre dano contínuo leve; recarrega um pouco mais rápido.')},
+      {name:$t('Napalm Leve'), cost:115, description:$t('+dano do fogo.')},
+      {name:$t('Barril Incendiário'), cost:195, description:$t('+dano do fogo, tica mais vezes e recarrega mais rápido.')},
+      {name:$t('Inferno Compacto'), cost:340, description:$t('+dano do fogo bem mais forte e recarrega ainda mais rápido.')},
+      {name:$t('Chuva de Estilhaços'), cost:560, description:$t('Fogo no auge: dano alto, tica muitas vezes, além de +dano no impacto direto.')}
     ]
   },
   {
-    id:'toxic', icon:'☣️', name:'Nuvem Tóxica', color:'#b6e66a',
+    id:'toxic', icon:'☣️', name:$t('Nuvem Tóxica'), color:'#b6e66a',
     tiers:[
-      {name:'Gás Lacrimogêneo', cost:60, description:'O impacto direto deixa o alvo mais lento por um tempo.'},
-      {name:'Névoa Corrosiva', cost:115, description:'O alvo atingido fica marcado e recebe mais dano de TODA a defesa por alguns segundos.'},
-      {name:'Gás Mostarda', cost:195, description:'A lentidão fica bem mais forte e dura mais.'},
-      {name:'Nuvem Densa', cost:340, description:'Lentidão e marca mais fortes e mais duradouras.'},
-      {name:'Zona Morta', cost:560, description:'O alvo atingido quase para no lugar e fica extremamente vulnerável ao resto da defesa.'}
+      {name:$t('Gás Lacrimogêneo'), cost:60, description:$t('O impacto direto deixa o alvo mais lento por um tempo.')},
+      {name:$t('Névoa Corrosiva'), cost:115, description:$t('O alvo atingido fica marcado e recebe mais dano de TODA a defesa por alguns segundos.')},
+      {name:$t('Gás Mostarda'), cost:195, description:$t('A lentidão fica bem mais forte e dura mais.')},
+      {name:$t('Nuvem Densa'), cost:340, description:$t('Lentidão e marca mais fortes e mais duradouras.')},
+      {name:$t('Zona Morta'), cost:560, description:$t('O alvo atingido quase para no lugar e fica extremamente vulnerável ao resto da defesa.')}
     ]
   }
 ];
@@ -507,33 +1834,33 @@ const NINJA_MAX_TIER = 5;
 const NINJA_SECONDARY_MAX = 3;
 const NINJA_PATHS = [
   {
-    id:'blades', icon:'🗡️', name:'Lâminas Afiadas', color:'#dcdcec',
+    id:'blades', icon:'🗡️', name:$t('Lâminas Afiadas'), color:'#dcdcec',
     tiers:[
-      {name:'Lâminas Afiadas', cost:70, description:'Ataques mais rápidos e um pouco mais de dano.'},
-      {name:'Kit de Arremesso', cost:130, description:'+dano e +alcance.'},
-      {name:'Reflexos de Sombra', cost:225, description:'+dano e ainda mais velocidade de ataque.'},
-      {name:'Fúria Silenciosa', cost:440, description:'+dano considerável, +alcance e mais velocidade de ataque.'},
-      {name:'Tempestade de Lâminas', cost:700, description:'Dano e velocidade de ataque no máximo — praticamente uma chuva de shurikens.'}
+      {name:$t('Lâminas Afiadas'), cost:70, description:$t('Ataques mais rápidos e um pouco mais de dano.')},
+      {name:$t('Kit de Arremesso'), cost:130, description:$t('+dano e +alcance.')},
+      {name:$t('Reflexos de Sombra'), cost:225, description:$t('+dano e ainda mais velocidade de ataque.')},
+      {name:$t('Fúria Silenciosa'), cost:440, description:$t('+dano considerável, +alcance e mais velocidade de ataque.')},
+      {name:$t('Tempestade de Lâminas'), cost:700, description:$t('Dano e velocidade de ataque no máximo — praticamente uma chuva de shurikens.')}
     ]
   },
   {
-    id:'poison', icon:'🧪', name:'Kunai Envenenado', color:'#8fd15a',
+    id:'poison', icon:'🧪', name:$t('Kunai Envenenado'), color:'#8fd15a',
     tiers:[
-      {name:'Kunai Envenenado', cost:70, description:'O alvo atingido diretamente sofre veneno leve.'},
-      {name:'Veneno Reforçado', cost:130, description:'+dano do veneno.'},
-      {name:'Lâminas Corrosivas', cost:225, description:'+dano do veneno, tica mais vezes e mais rápido; recarrega um pouco mais rápido.'},
-      {name:'Toxina Mortal', cost:390, description:'+dano do veneno bem mais forte.'},
-      {name:'Veneno Ancestral', cost:620, description:'Veneno no auge, tica muitas vezes, além de +dano no impacto direto.'}
+      {name:$t('Kunai Envenenado'), cost:70, description:$t('O alvo atingido diretamente sofre veneno leve.')},
+      {name:$t('Veneno Reforçado'), cost:130, description:$t('+dano do veneno.')},
+      {name:$t('Lâminas Corrosivas'), cost:225, description:$t('+dano do veneno, tica mais vezes e mais rápido; recarrega um pouco mais rápido.')},
+      {name:$t('Toxina Mortal'), cost:390, description:$t('+dano do veneno bem mais forte.')},
+      {name:$t('Veneno Ancestral'), cost:620, description:$t('Veneno no auge, tica muitas vezes, além de +dano no impacto direto.')}
     ]
   },
   {
-    id:'shadow', icon:'🌑', name:'Sombra Assassina', color:'#8a7fae',
+    id:'shadow', icon:'🌑', name:$t('Sombra Assassina'), color:'#8a7fae',
     tiers:[
-      {name:'Olhos na Escuridão', cost:70, description:'O Ninja passa a enxergar inimigos Camuflados.'},
-      {name:'Golpe Certeiro', cost:130, description:'+dano contra inimigos especiais (Camuflado, Blindado, Rápido, Regenerador, Elite).'},
-      {name:'Marca da Sombra', cost:225, description:'Cada acerto marca o alvo por alguns segundos: ele recebe mais dano de TODA a defesa.'},
-      {name:'Caçador Noturno', cost:390, description:'+dano contra especiais e contra Boss; a marca fica mais forte.'},
-      {name:'Lâmina Fantasma', cost:620, description:'Passa a quebrar blindagem; dano máximo contra especiais e Boss, e a marca no auge.'}
+      {name:$t('Olhos na Escuridão'), cost:70, description:$t('O Ninja passa a enxergar inimigos Camuflados.')},
+      {name:$t('Golpe Certeiro'), cost:130, description:$t('+dano contra inimigos especiais (Camuflado, Blindado, Rápido, Regenerador, Elite).')},
+      {name:$t('Marca da Sombra'), cost:225, description:$t('Cada acerto marca o alvo por alguns segundos: ele recebe mais dano de TODA a defesa.')},
+      {name:$t('Caçador Noturno'), cost:390, description:$t('+dano contra especiais e contra Boss; a marca fica mais forte.')},
+      {name:$t('Lâmina Fantasma'), cost:620, description:$t('Passa a quebrar blindagem; dano máximo contra especiais e Boss, e a marca no auge.')}
     ]
   }
 ];
@@ -542,33 +1869,33 @@ const LASER_MAX_TIER = 5;
 const LASER_SECONDARY_MAX = 3;
 const LASER_PATHS = [
   {
-    id:'focus', icon:'🔴', name:'Foco de Precisão', color:'#ff8f8f',
+    id:'focus', icon:'🔴', name:$t('Foco de Precisão'), color:'#ff8f8f',
     tiers:[
-      {name:'Foco de Precisão', cost:55, description:'+dano e dispara mais rápido.'},
-      {name:'Lente Refinada', cost:100, description:'+dano e dispara ainda mais rápido.'},
-      {name:'Emissor Duplo', cost:170, description:'+dano e mais velocidade de disparo.'},
-      {name:'Núcleo Instável', cost:340, description:'+dano considerável e mais velocidade de disparo.'},
-      {name:'Raio Contínuo', cost:620, description:'Dano e cadência no máximo — quase um feixe contínuo.'}
+      {name:$t('Foco de Precisão'), cost:55, description:$t('+dano e dispara mais rápido.')},
+      {name:$t('Lente Refinada'), cost:100, description:$t('+dano e dispara ainda mais rápido.')},
+      {name:$t('Emissor Duplo'), cost:170, description:$t('+dano e mais velocidade de disparo.')},
+      {name:$t('Núcleo Instável'), cost:340, description:$t('+dano considerável e mais velocidade de disparo.')},
+      {name:$t('Raio Contínuo'), cost:620, description:$t('Dano e cadência no máximo — quase um feixe contínuo.')}
     ]
   },
   {
-    id:'overheat', icon:'♨️', name:'Superaquecimento', color:'#ff9d5c',
+    id:'overheat', icon:'♨️', name:$t('Superaquecimento'), color:'#ff9d5c',
     tiers:[
-      {name:'Superaquecimento', cost:55, description:'O alvo atingido diretamente sofre queimadura leve.'},
-      {name:'Feixe Térmico', cost:100, description:'+dano da queimadura.'},
-      {name:'Overdrive', cost:170, description:'+dano da queimadura, tica mais vezes e mais rápido; dispara mais rápido.'},
-      {name:'Fusão Parcial', cost:300, description:'+dano da queimadura bem mais forte.'},
-      {name:'Plasma Ardente', cost:500, description:'Queimadura no auge, tica muitas vezes, além de +dano no impacto direto.'}
+      {name:$t('Superaquecimento'), cost:55, description:$t('O alvo atingido diretamente sofre queimadura leve.')},
+      {name:$t('Feixe Térmico'), cost:100, description:$t('+dano da queimadura.')},
+      {name:'Overdrive', cost:170, description:$t('+dano da queimadura, tica mais vezes e mais rápido; dispara mais rápido.')},
+      {name:$t('Fusão Parcial'), cost:300, description:$t('+dano da queimadura bem mais forte.')},
+      {name:$t('Plasma Ardente'), cost:500, description:$t('Queimadura no auge, tica muitas vezes, além de +dano no impacto direto.')}
     ]
   },
   {
-    id:'grid', icon:'🔷', name:'Grade de Plasma', color:'#7ee0ff',
+    id:'grid', icon:'🔷', name:$t('Grade de Plasma'), color:'#7ee0ff',
     tiers:[
-      {name:'Grade de Plasma', cost:55, description:'O raio passa a saltar para um segundo alvo próximo.'},
-      {name:'Condutor Amplo', cost:100, description:'O salto alcança alvos um pouco mais distantes.'},
-      {name:'Tripla Descarga', cost:170, description:'O raio salta para um terceiro alvo.'},
-      {name:'Grade Expandida', cost:320, description:'Salta para mais um alvo (4 no total) e alcança mais longe.'},
-      {name:'Grade de Plasma Total', cost:580, description:'O salto alcança bem mais longe e ganha +dano no impacto — cada um dos 4 alvos continua recebendo o dano cheio, sem redução.'}
+      {name:$t('Grade de Plasma'), cost:55, description:$t('O raio passa a saltar para um segundo alvo próximo.')},
+      {name:$t('Condutor Amplo'), cost:100, description:$t('O salto alcança alvos um pouco mais distantes.')},
+      {name:$t('Tripla Descarga'), cost:170, description:$t('O raio salta para um terceiro alvo.')},
+      {name:$t('Grade Expandida'), cost:320, description:$t('Salta para mais um alvo (4 no total) e alcança mais longe.')},
+      {name:$t('Grade de Plasma Total'), cost:580, description:$t('O salto alcança bem mais longe e ganha +dano no impacto — cada um dos 4 alvos continua recebendo o dano cheio, sem redução.')}
     ]
   }
 ];
@@ -577,33 +1904,33 @@ const WIZARD_MAX_TIER = 5;
 const WIZARD_SECONDARY_MAX = 3;
 const WIZARD_PATHS = [
   {
-    id:'arcane', icon:'✨', name:'Arcano Amplificado', color:'#d9c4ff',
+    id:'arcane', icon:'✨', name:$t('Arcano Amplificado'), color:'#d9c4ff',
     tiers:[
-      {name:'Arcano Amplificado', cost:85, description:'+dano e +raio da explosão mágica.'},
-      {name:'Prisma de Poder', cost:150, description:'+dano e +raio da explosão, de novo.'},
-      {name:'Ressonância', cost:260, description:'+dano e dispara mais rápido.'},
-      {name:'Convergência', cost:440, description:'+dano considerável, +raio da explosão e mais velocidade de disparo.'},
-      {name:'Explosão Cósmica', cost:720, description:'Dano e raio da explosão no máximo do caminho.'}
+      {name:$t('Arcano Amplificado'), cost:85, description:$t('+dano e +raio da explosão mágica.')},
+      {name:$t('Prisma de Poder'), cost:150, description:$t('+dano e +raio da explosão, de novo.')},
+      {name:$t('Ressonância'), cost:260, description:$t('+dano e dispara mais rápido.')},
+      {name:$t('Convergência'), cost:440, description:$t('+dano considerável, +raio da explosão e mais velocidade de disparo.')},
+      {name:$t('Explosão Cósmica'), cost:720, description:$t('Dano e raio da explosão no máximo do caminho.')}
     ]
   },
   {
-    id:'flame', icon:'🔥', name:'Chamas Arcanas', color:'#ffb26b',
+    id:'flame', icon:'🔥', name:$t('Chamas Arcanas'), color:'#ffb26b',
     tiers:[
-      {name:'Chamas Arcanas', cost:85, description:'O alvo atingido diretamente pega fogo mágico.'},
-      {name:'Fogo Fátuo', cost:150, description:'+dano do fogo.'},
-      {name:'Combustão', cost:260, description:'+dano do fogo, tica mais vezes; dispara mais rápido.'},
-      {name:'Inferno Arcano', cost:440, description:'+dano do fogo bem mais forte.'},
-      {name:'Chamas Eternas', cost:720, description:'Fogo no auge, tica muitas vezes, além de +dano no impacto direto.'}
+      {name:$t('Chamas Arcanas'), cost:85, description:$t('O alvo atingido diretamente pega fogo mágico.')},
+      {name:$t('Fogo Fátuo'), cost:150, description:$t('+dano do fogo.')},
+      {name:$t('Combustão'), cost:260, description:$t('+dano do fogo, tica mais vezes; dispara mais rápido.')},
+      {name:$t('Inferno Arcano'), cost:440, description:$t('+dano do fogo bem mais forte.')},
+      {name:$t('Chamas Eternas'), cost:720, description:$t('Fogo no auge, tica muitas vezes, além de +dano no impacto direto.')}
     ]
   },
   {
-    id:'runes', icon:'🔮', name:'Runas de Fraqueza', color:'#9fe0d0',
+    id:'runes', icon:'🔮', name:$t('Runas de Fraqueza'), color:'#9fe0d0',
     tiers:[
-      {name:'Runa de Fraqueza', cost:85, description:'O alvo atingido fica marcado e recebe mais dano de TODA a defesa por alguns segundos.'},
-      {name:'Grimório Gélido', cost:150, description:'A lentidão do Mago fica mais forte.'},
-      {name:'Marca Arcana', cost:260, description:'+dano recebido pela marca; a lentidão dura mais.'},
-      {name:'Selo do Vazio', cost:440, description:'Lentidão ainda mais forte e marca mais duradoura.'},
-      {name:'Colapso Dimensional', cost:720, description:'O alvo atingido quase para no lugar e fica extremamente vulnerável ao resto da defesa.'}
+      {name:$t('Runa de Fraqueza'), cost:85, description:$t('O alvo atingido fica marcado e recebe mais dano de TODA a defesa por alguns segundos.')},
+      {name:$t('Grimório Gélido'), cost:150, description:$t('A lentidão do Mago fica mais forte.')},
+      {name:$t('Marca Arcana'), cost:260, description:$t('+dano recebido pela marca; a lentidão dura mais.')},
+      {name:$t('Selo do Vazio'), cost:440, description:$t('Lentidão ainda mais forte e marca mais duradoura.')},
+      {name:$t('Colapso Dimensional'), cost:720, description:$t('O alvo atingido quase para no lugar e fica extremamente vulnerável ao resto da defesa.')}
     ]
   }
 ];
@@ -612,33 +1939,33 @@ const ELECTRIC_MAX_TIER = 5;
 const ELECTRIC_SECONDARY_MAX = 3;
 const ELECTRIC_PATHS = [
   {
-    id:'overload', icon:'⚡', name:'Sobrecarga', color:'#fff0a0',
+    id:'overload', icon:'⚡', name:$t('Sobrecarga'), color:'#fff0a0',
     tiers:[
-      {name:'Sobrecarga', cost:75, description:'+dano do raio.'},
-      {name:'Amperagem Alta', cost:140, description:'+dano e dispara mais rápido.'},
-      {name:'Núcleo Voltaico', cost:240, description:'+dano e mais velocidade de disparo.'},
-      {name:'Descarga Bruta', cost:410, description:'+dano considerável e mais velocidade de disparo.'},
-      {name:'Tempestade Voltaica', cost:660, description:'Dano e cadência no máximo do caminho.'}
+      {name:$t('Sobrecarga'), cost:75, description:$t('+dano do raio.')},
+      {name:$t('Amperagem Alta'), cost:140, description:$t('+dano e dispara mais rápido.')},
+      {name:$t('Núcleo Voltaico'), cost:240, description:$t('+dano e mais velocidade de disparo.')},
+      {name:$t('Descarga Bruta'), cost:410, description:$t('+dano considerável e mais velocidade de disparo.')},
+      {name:$t('Tempestade Voltaica'), cost:660, description:$t('Dano e cadência no máximo do caminho.')}
     ]
   },
   {
-    id:'chain', icon:'🔗', name:'Corrente Ampliada', color:'#ffd76b',
+    id:'chain', icon:'🔗', name:$t('Corrente Ampliada'), color:'#ffd76b',
     tiers:[
-      {name:'Corrente Ampliada', cost:75, description:'O raio alcança alvos um pouco mais distantes.'},
-      {name:'Elo Extra', cost:140, description:'O raio salta para +1 alvo e alcança mais longe.'},
-      {name:'Condutor Reforçado', cost:240, description:'Alcança bem mais longe; dispara mais rápido.'},
-      {name:'Malha Elétrica', cost:410, description:'O raio salta para +1 alvo e alcança ainda mais longe.'},
-      {name:'Rede Total', cost:660, description:'O raio salta para +2 alvos, alcançando o máximo, além de +dano no impacto direto.'}
+      {name:$t('Corrente Ampliada'), cost:75, description:$t('O raio alcança alvos um pouco mais distantes.')},
+      {name:$t('Elo Extra'), cost:140, description:$t('O raio salta para +1 alvo e alcança mais longe.')},
+      {name:$t('Condutor Reforçado'), cost:240, description:$t('Alcança bem mais longe; dispara mais rápido.')},
+      {name:$t('Malha Elétrica'), cost:410, description:$t('O raio salta para +1 alvo e alcança ainda mais longe.')},
+      {name:$t('Rede Total'), cost:660, description:$t('O raio salta para +2 alvos, alcançando o máximo, além de +dano no impacto direto.')}
     ]
   },
   {
-    id:'static', icon:'🌩️', name:'Tempestade Estática', color:'#b6a4ff',
+    id:'static', icon:'🌩️', name:$t('Tempestade Estática'), color:'#b6a4ff',
     tiers:[
-      {name:'Estática Residual', cost:75, description:'Todo alvo atingido pelo raio fica marcado e recebe mais dano de TODA a defesa por alguns segundos.'},
-      {name:'Choque Prolongado', cost:140, description:'+dano recebido pela marca.'},
-      {name:'Campo Eletrizado', cost:240, description:'+dano recebido e a marca dura mais; o raio alcança um pouco mais longe.'},
-      {name:'Paralisia Parcial', cost:410, description:'Todo alvo atingido também fica mais lento por um instante; marca mais forte.'},
-      {name:'Tempestade Estática', cost:660, description:'A lentidão e a marca chegam ao auge em todos os alvos atingidos pelo raio.'}
+      {name:$t('Estática Residual'), cost:75, description:$t('Todo alvo atingido pelo raio fica marcado e recebe mais dano de TODA a defesa por alguns segundos.')},
+      {name:$t('Choque Prolongado'), cost:140, description:$t('+dano recebido pela marca.')},
+      {name:$t('Campo Eletrizado'), cost:240, description:$t('+dano recebido e a marca dura mais; o raio alcança um pouco mais longe.')},
+      {name:$t('Paralisia Parcial'), cost:410, description:$t('Todo alvo atingido também fica mais lento por um instante; marca mais forte.')},
+      {name:$t('Tempestade Estática'), cost:660, description:$t('A lentidão e a marca chegam ao auge em todos os alvos atingidos pelo raio.')}
     ]
   }
 ];
@@ -647,41 +1974,41 @@ const ELECTRIC_PATHS = [
 const CELESTIAL_MAX_TIER = 5;
 const CELESTIAL_SECONDARY_MAX = 3;
 const CELESTIAL_PATHS = [
-  {id:'assault',icon:'🚀',name:'Ataque Orbital',color:'#8fdcff',tiers:[
-    {name:'Canhões Reforçados',cost:95,description:'+1 de dano por disparo dos drones.'},
-    {name:'Propulsores Celestes',cost:170,description:'+velocidade de voo e +1 drone.'},
-    {name:'Canhão de Pulso',cost:290,description:'+2 de dano e drones atacam mais rápido.'},
-    {name:'Hiperpropulsão',cost:490,description:'Muito mais velocidade de voo e +1 drone.'},
-    {name:'Esquadrão Celestial',cost:790,description:'Dano e cadência chegam ao auge do caminho.'}
+  {id:'assault',icon:'🚀',name:$t('Ataque Orbital'),color:'#8fdcff',tiers:[
+    {name:$t('Canhões Reforçados'),cost:95,description:$t('+1 de dano por disparo dos drones.')},
+    {name:$t('Propulsores Celestes'),cost:170,description:$t('+velocidade de voo e +1 drone.')},
+    {name:$t('Canhão de Pulso'),cost:290,description:$t('+2 de dano e drones atacam mais rápido.')},
+    {name:$t('Hiperpropulsão'),cost:490,description:$t('Muito mais velocidade de voo e +1 drone.')},
+    {name:$t('Esquadrão Celestial'),cost:790,description:$t('Dano e cadência chegam ao auge do caminho.')}
   ]},
-  {id:'bombardment',icon:'🌌',name:'Bombardeio',color:'#c6a4ff',tiers:[
-    {name:'Scanner de Longo Alcance',cost:90,description:'+25 de range do Gato Celestial.'},
-    {name:'Micromísseis',cost:165,description:'Ataques ganham dano em área e +1 drone.'},
-    {name:'Matriz Expandida',cost:285,description:'+range e explosões maiores.'},
-    {name:'Chuva de Meteoros',cost:500,description:'Explosões muito maiores e +1 drone.'},
-    {name:'Bombardeio Orbital',cost:820,description:'Máximo range e dano em área do caminho.'}
+  {id:'bombardment',icon:'🌌',name:$t('Bombardeio'),color:'#c6a4ff',tiers:[
+    {name:$t('Scanner de Longo Alcance'),cost:90,description:$t('+25 de range do Gato Celestial.')},
+    {name:$t('Micromísseis'),cost:165,description:$t('Ataques ganham dano em área e +1 drone.')},
+    {name:$t('Matriz Expandida'),cost:285,description:$t('+range e explosões maiores.')},
+    {name:$t('Chuva de Meteoros'),cost:500,description:$t('Explosões muito maiores e +1 drone.')},
+    {name:$t('Bombardeio Orbital'),cost:820,description:$t('Máximo range e dano em área do caminho.')}
   ]},
-  {id:'purify',icon:'👁️',name:'Purificação',color:'#f5e7a6',tiers:[
-    {name:'Radar Espectral',cost:100,description:'Drones passam a detectar Camuflados.'},
-    {name:'Sinal Revelador',cost:180,description:'Camo atingido é revelado para toda a defesa e +1 drone.'},
-    {name:'Pulso Antiblindagem',cost:310,description:'Drones passam a quebrar blindagem.'},
-    {name:'Desmaterializador',cost:520,description:'A cada 3 acertos dos drones no mesmo Blindado, remove a blindagem. +1 drone.'},
-    {name:'Campo de Normalização',cost:850,description:'A cada 1,5s normaliza 1 Camo/Blindado no alcance, exceto chefões e especiais.'}
+  {id:'purify',icon:'👁️',name:$t('Purificação'),color:'#f5e7a6',tiers:[
+    {name:$t('Radar Espectral'),cost:100,description:$t('Drones passam a detectar Camuflados.')},
+    {name:$t('Sinal Revelador'),cost:180,description:$t('Camo atingido é revelado para toda a defesa e +1 drone.')},
+    {name:$t('Pulso Antiblindagem'),cost:310,description:$t('Drones passam a quebrar blindagem.')},
+    {name:$t('Desmaterializador'),cost:520,description:$t('A cada 3 acertos dos drones no mesmo Blindado, remove a blindagem. +1 drone.')},
+    {name:$t('Campo de Normalização'),cost:850,description:$t('A cada 1,5s normaliza 1 Camo/Blindado no alcance, exceto chefões e especiais.')}
   ]}
 ];
 
 const powers = {
-  frenzy:{name:'Patinhas Frenéticas',icon:'⚡',cost:70,duration:10,description:'Todas as torres atacam 2× mais rápido por 10 segundos.',effect:'attackSpeed'},
-  focus:{name:'Instinto Predador',icon:'🔥',cost:85,duration:10,description:'Todas as torres causam 2× de dano por 10 segundos.',effect:'damage'},
-  blizzard:{name:'Nevasca Felina',icon:'🌨️',cost:65,duration:8,description:'Todos os inimigos ficam com 35% da velocidade por 8 segundos.',effect:'slow'},
-  cash:{name:'Cofre de Sardinhas',icon:'🐟',cost:45,duration:0,description:'Receba +350 salmões imediatamente dentro da partida.',effect:'cash'},
-  heal:{name:'Nove Vidas',icon:'❤️‍🩹',cost:55,duration:0,description:'Recupera até 6 vidas perdidas no mapa atual.',effect:'heal'}
+  frenzy:{name:$t('Patinhas Frenéticas'),icon:'⚡',cost:70,duration:10,description:$t('Todas as torres atacam 2× mais rápido por 10 segundos.'),effect:'attackSpeed'},
+  focus:{name:$t('Instinto Predador'),icon:'🔥',cost:85,duration:10,description:$t('Todas as torres causam 2× de dano por 10 segundos.'),effect:'damage'},
+  blizzard:{name:$t('Nevasca Felina'),icon:'🌨️',cost:65,duration:8,description:$t('Todos os inimigos ficam com 35% da velocidade por 8 segundos.'),effect:'slow'},
+  cash:{name:$t('Cofre de Sardinhas'),icon:'🐟',cost:45,duration:0,description:$t('Receba +350 salmões imediatamente dentro da partida.'),effect:'cash'},
+  heal:{name:$t('Nove Vidas'),icon:'❤️‍🩹',cost:55,duration:0,description:$t('Recupera até 6 vidas perdidas no mapa atual.'),effect:'heal'}
 };
 
 const skins = {
   elvenMage:{
-    name:'Gata Maga Élfica',icon:'🧝‍♀️',tower:'wizard',cost:0,
-    description:'Visual experimental do Gato Mago com pelagem clara, cabelos prateados, traje verde-petróleo e magia azul-dourada.'
+    name:$t('Gata Maga Élfica'),icon:'🧝‍♀️',tower:'wizard',cost:0,
+    description:$t('Visual experimental do Gato Mago com pelagem clara, cabelos prateados, traje verde-petróleo e magia azul-dourada.')
   }
 };
 
@@ -819,21 +2146,21 @@ let heroCollectionSelection=profile.selectedHero||'king';
 const MASTERY_MAX_LEVEL=50;
 const MASTERY_MAX_COINS=500;
 const MASTERY_ABILITIES={
-  dart:{name:'Chuva de Dardos',icon:'🌧️',cooldown:40,description:'Todos os inimigos no mapa recebem 50% do dano atual deste Dardo.'},
-  sniper:{name:'Tiro de Execução',icon:'💥',cooldown:30,description:'Dispara no inimigo de maior vida e causa 10× o dano atual do Sniper.'},
-  frost:{name:'Zero Absoluto',icon:'🧊',cooldown:45,description:'Congela inimigos comuns por 3s; chefões ficam extremamente lentos por 4s.'},
-  burst:{name:'Bombardeio Felino',icon:'💣',cooldown:35,description:'Cinco explosões atingem a região do inimigo mais forte, cada uma com 100% do dano atual.'},
-  electric:{name:'Tempestade Elétrica',icon:'⛈️',cooldown:40,description:'Quatro pulsos globais de raio causam 75% do dano atual por pulso.'},
-  vine:{name:'Floresta Prisional',icon:'🌳',cooldown:50,description:'Prende todos os inimigos comuns por 4s e chefões por 2s.'},
-  salmon:{name:'Pesca Milagrosa',icon:'🐟',cooldown:60,description:'Gera instantaneamente 3× a renda atual por rodada deste Pescador.'},
-  ninja:{name:'Clones das Sombras',icon:'👥',cooldown:45,description:'Por 10s, dois clones atacam junto: o dano total do Ninja fica aproximadamente 2× maior.'},
-  wizard:{name:'Cataclismo Arcano',icon:'🔮',cooldown:45,description:'Explode a área do inimigo mais forte e causa 300% do dano atual em grande área.'},
-  laser:{name:'Sobrecarga',icon:'🔴',cooldown:40,description:'Por 8s, dobra a cadência do Laser e faz seus disparos saltarem entre mais inimigos.'},
-  boomerang:{name:'Tornado de Bumerangues',icon:'🪃',cooldown:45,description:'Uma tempestade de bumerangues atravessa o mapa em 5 rajadas, atingindo todos os inimigos.'},
-  alchemist:{name:'Pedra Filosofal',icon:'⚗️',cooldown:50,description:'Por 10s, cada ataque aplica Veneno, Fraqueza e Explosão de uma vez.'},
-  chronomancer:{name:'Reverter o Tempo',icon:'⏰',cooldown:60,description:'Todos os inimigos voltam aproximadamente 5 segundos na rota; chefões voltam menos.'},
-  demonking:{name:'Reino do Rei Demônio',icon:'🌑',cooldown:70,description:'Espalha Medo por todo o mapa, intensifica o Fogo Sombrio e fortalece o exército de sombras.'},
-  celestial:{name:'Frota Celestial',icon:'🛸',cooldown:55,description:'Por 12s, ganha +2 drones temporários, drones atacam 35% mais rápido e o campo revela Camo no alcance.'}
+  dart:{name:$t('Chuva de Dardos'),icon:'🌧️',cooldown:40,description:$t('Todos os inimigos no mapa recebem 50% do dano atual deste Dardo.')},
+  sniper:{name:$t('Tiro de Execução'),icon:'💥',cooldown:30,description:$t('Dispara no inimigo de maior vida e causa 10× o dano atual do Sniper.')},
+  frost:{name:$t('Zero Absoluto'),icon:'🧊',cooldown:45,description:$t('Congela inimigos comuns por 3s; chefões ficam extremamente lentos por 4s.')},
+  burst:{name:$t('Bombardeio Felino'),icon:'💣',cooldown:35,description:$t('Cinco explosões atingem a região do inimigo mais forte, cada uma com 100% do dano atual.')},
+  electric:{name:$t('Tempestade Elétrica'),icon:'⛈️',cooldown:40,description:$t('Quatro pulsos globais de raio causam 75% do dano atual por pulso.')},
+  vine:{name:$t('Floresta Prisional'),icon:'🌳',cooldown:50,description:$t('Prende todos os inimigos comuns por 4s e chefões por 2s.')},
+  salmon:{name:$t('Pesca Milagrosa'),icon:'🐟',cooldown:60,description:$t('Gera instantaneamente 3× a renda atual por rodada deste Pescador.')},
+  ninja:{name:$t('Clones das Sombras'),icon:'👥',cooldown:45,description:$t('Por 10s, dois clones atacam junto: o dano total do Ninja fica aproximadamente 2× maior.')},
+  wizard:{name:$t('Cataclismo Arcano'),icon:'🔮',cooldown:45,description:$t('Explode a área do inimigo mais forte e causa 300% do dano atual em grande área.')},
+  laser:{name:$t('Sobrecarga'),icon:'🔴',cooldown:40,description:$t('Por 8s, dobra a cadência do Laser e faz seus disparos saltarem entre mais inimigos.')},
+  boomerang:{name:$t('Tornado de Bumerangues'),icon:'🪃',cooldown:45,description:$t('Uma tempestade de bumerangues atravessa o mapa em 5 rajadas, atingindo todos os inimigos.')},
+  alchemist:{name:$t('Pedra Filosofal'),icon:'⚗️',cooldown:50,description:$t('Por 10s, cada ataque aplica Veneno, Fraqueza e Explosão de uma vez.')},
+  chronomancer:{name:$t('Reverter o Tempo'),icon:'⏰',cooldown:60,description:$t('Todos os inimigos voltam aproximadamente 5 segundos na rota; chefões voltam menos.')},
+  demonking:{name:$t('Reino do Rei Demônio'),icon:'🌑',cooldown:70,description:$t('Espalha Medo por todo o mapa, intensifica o Fogo Sombrio e fortalece o exército de sombras.')},
+  celestial:{name:$t('Frota Celestial'),icon:'🛸',cooldown:55,description:$t('Por 12s, ganha +2 drones temporários, drones atacam 35% mais rápido e o campo revela Camo no alcance.')}
 };
 function requiredMasteryXp(level){
   if(level>=MASTERY_MAX_LEVEL)return 0;
@@ -866,9 +2193,9 @@ function masteryBonusSummary(id,level=masteryState(id).level){
   const b=masteryBonuses(level);
   if(id==='salmon'){
     const incomePct=Math.round(Math.min(.30,(b.range/5)*.05+(b.damage/5)*.10+b.attackReduction*.5)*100);
-    return{...b,incomeBonus:incomePct/100,text:`+${incomePct}% renda`};
+    return{...b,incomeBonus:incomePct/100,text:$T`+${incomePct}% renda`};
   }
-  return{...b,text:`+${b.range.toFixed(1)} Range • +${b.damage.toFixed(1)} Dano • -${Math.round(b.attackReduction*100)}% intervalo de ataque`};
+  return{...b,text:$T`+${b.range.toFixed(1)} Range • +${b.damage.toFixed(1)} Dano • -${Math.round(b.attackReduction*100)}% intervalo de ataque`};
 }
 
 
@@ -1104,7 +2431,7 @@ function showNextSecretReveal(){
   if($('#secret-unlock-icon'))$('#secret-unlock-icon').textContent=t.icon;
   if($('#secret-unlock-name'))$('#secret-unlock-name').textContent=t.name;
   if($('#secret-unlock-role'))$('#secret-unlock-role').textContent=t.role;
-  if($('#secret-unlock-text'))$('#secret-unlock-text').textContent='Um novo Gatinho Secreto foi descoberto e agora pode ser usado nas partidas.';
+  if($('#secret-unlock-text'))$('#secret-unlock-text').textContent=$t('Um novo Gatinho Secreto foi descoberto e agora pode ser usado nas partidas.');
   modal.classList.add('visible');modal.setAttribute('aria-hidden','false');sfx('win');
 }
 function closeSecretReveal(){
@@ -1132,14 +2459,14 @@ function grantXp(amount){
 
 function nextUnlock(){
   const locked=Object.entries(types).filter(([,t])=>t.unlockLevel>profile.level).sort((a,b)=>a[1].unlockLevel-b[1].unlockLevel);
-  if(!locked.length) return 'Todos os gatinhos atuais já foram liberados.';
+  if(!locked.length) return $t('Todos os gatinhos atuais já foram liberados.');
   const level=locked[0][1].unlockLevel;
   const names=locked.filter(([,t])=>t.unlockLevel===level).map(([,t])=>t.name).join(', ');
-  return `Próximo: ${names} no nível ${level}`;
+  return $T`Próximo: ${names} no nível ${level}`;
 }
 
 function starMarkup(mapId){
-  return difficultyOrder.map(d=>`<span class="map-star ${profile.maps[mapId].cleared[d]?'cleared':''}" title="${difficulties[d].name}${profile.maps[mapId].cleared[d]?' concluído':' não concluído'}">★</span>`).join('');
+  return difficultyOrder.map(d=>`<span class="map-star ${profile.maps[mapId].cleared[d]?'cleared':''}" title="${difficulties[d].name}${profile.maps[mapId].cleared[d]?$t(' concluído'):$t(' não concluído')}">★</span>`).join('');
 }
 
 function setScreen(id,pushHistory=true){
@@ -1171,7 +2498,7 @@ function renderHub(){
   if($('#hub-xp-fill')) $('#hub-xp-fill').style.width=`${pct}%`;
   const root=$('#hub-summary');
   if(root){
-    root.innerHTML=`
+    root.innerHTML=$T`
       <div class="summary-card"><span>Nível</span><b>🎖️ ${profile.level}</b></div>
       <div class="summary-card"><span>Estrelas de dificuldade</span><b>⭐ ${totalStars()}/${Object.keys(maps).length*3}</b></div>
       <div class="summary-card"><span>Vitórias</span><b>🏆 ${totalWins()}</b></div>
@@ -1191,7 +2518,7 @@ function renderMapLobby(){
 
   const categoryPicker=$('#map-category-picker');
   if(categoryPicker){
-    categoryPicker.innerHTML=MAP_CATEGORIES.map(c=>`<button type="button" class="map-category-button ${category.id===c.id?'selected':''} ${c.maps.length?'':'coming-soon'}" data-map-category="${c.id}"><span>${c.icon}</span><b>${c.name}</b><small>${c.maps.length?`${c.maps.length} mapa${c.maps.length>1?'s':''}`:'em breve'}</small></button>`).join('');
+    categoryPicker.innerHTML=MAP_CATEGORIES.map(c=>`<button type="button" class="map-category-button ${category.id===c.id?'selected':''} ${c.maps.length?'':'coming-soon'}" data-map-category="${c.id}"><span>${c.icon}</span><b>${c.name}</b><small>${c.maps.length?`${c.maps.length} mapa${c.maps.length>1?'s':''}`:$t('em breve')}</small></button>`).join('');
     $$('[data-map-category]').forEach(btn=>btn.onclick=()=>{
       sfx('ui');
       lobbySelection.category=btn.dataset.mapCategory;
@@ -1202,18 +2529,18 @@ function renderMapLobby(){
   }
   const categoryNote=$('#map-category-note');
   if(categoryNote){
-    categoryNote.innerHTML=`<b>${category.icon} Mapas ${category.name}</b><span>${category.description} • 🐾 Gatinhos: ${towerPriceDeltaLabel(category.maps[0]||'grove')}.</span>`;
+    categoryNote.innerHTML=$T`<b>${category.icon} Mapas ${category.name}</b><span>${category.description} • 🐾 Gatinhos: ${towerPriceDeltaLabel(category.maps[0]||'grove')}.</span>`;
     categoryNote.classList.toggle('empty-category',!categoryHasMaps);
   }
 
   const root=$('#map-selection-grid');
   if(root){
     if(!categoryHasMaps){
-      root.innerHTML=`<div class="map-category-empty"><span>${category.icon}</span><div><b>Mapas ${category.name} em desenvolvimento</b><p>Esta categoria já está preparada para receber novos mapas sem misturar com os três mapas Iniciantes.</p></div></div>`;
+      root.innerHTML=$T`<div class="map-category-empty"><span>${category.icon}</span><div><b>Mapas ${category.name} em desenvolvimento</b><p>Esta categoria já está preparada para receber novos mapas sem misturar com os três mapas Iniciantes.</p></div></div>`;
     }else{
       root.innerHTML=availableMapIds.map(id=>{
         const map=maps[id];
-        const label=infinite?`∞ sem limite • recorde ${infiniteBestFor(id,lobbySelection.difficulty)}`:`${mapRounds(id,lobbySelection.difficulty)} rodadas`;
+        const label=infinite?$T`∞ sem limite • recorde ${infiniteBestFor(id,lobbySelection.difficulty)}`:$T`${mapRounds(id,lobbySelection.difficulty)} rodadas`;
         return `
         <button type="button" class="map-choice ${lobbySelection.map===id?'selected':''}" data-map-choice="${id}">
           <div class="map-preview preview-${id}"><span class="map-preview-label">${label}</span></div>
@@ -1240,17 +2567,17 @@ function renderMapLobby(){
   }
   const modeDescription=$('#mode-description');
   if(modeDescription)modeDescription.textContent=infinite
-    ?'Infinito: não existe rodada final. A vida, velocidade e composição dos inimigos escalam continuamente; a cada 10 rodadas concluídas você recebe moedas permanentes.'
-    :'Campanha: conclua a fase, derrote o dirigível boss e conquiste a estrela da dificuldade.';
+    ?$t('Infinito: não existe rodada final. A vida, velocidade e composição dos inimigos escalam continuamente; a cada 10 rodadas concluídas você recebe moedas permanentes.')
+    :$t('Campanha: conclua a fase, derrote o dirigível boss e conquiste a estrela da dificuldade.');
 
   const picker=$('#difficulty-picker');
   if(picker){
     picker.innerHTML=difficultyOrder.map(d=>{
       const diff=difficulties[d],cleared=profile.maps[lobbySelection.map]?.cleared?.[d]||false;
       const endlessDescriptions={
-        easy:'Escalada mais lenta e mais vidas; no Infinito todas as cores aparecem e blindados entram só depois da rodada 20.',
-        normal:'Escalada padrão do Infinito, com blindados e ameaças especiais chegando mais cedo.',
-        hard:'Escalada mais agressiva, menos salmões/vidas e crescimento de vida/velocidade mais rápido.'
+        easy:$t('Escalada mais lenta e mais vidas; no Infinito todas as cores aparecem e blindados entram só depois da rodada 20.'),
+        normal:$t('Escalada padrão do Infinito, com blindados e ameaças especiais chegando mais cedo.'),
+        hard:$t('Escalada mais agressiva, menos salmões/vidas e crescimento de vida/velocidade mais rápido.')
       };
       return `<button type="button" class="difficulty-button ${lobbySelection.difficulty===d?'selected':''}" data-difficulty="${d}" ${categoryHasMaps?'':'disabled'}>
         <b>${infinite?'∞':(cleared?'⭐':'☆')} ${diff.name}</b><small>${infinite?endlessDescriptions[d]:diff.description}</small>
@@ -1265,17 +2592,17 @@ function renderMapLobby(){
   const record=$('#infinite-record');
   if(record){
     record.hidden=!infinite||!categoryHasMaps;
-    if(infinite&&categoryHasMaps)record.innerHTML=`∞ Recorde: rodada <b>${infiniteBestFor(lobbySelection.map,lobbySelection.difficulty)}</b>`;
+    if(infinite&&categoryHasMaps)record.innerHTML=$T`∞ Recorde: rodada <b>${infiniteBestFor(lobbySelection.map,lobbySelection.difficulty)}</b>`;
   }
   const diffDesc=$('#difficulty-description');
   if(diffDesc)diffDesc.textContent=categoryHasMaps
-    ?(infinite?'A dificuldade define sua economia inicial, vidas e velocidade de escalada.':'Cada mapa pode ser jogado em Fácil, Normal ou Difícil; a categoria do mapa é independente da dificuldade escolhida.')
-    :'Escolha uma categoria com mapas disponíveis para selecionar a dificuldade.';
+    ?(infinite?$t('A dificuldade define sua economia inicial, vidas e velocidade de escalada.'):$t('Cada mapa pode ser jogado em Fácil, Normal ou Difícil; a categoria do mapa é independente da dificuldade escolhida.'))
+    :$t('Escolha uma categoria com mapas disponíveis para selecionar a dificuldade.');
   const playEnter=$('#play-enter');
-  if(playEnter){playEnter.textContent=infinite?'Jogar Infinito':'Entrar no mapa';playEnter.disabled=!categoryHasMaps;}
+  if(playEnter){playEnter.textContent=infinite?$t('Jogar Infinito'):$t('Entrar no mapa');playEnter.disabled=!categoryHasMaps;}
   if($('#selected-map-badge')) $('#selected-map-badge').textContent=categoryHasMaps
-    ?`${maps[lobbySelection.map].name} • ${category.name} • ${infinite?'∞ Infinito':'🏁 Campanha'} • ${difficulties[lobbySelection.difficulty].name}`
-    :`${category.icon} Mapas ${category.name} • em desenvolvimento`;
+    ?`${maps[lobbySelection.map].name} • ${category.name} • ${infinite?$t('∞ Infinito'):$t('🏁 Campanha')} • ${difficulties[lobbySelection.difficulty].name}`
+    :$T`${category.icon} Mapas ${category.name} • em desenvolvimento`;
   renderPlayHeroSummary();
 }
 function drawCollectionCat(id){
@@ -1295,16 +2622,16 @@ function drawCollectionCat(id){
   c.fillStyle='#e88993';c.beginPath();c.moveTo(-5,1);c.lineTo(5,1);c.lineTo(0,8);c.closePath();c.fill();
   c.strokeStyle=gold?'#f7d66b':accent;c.lineWidth=5;c.beginPath();c.arc(0,46,36,.15,Math.PI-.15);c.stroke();
   c.font='52px Segoe UI Emoji,Segoe UI Symbol';c.textAlign='center';c.fillText(t.icon,0,-88);if(gold){c.font='28px Segoe UI Emoji';c.fillText('👑',48,-72);}c.restore();
-  c.fillStyle='#f4f7fa';c.font='900 18px Segoe UI,Arial';c.textAlign='center';c.fillText(gold?'SKIN MAESTRIA DOURADA':'VISUAL DO GATINHO',W/2,H-18);
+  c.fillStyle='#f4f7fa';c.font='900 18px Segoe UI,Arial';c.textAlign='center';c.fillText(gold?$t('SKIN MAESTRIA DOURADA'):$t('VISUAL DO GATINHO'),W/2,H-18);
 }
 function renderCatMasteryDetail(id){
   const root=$('#cat-mastery-info');if(!root)return;
   const t=types[id],m=masteryState(id),b=masteryBonusSummary(id),ability=MASTERY_ABILITIES[id],max=m.level>=50,need=max?0:requiredMasteryXp(m.level),pct=masteryProgressPct(id);
-  root.innerHTML=`<div class="mastery-detail-head"><div><span class="eyebrow">MAESTRIA INDIVIDUAL</span><h3>${t.name}</h3><small>${t.role}</small></div><span class="mastery-level-badge ${max?'max':''}">${max?'⭐ MÁX 50':`Nv. ${m.level}/50`}</span></div>
-    <div class="mastery-xp-line"><span>${max?'Maestria concluída':`${m.xp}/${need} XP`}</span><b>${Math.round(pct)}%</b></div><div class="mastery-big-track"><i style="width:${pct}%"></i></div>
-    <div class="mastery-bonus-list">${id==='salmon'?`<span>🎣 Bônus atual: <b>${b.text}</b></span>`:`<span>📏 Range: <b>+${b.range.toFixed(1)}</b></span><span>💥 Dano: <b>+${b.damage.toFixed(1)}</b></span><span>⚡ Attack Speed: <b>-${Math.round(b.attackReduction*100)}% no intervalo</b></span>`}</div>
-    <div class="mastery-ability-card ${max?'':'locked'}"><b>${ability.icon} ${ability.name}</b><br>${ability.description}<br><small>${max?`✓ Desbloqueada • cooldown ${ability.cooldown}s`:'🔒 Desbloqueia no nível 50'}</small></div>
-    <div class="mastery-reward">${max?'✨ Skin dourada equipada automaticamente • recompensa de nível 50 recebida':'🎁 Nível 50: skin dourada + habilidade exclusiva + 🪙 '+MASTERY_MAX_COINS+' moedas'}</div>`;
+  root.innerHTML=$T`<div class="mastery-detail-head"><div><span class="eyebrow">MAESTRIA INDIVIDUAL</span><h3>${t.name}</h3><small>${t.role}</small></div><span class="mastery-level-badge ${max?'max':''}">${max?$t('⭐ MÁX 50'):`Nv. ${m.level}/50`}</span></div>
+    <div class="mastery-xp-line"><span>${max?$t('Maestria concluída'):`${m.xp}/${need} XP`}</span><b>${Math.round(pct)}%</b></div><div class="mastery-big-track"><i style="width:${pct}%"></i></div>
+    <div class="mastery-bonus-list">${id==='salmon'?$T`<span>🎣 Bônus atual: <b>${b.text}</b></span>`:$T`<span>📏 Range: <b>+${b.range.toFixed(1)}</b></span><span>💥 Dano: <b>+${b.damage.toFixed(1)}</b></span><span>⚡ Attack Speed: <b>-${Math.round(b.attackReduction*100)}% no intervalo</b></span>`}</div>
+    <div class="mastery-ability-card ${max?'':'locked'}"><b>${ability.icon} ${ability.name}</b><br>${ability.description}<br><small>${max?$T`✓ Desbloqueada • cooldown ${ability.cooldown}s`:$t('🔒 Desbloqueia no nível 50')}</small></div>
+    <div class="mastery-reward">${max?$t('✨ Skin dourada equipada automaticamente • recompensa de nível 50 recebida'):$t('🎁 Nível 50: skin dourada + habilidade exclusiva + 🪙 ')+MASTERY_MAX_COINS+$t(' moedas')}</div>`;
   drawCollectionCat(id);
 }
 function renderCatCollection(){
@@ -1315,9 +2642,9 @@ function renderCatCollection(){
   root.innerHTML=visibleTypes.map(([id,t])=>{const unlocked=isTowerUnlocked(id),m=masteryState(id),pct=masteryProgressPct(id),max=m.level>=50,need=max?0:requiredMasteryXp(m.level);
     return `<article class="cat-card mastery-card ${unlocked?'':'locked'} ${max?'mastered':''} ${catCollectionSelection===id?'selected':''}" data-mastery-cat="${id}" style="--cat-glow:${max?'#f2cf62':t.color}33">
       <div class="cat-head"><div class="cat-avatar">${unlocked?t.icon:'🔒'}</div><div><h3>${t.name}</h3><small>${t.role} • base 🐟 ${Math.round(t.cost*GLOBAL_TOWER_PRICE_MULTIPLIER)}</small></div></div>
-      <p class="cat-role">${max?'<span class="mastery-gold-label">⭐ Maestria Máxima • Skin Dourada</span>':`Maestria ${m.level}/50`} • ${masteryBonusSummary(id).text}</p>
+      <p class="cat-role">${max?$t('<span class="mastery-gold-label">⭐ Maestria Máxima • Skin Dourada</span>'):$T`Maestria ${m.level}/50`} • ${masteryBonusSummary(id).text}</p>
       <div class="mastery-mini-track"><i style="width:${pct}%"></i></div><div class="mastery-mini-text"><span>${max?'MAX':`${m.xp}/${need} XP`}</span><span>${Math.round(pct)}%</span></div>
-      <div class="cat-unlock">${unlocked?'✓ Liberado para jogar':`🔒 Libera no nível ${t.unlockLevel} • você está no ${profile.level}`}</div></article>`;}).join('');
+      <div class="cat-unlock">${unlocked?$t('✓ Liberado para jogar'):$T`🔒 Libera no nível ${t.unlockLevel} • você está no ${profile.level}`}</div></article>`;}).join('');
   $$('[data-mastery-cat]').forEach(card=>card.onclick=()=>{catCollectionSelection=card.dataset.masteryCat;renderCatCollection();});
   renderCatMasteryDetail(catCollectionSelection);
 }
@@ -1350,10 +2677,10 @@ function drawHeroPreview(heroId){
 function renderHeroDetail(heroId){
   const root=$('#hero-detail-info');if(!root)return;
   const h=HEROES[heroId]||HEROES.king;
-  root.innerHTML=`<div class="hero-detail-head"><div><span class="eyebrow">HERÓI GATINHO</span><h3>${h.icon} ${h.name}</h3><small>${h.role}</small></div><span class="hero-cost-chip">🐟 ${h.cost} base</span></div>
+  root.innerHTML=$T`<div class="hero-detail-head"><div><span class="eyebrow">HERÓI GATINHO</span><h3>${h.icon} ${h.name}</h3><small>${h.role}</small></div><span class="hero-cost-chip">🐟 ${h.cost} base</span></div>
     <div class="hero-passive-card"><b>✨ Passiva</b><p>${h.passive}</p></div>
     <div class="hero-skill-grid"><div><b>🔓 Nv.5 • ${h.skill.icon} ${h.skill.name}</b><p>${h.skill.description}</p><small>Cooldown: ${h.skill.cooldown}s</small></div><div class="ultimate"><b>⭐ Nv.10 • ${h.ultimate.icon} ${h.ultimate.name}</b><p>${h.ultimate.description}</p><small>Cooldown: ${h.ultimate.cooldown}s</small></div></div>
-    <button type="button" id="hero-equip" class="primary big-action">${profile.selectedHero===heroId?'✓ Herói equipado':'Equipar '+h.name}</button>
+    <button type="button" id="hero-equip" class="primary big-action">${profile.selectedHero===heroId?$t('✓ Herói equipado'):$t('Equipar ')+h.name}</button>
     <small class="hero-note">Cada partida começa no nível 1. XP do herói é ganho durante o mapa e não substitui a Maestria dos gatinhos normais.</small>`;
   const btn=$('#hero-equip');if(btn)btn.onclick=()=>{profile.selectedHero=heroId;heroCollectionSelection=heroId;saveProfile();sfx('ui');renderHeroCollection();renderMapLobby();};
   drawHeroPreview(heroId);
@@ -1362,68 +2689,68 @@ function renderHeroDetail(heroId){
 function renderHeroCollection(){
   const root=$('#hero-collection');if(!root)return;
   if(!HEROES[heroCollectionSelection])heroCollectionSelection=profile.selectedHero||'king';
-  root.innerHTML=Object.entries(HEROES).map(([id,h])=>`<article class="hero-card ${profile.selectedHero===id?'equipped':''} ${heroCollectionSelection===id?'selected':''}" data-hero-choice="${id}" style="--hero-color:${h.color}">
-    <div class="hero-card-icon">${h.icon}</div><div class="hero-card-copy"><h3>${h.name}</h3><small>${h.role}</small><p>${h.passive}</p><span>🐟 ${h.cost} base • habilidade Nv.5 • Ultimate Nv.10</span></div>${profile.selectedHero===id?'<b class="hero-equipped-label">✓ EQUIPADO</b>':''}</article>`).join('');
+  root.innerHTML=Object.entries(HEROES).map(([id,h])=>$T`<article class="hero-card ${profile.selectedHero===id?'equipped':''} ${heroCollectionSelection===id?'selected':''}" data-hero-choice="${id}" style="--hero-color:${h.color}">
+    <div class="hero-card-icon">${h.icon}</div><div class="hero-card-copy"><h3>${h.name}</h3><small>${h.role}</small><p>${h.passive}</p><span>🐟 ${h.cost} base • habilidade Nv.5 • Ultimate Nv.10</span></div>${profile.selectedHero===id?$t('<b class="hero-equipped-label">✓ EQUIPADO</b>'):''}</article>`).join('');
   $$('[data-hero-choice]').forEach(card=>card.onclick=()=>{sfx('ui');heroCollectionSelection=card.dataset.heroChoice;renderHeroCollection();});
-  if($('#hero-equipped-chip'))$('#hero-equipped-chip').textContent=`🦸 Equipado: ${(HEROES[profile.selectedHero]||HEROES.king).name}`;
+  if($('#hero-equipped-chip'))$('#hero-equipped-chip').textContent=$T`🦸 Equipado: ${(HEROES[profile.selectedHero]||HEROES.king).name}`;
   renderHeroDetail(heroCollectionSelection);
 }
 
 function renderPlayHeroSummary(){
   const root=$('#play-hero-summary');if(!root)return;
   const h=HEROES[profile.selectedHero]||HEROES.king,price=heroPrice(profile.selectedHero,lobbySelection.map);
-  root.innerHTML=`<span class="play-hero-icon">${h.icon}</span><span><b>${h.name}</b><small>${h.role} • 🐟 ${price} neste mapa • Nv.5 ${h.skill.name} • Nv.10 ${h.ultimate.name}</small></span>`;
+  root.innerHTML=$T`<span class="play-hero-icon">${h.icon}</span><span><b>${h.name}</b><small>${h.role} • 🐟 ${price} neste mapa • Nv.5 ${h.skill.name} • Nv.10 ${h.ultimate.name}</small></span>`;
 }
 
 const TOWER_TIPS={
-  dart:'Barato e flexível — boa escolha logo no início em qualquer mapa. O caminho Lanceiro é a única forma de enxergar Camuflados fora do Sniper e do Ninja.',
-  frost:'Não escolhe um alvo: atinge todos os inimigos válidos no alcance a cada ataque. Ótimo pra segurar grupos e deixa todo mundo mais lento.',
-  burst:'Sempre quebra blindagem, mesmo sem investir em nenhum caminho — a primeira escolha natural contra Blindados e Blindados Pesados.',
-  laser:'A maior cadência de tiro do jogo. Forte contra muitos balões fracos ao mesmo tempo, principalmente com o caminho Grade de Plasma.',
-  ninja:'O maior dano por acerto entre as torres rápidas. O caminho Sombra Assassina é a única forma, além do Sniper, de enxergar Camuflado e quebrar blindagem ao mesmo tempo.',
-  wizard:'Dano em área com uma lentidão leve já de fábrica — caro, mas já nasce pronto pra ajudar contra grupos.',
-  electric:'O raio salta entre vários alvos próximos sozinho — ótimo contra balões enfileirados ou agrupados.',
-  vine:'Não causa dano por padrão: imobiliza inimigos por alguns segundos. Combine com torres de dano pra aproveitar a deixa parada.',
-  salmon:'Não ataca — gera salmões extras a cada rodada concluída. Ajuda a bancar as outras torres mais caras.',
-  sniper:'Alcance cobre o mapa inteiro e sempre enxerga Camuflados sozinho. Caro, mas nunca precisa se preocupar com posicionamento.',
-  celestial:'Não ataca diretamente: os drones fazem o trabalho. A cada 2 upgrades no mesmo caminho a frota ganha +1 drone.'
+  dart:$t('Barato e flexível — boa escolha logo no início em qualquer mapa. O caminho Lanceiro é a única forma de enxergar Camuflados fora do Sniper e do Ninja.'),
+  frost:$t('Não escolhe um alvo: atinge todos os inimigos válidos no alcance a cada ataque. Ótimo pra segurar grupos e deixa todo mundo mais lento.'),
+  burst:$t('Sempre quebra blindagem, mesmo sem investir em nenhum caminho — a primeira escolha natural contra Blindados e Blindados Pesados.'),
+  laser:$t('A maior cadência de tiro do jogo. Forte contra muitos balões fracos ao mesmo tempo, principalmente com o caminho Grade de Plasma.'),
+  ninja:$t('O maior dano por acerto entre as torres rápidas. O caminho Sombra Assassina é a única forma, além do Sniper, de enxergar Camuflado e quebrar blindagem ao mesmo tempo.'),
+  wizard:$t('Dano em área com uma lentidão leve já de fábrica — caro, mas já nasce pronto pra ajudar contra grupos.'),
+  electric:$t('O raio salta entre vários alvos próximos sozinho — ótimo contra balões enfileirados ou agrupados.'),
+  vine:$t('Não causa dano por padrão: imobiliza inimigos por alguns segundos. Combine com torres de dano pra aproveitar a deixa parada.'),
+  salmon:$t('Não ataca — gera salmões extras a cada rodada concluída. Ajuda a bancar as outras torres mais caras.'),
+  sniper:$t('Alcance cobre o mapa inteiro e sempre enxerga Camuflados sozinho. Caro, mas nunca precisa se preocupar com posicionamento.'),
+  celestial:$t('Não ataca diretamente: os drones fazem o trabalho. A cada 2 upgrades no mesmo caminho a frota ganha +1 drone.')
 };
 
 const BALLOON_GUIDE=[
-  {icon:'🥷',name:'Camuflado',color:'#547b59',desc:'Invisível para a maioria das torres — passa despercebido até ser detectado.',counter:'Detectado por: Sniper (sempre), Dardo (caminho Lanceiro, T2+), Ninja (caminho Sombra Assassina, T1+) e pelo Observador do Sniper (T2+, revela pra toda a defesa).'},
-  {icon:'🛡️',name:'Blindado',color:'#9ba4b4',desc:'Tem uma camada extra de blindagem por fora. A maioria dos ataques não avança até ela quebrar.',counter:'Quebra blindagem: Bombinha (sempre), Sniper (caminho Caçador, T4+), Ninja (caminho Sombra Assassina, T5).'},
-  {icon:'🛡️🛡️',name:'Blindado Pesado',color:'#4a525c',desc:'A versão reforçada do Blindado — a camada externa aguenta bem mais dano antes de quebrar. Aparece a partir da dificuldade Normal.',counter:'As mesmas fontes que quebram blindagem comum funcionam, só que leva mais tempo pra derrubar a camada.'},
-  {icon:'🥷🛡️',name:'Camuflado + Blindado',color:'#5c7a63',desc:'Combina os dois ao mesmo tempo: invisível E blindado.',counter:'Precisa de detecção de Camuflado E de uma fonte que quebre blindagem — nem sempre é a mesma torre.'},
-  {icon:'⚡',name:'Rápido',color:'#ffe066',desc:'Menos vida que o normal, mas atravessa a rota bem mais rápido — passa rápido pelo alcance das torres.',counter:'Lentidão (Gelinho, Cipó, Mago) ajuda a mantê-lo no alcance por mais tempo.'},
-  {icon:'➕',name:'Regenerador',color:'#5fd88a',desc:'Recupera vida aos poucos quando fica um tempo sem ser atingido.',counter:'Dano constante e rápido (Laser, Dardo, Ninja) não dá espaço pra ele regenerar.'},
-  {icon:'❤️',name:'Curandeiro',color:'#62d887',desc:'Regenera 1 camada por segundo dos balões próximos em um raio pequeno.',counter:'Priorize o Curandeiro antes que uma formação inteira comece a recuperar camadas.'},
-  {icon:'🤡',name:'Atrapalhão',color:'#ff9f5d',desc:'Pode estourar 1 camada do balão à frente, mas o impacto atordoa gatinhos próximos por 1,2s.',counter:'Evite concentrar toda a defesa colada no mesmo ponto quando ele estiver chegando.'},
-  {icon:'🃏',name:'Bobo da Corte',color:'#ce78ff',desc:'Tem apenas 1 de vida. O dano do tiro que o acerta tira salmões da partida.',counter:'O prejuízo é limitado a 500 salmões por acerto. Torres fracas/rápidas podem ser mais econômicas do que um tiro enorme de Sniper.'},
-  {icon:'😇',name:'Anjo',color:'#f4efc7',desc:'Dá 1 escudo a um balão próximo. O escudo bloqueia um ataque inteiro, mas reduz em 18% a velocidade do protegido.',counter:'Ataques baratos e rápidos quebram o escudo antes dos seus golpes pesados.'},
-  {icon:'😈',name:'Demônio',color:'#a94455',desc:'Rouba até 1 camada de balões próximos e converte isso em vida máxima própria.',counter:'Mate cedo: ele pode crescer até 2× a vida máxima original se ficar cercado de aliados.'},
-  {icon:'⭐',name:'Elite',color:'#ffd36b',desc:'Não é bem um tipo novo — é uma versão fortalecida (+45% de vida) de qualquer balão comum ou especial, a partir da rodada 3.',counter:'Fica mais fácil de notar pela barra de vida maior; trate como o tipo base, só que mais resistente.'},
-  {icon:'👹',name:'Mini Boss',color:'#f29b54',desc:'Na rodada 15 do Normal e do Difícil surge com 30× a vida do inimigo regular mais resistente disponível até ali.',counter:'É um teste de dano no meio da fase. Se escapar, tira 8 vidas em vez de encerrar a partida inteira.'},
-  {icon:'👑',name:'Chefão',color:'#ffb347',desc:'Aparece na última rodada de cada mapa. Tem 75× a vida do inimigo regular mais resistente e anda 30% mais devagar do que antes.',counter:'É um tanque de verdade. Se escapar, tira TODAS as suas vidas restantes na hora.'}
+  {icon:'🥷',name:$t('Camuflado'),color:'#547b59',desc:$t('Invisível para a maioria das torres — passa despercebido até ser detectado.'),counter:$t('Detectado por: Sniper (sempre), Dardo (caminho Lanceiro, T2+), Ninja (caminho Sombra Assassina, T1+) e pelo Observador do Sniper (T2+, revela pra toda a defesa).')},
+  {icon:'🛡️',name:$t('Blindado'),color:'#9ba4b4',desc:$t('Tem uma camada extra de blindagem por fora. A maioria dos ataques não avança até ela quebrar.'),counter:$t('Quebra blindagem: Bombinha (sempre), Sniper (caminho Caçador, T4+), Ninja (caminho Sombra Assassina, T5).')},
+  {icon:'🛡️🛡️',name:$t('Blindado Pesado'),color:'#4a525c',desc:$t('A versão reforçada do Blindado — a camada externa aguenta bem mais dano antes de quebrar. Aparece a partir da dificuldade Normal.'),counter:$t('As mesmas fontes que quebram blindagem comum funcionam, só que leva mais tempo pra derrubar a camada.')},
+  {icon:'🥷🛡️',name:$t('Camuflado + Blindado'),color:'#5c7a63',desc:$t('Combina os dois ao mesmo tempo: invisível E blindado.'),counter:$t('Precisa de detecção de Camuflado E de uma fonte que quebre blindagem — nem sempre é a mesma torre.')},
+  {icon:'⚡',name:$t('Rápido'),color:'#ffe066',desc:$t('Menos vida que o normal, mas atravessa a rota bem mais rápido — passa rápido pelo alcance das torres.'),counter:$t('Lentidão (Gelinho, Cipó, Mago) ajuda a mantê-lo no alcance por mais tempo.')},
+  {icon:'➕',name:$t('Regenerador'),color:'#5fd88a',desc:$t('Recupera vida aos poucos quando fica um tempo sem ser atingido.'),counter:$t('Dano constante e rápido (Laser, Dardo, Ninja) não dá espaço pra ele regenerar.')},
+  {icon:'❤️',name:$t('Curandeiro'),color:'#62d887',desc:$t('Regenera 1 camada por segundo dos balões próximos em um raio pequeno.'),counter:$t('Priorize o Curandeiro antes que uma formação inteira comece a recuperar camadas.')},
+  {icon:'🤡',name:$t('Atrapalhão'),color:'#ff9f5d',desc:$t('Pode estourar 1 camada do balão à frente, mas o impacto atordoa gatinhos próximos por 1,2s.'),counter:$t('Evite concentrar toda a defesa colada no mesmo ponto quando ele estiver chegando.')},
+  {icon:'🃏',name:$t('Bobo da Corte'),color:'#ce78ff',desc:$t('Tem apenas 1 de vida. O dano do tiro que o acerta tira salmões da partida.'),counter:$t('O prejuízo é limitado a 500 salmões por acerto. Torres fracas/rápidas podem ser mais econômicas do que um tiro enorme de Sniper.')},
+  {icon:'😇',name:$t('Anjo'),color:'#f4efc7',desc:$t('Dá 1 escudo a um balão próximo. O escudo bloqueia um ataque inteiro, mas reduz em 18% a velocidade do protegido.'),counter:$t('Ataques baratos e rápidos quebram o escudo antes dos seus golpes pesados.')},
+  {icon:'😈',name:$t('Demônio'),color:'#a94455',desc:$t('Rouba até 1 camada de balões próximos e converte isso em vida máxima própria.'),counter:$t('Mate cedo: ele pode crescer até 2× a vida máxima original se ficar cercado de aliados.')},
+  {icon:'⭐',name:'Elite',color:'#ffd36b',desc:$t('Não é bem um tipo novo — é uma versão fortalecida (+45% de vida) de qualquer balão comum ou especial, a partir da rodada 3.'),counter:$t('Fica mais fácil de notar pela barra de vida maior; trate como o tipo base, só que mais resistente.')},
+  {icon:'👹',name:'Mini Boss',color:'#f29b54',desc:$t('Na rodada 15 do Normal e do Difícil surge com 30× a vida do inimigo regular mais resistente disponível até ali.'),counter:$t('É um teste de dano no meio da fase. Se escapar, tira 8 vidas em vez de encerrar a partida inteira.')},
+  {icon:'👑',name:$t('Chefão'),color:'#ffb347',desc:$t('Aparece na última rodada de cada mapa. Tem 75× a vida do inimigo regular mais resistente e anda 30% mais devagar do que antes.'),counter:$t('É um tanque de verdade. Se escapar, tira TODAS as suas vidas restantes na hora.')}
 ];
 
 function renderTutorial(){
   const towerRoot=$('#tutorial-towers');
   if(towerRoot){
     towerRoot.innerHTML=Object.entries(types).filter(([id,t])=>!(t.secret||t.exclusive)||isTowerUnlocked(id)).map(([id,t])=>{
-      const cadence=t.farm?`+🐟 ${t.farmIncome}/rodada`:t.rootHold?`recarga ${t.rate.toFixed(1)}s`:`${(1/t.rate).toFixed(1)} ataque(s)/s`;
+      const cadence=t.farm?$T`+🐟 ${t.farmIncome}/rodada`:t.rootHold?$T`recarga ${t.rate.toFixed(1)}s`:$T`${(1/t.rate).toFixed(1)} ataque(s)/s`;
       return `<article class="cat-card" style="--cat-glow:${t.color}33">
         <div class="cat-head">
           <div class="cat-avatar">${t.icon}</div>
           <div><h3>${t.name}</h3><small>${t.role} • base 🐟 ${Math.round(t.cost*GLOBAL_TOWER_PRICE_MULTIPLIER)}</small></div>
         </div>
-        <p class="cat-role">${t.farm?'Economia • não ataca':t.rootHold?'Controle • imobiliza':`Dano ${t.damage.toFixed(2)}`} • ${t.globalRange?'range GLOBAL':`range ${t.range}`} • ${cadence}.</p>
+        <p class="cat-role">${t.farm?$t('Economia • não ataca'):t.rootHold?$t('Controle • imobiliza'):$T`Dano ${t.damage.toFixed(2)}`} • ${t.globalRange?$t('range GLOBAL'):`range ${t.range}`} • ${cadence}.</p>
         <div class="tutorial-tip">💡 ${TOWER_TIPS[id]||t.special}</div>
       </article>`;
     }).join('');
   }
   const tierRoot=$('#tutorial-tiers');
   if(tierRoot){
-    tierRoot.innerHTML=TIERS.map((tier,i)=>`<span class="tier-chip"><b style="background:${tier.color};--ring:${tier.ring}55"></b>${tier.name} • resistência ${i+1}</span>`).join('');
+    tierRoot.innerHTML=TIERS.map((tier,i)=>$T`<span class="tier-chip"><b style="background:${tier.color};--ring:${tier.ring}55"></b>${tier.name} • resistência ${i+1}</span>`).join('');
   }
   const balloonRoot=$('#tutorial-balloons');
   if(balloonRoot){
@@ -1442,7 +2769,7 @@ function celestialFreeSpinReady(){return Date.now()>=(profile.celestialWheel?.ne
 function celestialWheelCost(){return celestialFreeSpinReady()?0:CELESTIAL_SPIN_COST;}
 function celestialFreeSpinRemaining(){return Math.max(0,(profile.celestialWheel?.nextFreeAt||0)-Date.now());}
 function formatCelestialCooldown(ms){
-  if(ms<=0)return 'Disponível agora';
+  if(ms<=0)return $t('Disponível agora');
   const totalMinutes=Math.ceil(ms/60000),hours=Math.floor(totalMinutes/60),minutes=totalMinutes%60;
   if(hours>=1)return `${hours}h ${String(minutes).padStart(2,'0')}min`;
   return `${minutes}min`;
@@ -1451,19 +2778,19 @@ function celestialXpTargets(){return Object.entries(types).filter(([id])=>isTowe
 function updateCelestialWheelClock(){
   const clock=$('#celestial-free-clock'),spin=$('#celestial-spin');if(!clock||!spin)return;
   const pending=profile.celestialWheel?.pendingXp||0,ready=celestialFreeSpinReady(),remaining=celestialFreeSpinRemaining();
-  clock.textContent=ready?'🎁 Seu giro gratuito diário está disponível.':`⏳ Próximo giro grátis em ${formatCelestialCooldown(remaining)}.`;
-  spin.textContent=ready?'🎁 Giro gratuito':`🎰 Girar • 🪙 ${CELESTIAL_SPIN_COST}`;
+  clock.textContent=ready?$t('🎁 Seu giro gratuito diário está disponível.'):$T`⏳ Próximo giro grátis em ${formatCelestialCooldown(remaining)}.`;
+  spin.textContent=ready?$t('🎁 Giro gratuito'):$T`🎰 Girar • 🪙 ${CELESTIAL_SPIN_COST}`;
   spin.disabled=Boolean(pending);
 }
 function renderCelestialWheel(){
   const root=$('#celestial-wheel');if(!root)return;
   const unlocked=Boolean(profile.exclusiveUnlocks?.celestial),cost=celestialWheelCost(),pending=profile.celestialWheel?.pendingXp||0;
   const pity=Math.max(0,Math.min(49,profile.celestialWheel?.misses||0));
-  root.innerHTML=`<div class="celestial-wheel-core"><div class="celestial-orb">🛸</div><div><span class="eyebrow">ROLETA CELESTIAL</span><h3>${unlocked?'Gato Celestial desbloqueado':'1,5% • Gato Celestial'}</h3><p>1,5% Gatinho Exclusivo • 30% moedas • 68,5% XP de Maestria para um gatinho à escolha.</p></div></div>
-    <div class="celestial-odds"><span>🛸 1,5%</span><span>🪙 30%</span><span>⭐ 68,5%</span>${unlocked?'':`<span>✨ Garantia ${pity}/50</span>`}</div>
-    <button type="button" id="celestial-spin" class="primary big-action" ${pending?'disabled':''}>${cost===0?'🎁 Giro gratuito':'🎰 Girar • 🪙 '+cost}</button>
-    <div id="celestial-free-clock" class="celestial-free-clock">${cost===0?'🎁 Seu giro gratuito diário está disponível.':'⏳ Próximo giro grátis em '+formatCelestialCooldown(celestialFreeSpinRemaining())+'.'}</div>
-    <div id="celestial-wheel-result" class="celestial-wheel-result">${pending?`⭐ Você tem <b>${pending} XP</b> esperando para ser aplicado.`:'Você recebe 1 giro grátis a cada 24h. Giros extras custam moedas do jogo.'}</div>
+  root.innerHTML=$T`<div class="celestial-wheel-core"><div class="celestial-orb">🛸</div><div><span class="eyebrow">ROLETA CELESTIAL</span><h3>${unlocked?$t('Gato Celestial desbloqueado'):$t('1,5% • Gato Celestial')}</h3><p>1,5% Gatinho Exclusivo • 30% moedas • 68,5% XP de Maestria para um gatinho à escolha.</p></div></div>
+    <div class="celestial-odds"><span>🛸 1,5%</span><span>🪙 30%</span><span>⭐ 68,5%</span>${unlocked?'':$T`<span>✨ Garantia ${pity}/50</span>`}</div>
+    <button type="button" id="celestial-spin" class="primary big-action" ${pending?'disabled':''}>${cost===0?$t('🎁 Giro gratuito'):$t('🎰 Girar • 🪙 ')+cost}</button>
+    <div id="celestial-free-clock" class="celestial-free-clock">${cost===0?$t('🎁 Seu giro gratuito diário está disponível.'):$t('⏳ Próximo giro grátis em ')+formatCelestialCooldown(celestialFreeSpinRemaining())+'.'}</div>
+    <div id="celestial-wheel-result" class="celestial-wheel-result">${pending?$T`⭐ Você tem <b>${pending} XP</b> esperando para ser aplicado.`:$t('Você recebe 1 giro grátis a cada 24h. Giros extras custam moedas do jogo.')}</div>
     <div id="celestial-xp-assign" class="celestial-xp-assign" ${pending?'':'hidden'}><select id="celestial-xp-target">${celestialXpTargets().map(x=>`<option value="${x.id}">${x.icon} ${x.name}</option>`).join('')}</select><button type="button" id="celestial-xp-apply">Aplicar XP</button></div>`;
   const spin=$('#celestial-spin');if(spin)spin.onclick=spinCelestialWheel;
   const apply=$('#celestial-xp-apply');if(apply)apply.onclick=applyCelestialWheelXp;
@@ -1471,17 +2798,17 @@ function renderCelestialWheel(){
 function spinCelestialWheel(){
   if((profile.celestialWheel?.pendingXp||0)>0)return;
   const free=celestialFreeSpinReady(),cost=free?0:CELESTIAL_SPIN_COST;
-  if(profile.coins<cost){const r=$('#celestial-wheel-result');if(r)r.textContent=`Faltam ${cost-profile.coins} moedas para girar novamente.`;return;}
+  if(profile.coins<cost){const r=$('#celestial-wheel-result');if(r)r.textContent=$T`Faltam ${cost-profile.coins} moedas para girar novamente.`;return;}
   if(cost)profile.coins-=cost;
   else profile.celestialWheel.nextFreeAt=Date.now()+CELESTIAL_FREE_SPIN_MS;
   profile.celestialWheel.spins=(profile.celestialWheel.spins||0)+1;
   const pityDue=!profile.exclusiveUnlocks.celestial&&(profile.celestialWheel.misses||0)>=49;
   const roll=Math.random()*100;let msg='';
   if(pityDue||roll<1.5){
-    if(profile.exclusiveUnlocks.celestial){profile.coins+=500;msg='🛸 O Gato Celestial já era seu: duplicata convertida em 🪙 500 moedas.';}
-    else{profile.exclusiveUnlocks.celestial=true;profile.celestialWheel.misses=0;catCollectionSelection='celestial';msg=pityDue?'🛸✨ GARANTIA DO 50º GIRO! Gato Celestial desbloqueado permanentemente!':'🛸✨ PRÊMIO MÁXIMO! Gato Celestial desbloqueado permanentemente!';}
-  }else if(roll<31.5){profile.celestialWheel.misses=(profile.celestialWheel.misses||0)+1;const coins=80+Math.floor(Math.random()*81);profile.coins+=coins;msg=`🪙 Você ganhou ${coins} moedas permanentes.`;}
-  else{profile.celestialWheel.misses=(profile.celestialWheel.misses||0)+1;const xp=80+Math.floor(Math.random()*81);profile.celestialWheel.pendingXp=xp;msg=`⭐ Você ganhou ${xp} XP de Maestria. Escolha abaixo quem recebe.`;}
+    if(profile.exclusiveUnlocks.celestial){profile.coins+=500;msg=$t('🛸 O Gato Celestial já era seu: duplicata convertida em 🪙 500 moedas.');}
+    else{profile.exclusiveUnlocks.celestial=true;profile.celestialWheel.misses=0;catCollectionSelection='celestial';msg=pityDue?$t('🛸✨ GARANTIA DO 50º GIRO! Gato Celestial desbloqueado permanentemente!'):$t('🛸✨ PRÊMIO MÁXIMO! Gato Celestial desbloqueado permanentemente!');}
+  }else if(roll<31.5){profile.celestialWheel.misses=(profile.celestialWheel.misses||0)+1;const coins=80+Math.floor(Math.random()*81);profile.coins+=coins;msg=$T`🪙 Você ganhou ${coins} moedas permanentes.`;}
+  else{profile.celestialWheel.misses=(profile.celestialWheel.misses||0)+1;const xp=80+Math.floor(Math.random()*81);profile.celestialWheel.pendingXp=xp;msg=$T`⭐ Você ganhou ${xp} XP de Maestria. Escolha abaixo quem recebe.`;}
   saveProfile();sfx('win');renderPowerShop();const r=$('#celestial-wheel-result');if(r)r.textContent=msg;
 }
 
@@ -1496,9 +2823,9 @@ function renderPowerShop(){
   if(root){
     root.innerHTML=Object.entries(powers).map(([id,p])=>{
       const qty=profile.inventory[id]||0,affordable=profile.coins>=p.cost;
-      return `<article class="shop-card">
+      return $T`<article class="shop-card">
         <div class="shop-card-head"><div class="shop-card-icon">${p.icon}</div><div><h3>${p.name}</h3><p>${p.description}</p></div></div>
-        <div class="shop-card-meta"><span>Na mochila: <b>${qty}</b></span><span>${p.duration?`${p.duration}s`:'instantâneo'}</span></div>
+        <div class="shop-card-meta"><span>Na mochila: <b>${qty}</b></span><span>${p.duration?`${p.duration}s`:$t('instantâneo')}</span></div>
         <button type="button" data-buy-power="${id}" class="${affordable?'affordable':''}" ${affordable?'':'disabled'}>🪙 ${p.cost} • Comprar 1 carga</button>
       </article>`;
     }).join('');
@@ -1506,7 +2833,7 @@ function renderPowerShop(){
   }
   const need=requiredXp(profile.level),pct=xpPercent();
   if($('#powers-level')) $('#powers-level').textContent=profile.level;
-  if($('#powers-xp-text')) $('#powers-xp-text').textContent=`${profile.xp}/${need} XP • próximo nível exige ${requiredXp(profile.level+1)} XP`;
+  if($('#powers-xp-text')) $('#powers-xp-text').textContent=$T`${profile.xp}/${need} XP • próximo nível exige ${requiredXp(profile.level+1)} XP`;
   if($('#powers-xp-fill')) $('#powers-xp-fill').style.width=`${pct}%`;
   renderSkinShop();
   renderCelestialWheel();
@@ -1516,10 +2843,10 @@ function renderSkinShop(){
   const root=$('#skin-shop');if(!root)return;
   root.innerHTML=Object.entries(skins).map(([id,skin])=>{
     const owned=Boolean(profile.ownedSkins[id]),equipped=profile.equippedSkins[skin.tower]===id;
-    return `<article class="shop-card ${equipped?'skin-equipped':''}">
+    return $T`<article class="shop-card ${equipped?'skin-equipped':''}">
       <div class="shop-card-head"><div class="shop-card-icon">${skin.icon}</div><div><h3>${skin.name}</h3><p>${skin.description}</p></div></div>
-      <div class="shop-card-meta"><span>Skin de: <b>${types[skin.tower].name}</b></span><span>${equipped?'✓ Equipada':owned?'Adquirida':'Teste gratuito'}</span></div>
-      <button type="button" data-skin-action="${id}" class="affordable">${equipped?'✓ Equipada':owned?'Equipar':'🪙 0 • Adquirir grátis'}</button>
+      <div class="shop-card-meta"><span>Skin de: <b>${types[skin.tower].name}</b></span><span>${equipped?$t('✓ Equipada'):owned?$t('Adquirida'):$t('Teste gratuito')}</span></div>
+      <button type="button" data-skin-action="${id}" class="affordable">${equipped?$t('✓ Equipada'):owned?$t('Equipar'):$t('🪙 0 • Adquirir grátis')}</button>
     </article>`;
   }).join('');
   $$('[data-skin-action]').forEach(btn=>btn.onclick=()=>unlockOrEquipSkin(btn.dataset.skinAction));
@@ -1546,7 +2873,7 @@ function renderUnlocks(){
   const sideLabel=$('#td-side-label');
   if(sideLabel){
     const pct=Math.round((mult-1)*100);
-    sideLabel.textContent=`GATINHOS • MÁX 4 • ${category.name.toUpperCase()} ${pct===0?'NORMAL':`${pct>0?'+':''}${pct}%`}`;
+    sideLabel.textContent=$T`GATINHOS • MÁX 4 • ${category.name.toUpperCase()} ${pct===0?'NORMAL':`${pct>0?'+':''}${pct}%`}`;
   }
   $$('.td-tower-picker [data-td-tower]').forEach(btn=>{
     const id=btn.dataset.tdTower,unlocked=isTowerUnlocked(id),t=types[id],price=towerPrice(id,mapId);
@@ -1559,10 +2886,10 @@ function renderUnlocks(){
     const small=btn.querySelector('small');
     if(small)small.innerHTML=`🐟 ${price}<span class="tower-count">${placed}/${limit}</span>`;
     btn.title=!unlocked
-      ?`Bloqueado: ${t.name} libera no nível ${t.unlockLevel}.`
+      ?$T`Bloqueado: ${t.name} libera no nível ${t.unlockLevel}.`
       :maxed
-        ?`${t.name}: limite de ${limit} unidade${limit===1?'':'s'} atingido.`
-        :`${t.name} • 🐟 ${price} salmões (${category.name}) • ${placed}/${limit} no mapa • ${t.special}`;
+        ?$T`${t.name}: limite de ${limit} unidade${limit===1?'':'s'} atingido.`
+        :$T`${t.name} • 🐟 ${price} salmões (${category.name}) • ${placed}/${limit} no mapa • ${t.special}`;
   });
 }
 
@@ -1600,7 +2927,7 @@ function initResetSave(){
   if(!btn) return;
   const closeModal=()=>{ if(modal){modal.classList.remove('visible');modal.setAttribute('aria-hidden','true');} };
   btn.onclick=()=>{
-    if(!modal){ if(confirm('Apagar moedas, nível, XP, estrelas, vitórias e poderes comprados?'))doResetSave(); return; }
+    if(!modal){ if(confirm($t('Apagar moedas, nível, XP, estrelas, vitórias e poderes comprados?')))doResetSave(); return; }
     modal.classList.add('visible');modal.setAttribute('aria-hidden','false');
   };
   if(cancelBtn) cancelBtn.onclick=()=>{sfx('ui');closeModal();};
@@ -1619,16 +2946,27 @@ function showSaveIoStatus(text,isError=false){
 }
 function initSettingsExtras(){
   const fsBtn=$('#menu-fullscreen');
-  const syncFsLabel=()=>{ if(fsBtn) fsBtn.textContent=document.fullscreenElement?'🗗 Sair da tela cheia':'🖥️ Tela cheia'; };
+  const syncFsLabel=()=>{ if(fsBtn) fsBtn.textContent=document.fullscreenElement?$t('🗗 Sair da tela cheia'):$t('🖥️ Tela cheia'); };
   if(fsBtn){
     fsBtn.onclick=()=>{
       sfx('ui');
       if(document.fullscreenElement){ document.exitFullscreen().catch(()=>{}); }
-      else if(document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen().catch(()=>showSaveIoStatus('Não foi possível entrar em tela cheia neste navegador.',true)); }
+      else if(document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen().catch(()=>showSaveIoStatus($t('Não foi possível entrar em tela cheia neste navegador.'),true)); }
     };
   }
   document.addEventListener('fullscreenchange',syncFsLabel);
   syncFsLabel();
+
+  const langSel=$('#menu-language');
+  if(langSel){
+    langSel.value=I18N_LANG;
+    langSel.onchange=e=>{sfx('ui');setGameLanguage(e.target.value);};
+  }
+  const langBtn=$('#hub-language-btn');
+  if(langBtn){
+    langBtn.textContent=I18N_LANG==='en'?'🌐 PT':'🌐 EN';
+    langBtn.onclick=()=>{sfx('ui');setGameLanguage(I18N_LANG==='en'?'pt':'en');};
+  }
 
   const scaleSel=$('#menu-ui-scale');
   if(scaleSel){
@@ -1650,8 +2988,8 @@ function initSettingsExtras(){
       a.href=url;a.download=`catoons-td-save-${new Date().toISOString().slice(0,10)}.json`;
       document.body.appendChild(a);a.click();a.remove();
       setTimeout(()=>URL.revokeObjectURL(url),4000);
-      showSaveIoStatus('✓ Save exportado. Guarde o arquivo .json em um lugar seguro.');
-    }catch(err){ console.warn('Falha ao exportar save.',err); showSaveIoStatus('Não foi possível exportar o save.',true); }
+      showSaveIoStatus($t('✓ Save exportado. Guarde o arquivo .json em um lugar seguro.'));
+    }catch(err){ console.warn('Falha ao exportar save.',err); showSaveIoStatus($t('Não foi possível exportar o save.'),true); }
   };
 
   const importInput=$('#menu-import-save-input'),importBtn=$('#menu-import-save');
@@ -1670,10 +3008,10 @@ function initSettingsExtras(){
           if($('#menu-ui-scale'))$('#menu-ui-scale').value=String(profile.settings&&profile.settings.uiScale||1);
           renderHub();
           if(personalTd&&personalTd.renderHotbar) personalTd.renderHotbar();
-          showSaveIoStatus(`✓ Save importado: nível ${profile.level}, ${profile.coins} moedas, ${totalStars()} estrelas.`);
+          showSaveIoStatus($T`✓ Save importado: nível ${profile.level}, ${profile.coins} moedas, ${totalStars()} estrelas.`);
         }catch(err){
           console.warn('Falha ao importar save.',err);
-          showSaveIoStatus('Arquivo inválido — não parece um save do Catoons TD.',true);
+          showSaveIoStatus($t('Arquivo inválido — não parece um save do Catoons TD.'),true);
         }
         importInput.value='';
       };
@@ -1685,13 +3023,13 @@ function initSettingsExtras(){
 // v0.22.0 — Tutorial 2.0: as primeiras etapas validam a ação real do jogador.
 // O cartão não bloqueia o jogo; quando a ação pedida acontece, a etapa avança sozinha.
 const MATCH_TUTORIAL_STEPS=[
-  {id:'pick',sel:'.td-tower-picker',action:'towerSelected',text:'Comece escolhendo um gatinho na barra. O Dardo é barato e ótimo para aprender.',task:'Escolha qualquer gatinho na barra da direita.'},
-  {id:'place',sel:'.canvas-wrap',action:'towerPlaced',text:'Agora coloque o gatinho fora da estrada e longe de obstáculos. A área válida é confirmada no próprio mapa.',task:'Clique em um ponto válido do mapa para posicionar.'},
-  {id:'inspect',sel:'.canvas-wrap',action:'towerInspected',text:'Clique no gatinho que você acabou de colocar. É aqui que você abre upgrades, venda, reposicionamento e Maestria.',task:'Clique em uma torre já colocada.'},
-  {id:'wave',sel:'.td-side-controls',action:'waveStarted',text:'Sua defesa está pronta. Chame a primeira rodada; depois você pode usar 2×/3× ou até sobrepor ondas quando quiser mais ritmo.',task:'Clique em Rodada 1.'},
-  {id:'hero',sel:'.td-hero-slot',text:'O Herói equipado é único por partida. Ele sobe do Nv.1 ao Nv.10 no próprio mapa, libera habilidade no Nv.5 e Ultimate no Nv.10.',task:'Herói: 1 por partida. Você pode colocá-lo quando tiver salmões.'},
-  {id:'powers',sel:'.power-hotbar-wrap',text:'Poderes gastam cargas da mochila e são temporários. Guarde-os para uma onda difícil, um Boss ou quando a defesa estiver perto de romper.',task:'Poderes são consumíveis; usar é opcional.'},
-  {id:'menu',sel:'#td-exit',text:'Por fim, o Menu pausa a partida e dá acesso a som, tamanho da interface, save e saída. Pronto: o resto você descobre jogando. 🐱',task:'Tutorial concluído.'}
+  {id:'pick',sel:'.td-tower-picker',action:'towerSelected',text:$t('Comece escolhendo um gatinho na barra. O Dardo é barato e ótimo para aprender.'),task:$t('Escolha qualquer gatinho na barra da direita.')},
+  {id:'place',sel:'.canvas-wrap',action:'towerPlaced',text:$t('Agora coloque o gatinho fora da estrada e longe de obstáculos. A área válida é confirmada no próprio mapa.'),task:$t('Clique em um ponto válido do mapa para posicionar.')},
+  {id:'inspect',sel:'.canvas-wrap',action:'towerInspected',text:$t('Clique no gatinho que você acabou de colocar. É aqui que você abre upgrades, venda, reposicionamento e Maestria.'),task:$t('Clique em uma torre já colocada.')},
+  {id:'wave',sel:'.td-side-controls',action:'waveStarted',text:$t('Sua defesa está pronta. Chame a primeira rodada; depois você pode usar 2×/3× ou até sobrepor ondas quando quiser mais ritmo.'),task:$t('Clique em Rodada 1.')},
+  {id:'hero',sel:'.td-hero-slot',text:$t('O Herói equipado é único por partida. Ele sobe do Nv.1 ao Nv.10 no próprio mapa, libera habilidade no Nv.5 e Ultimate no Nv.10.'),task:$t('Herói: 1 por partida. Você pode colocá-lo quando tiver salmões.')},
+  {id:'powers',sel:'.power-hotbar-wrap',text:$t('Poderes gastam cargas da mochila e são temporários. Guarde-os para uma onda difícil, um Boss ou quando a defesa estiver perto de romper.'),task:$t('Poderes são consumíveis; usar é opcional.')},
+  {id:'menu',sel:'#td-exit',text:$t('Por fim, o Menu pausa a partida e dá acesso a som, tamanho da interface, save e saída. Pronto: o resto você descobre jogando. 🐱'),task:$t('Tutorial concluído.')}
 ];
 let matchTutorialIndex=0,matchTutorialActive=false,matchTutorialAdvanceTimer=null;
 function clearTutorialSpotlight(){ $$('.tutorial-spotlight').forEach(el=>el.classList.remove('tutorial-spotlight')); }
@@ -1707,13 +3045,13 @@ function renderMatchTutorialStep(){
   if(!step){ endMatchTutorial(); return; }
   matchTutorialActive=true;
   const target=$(step.sel);if(target)target.classList.add('tutorial-spotlight');
-  if($('#match-tutorial-step'))$('#match-tutorial-step').textContent=`Treinamento • ${matchTutorialIndex+1}/${MATCH_TUTORIAL_STEPS.length}`;
+  if($('#match-tutorial-step'))$('#match-tutorial-step').textContent=$T`Treinamento • ${matchTutorialIndex+1}/${MATCH_TUTORIAL_STEPS.length}`;
   if($('#match-tutorial-text'))$('#match-tutorial-text').textContent=step.text;
   if($('#match-tutorial-task')){$('#match-tutorial-task').textContent=step.task||'';$('#match-tutorial-task').classList.toggle('done',false);}
   const nextBtn=$('#match-tutorial-next');
   if(nextBtn){
-    if(step.action){nextBtn.disabled=true;nextBtn.textContent='Faça a ação destacada';}
-    else{nextBtn.disabled=false;nextBtn.textContent=matchTutorialIndex>=MATCH_TUTORIAL_STEPS.length-1?'Concluir tutorial 🐱':'Próximo →';}
+    if(step.action){nextBtn.disabled=true;nextBtn.textContent=$t('Faça a ação destacada');}
+    else{nextBtn.disabled=false;nextBtn.textContent=matchTutorialIndex>=MATCH_TUTORIAL_STEPS.length-1?$t('Concluir tutorial 🐱'):$t('Próximo →');}
   }
 }
 function startMatchTutorial(){
@@ -1729,8 +3067,8 @@ function notifyMatchTutorialAction(action){
   if(!matchTutorialActive)return;
   const step=MATCH_TUTORIAL_STEPS[matchTutorialIndex];
   if(!step||step.action!==action)return;
-  if($('#match-tutorial-task')){$('#match-tutorial-task').textContent='✓ Feito!';$('#match-tutorial-task').classList.add('done');}
-  const nextBtn=$('#match-tutorial-next');if(nextBtn){nextBtn.disabled=true;nextBtn.textContent='✓ Certo!';}
+  if($('#match-tutorial-task')){$('#match-tutorial-task').textContent=$t('✓ Feito!');$('#match-tutorial-task').classList.add('done');}
+  const nextBtn=$('#match-tutorial-next');if(nextBtn){nextBtn.disabled=true;nextBtn.textContent=$t('✓ Certo!');}
   clearTutorialSpotlight();
   if(matchTutorialAdvanceTimer)clearTimeout(matchTutorialAdvanceTimer);
   matchTutorialAdvanceTimer=setTimeout(()=>{matchTutorialAdvanceTimer=null;advanceMatchTutorial();},520);
@@ -1746,16 +3084,16 @@ function initMatchTutorial(){
 }
 
 const loadingTips=[
-  'Dica: gatinhos Sniper enxergam qualquer camuflado do mapa, de qualquer posição.',
-  'Dica: só o Gato Bombinha quebra a blindagem dos balões blindados.',
-  'Dica: o Gato Gelinho é FULL AOE — cada ataque acerta todos os alvos no alcance.',
-  'Dica: quanto mais forte o balão, mais salmões ele rende ao estourar.',
-  'Dica: a cor do balão mostra quantos tiros ele aguenta — Vermelho é 1, e vai subindo até o Preto. Uma torre bem upada pode estourar várias cores de uma vez.',
-  'Dica: as rodadas ficam mais difíceis com o tempo — reforce a defesa antes de avançar.',
-  'Dica: você pode chamar a próxima rodada mesmo com inimigos ainda em campo.',
-  'Dica: use a velocidade 2× ou 3× para acelerar rodadas mais tranquilas.',
-  'Dica: poderes da mochila só duram alguns segundos — use no momento certo.',
-  'Dica: árvores, pedras e obstáculos grandes bloqueiam a linha de visão dos gatinhos. Posicionamento agora importa mais.'
+  $t('Dica: gatinhos Sniper enxergam qualquer camuflado do mapa, de qualquer posição.'),
+  $t('Dica: só o Gato Bombinha quebra a blindagem dos balões blindados.'),
+  $t('Dica: o Gato Gelinho é FULL AOE — cada ataque acerta todos os alvos no alcance.'),
+  $t('Dica: quanto mais forte o balão, mais salmões ele rende ao estourar.'),
+  $t('Dica: a cor do balão mostra quantos tiros ele aguenta — Vermelho é 1, e vai subindo até o Preto. Uma torre bem upada pode estourar várias cores de uma vez.'),
+  $t('Dica: as rodadas ficam mais difíceis com o tempo — reforce a defesa antes de avançar.'),
+  $t('Dica: você pode chamar a próxima rodada mesmo com inimigos ainda em campo.'),
+  $t('Dica: use a velocidade 2× ou 3× para acelerar rodadas mais tranquilas.'),
+  $t('Dica: poderes da mochila só duram alguns segundos — use no momento certo.'),
+  $t('Dica: árvores, pedras e obstáculos grandes bloqueiam a linha de visão dos gatinhos. Posicionamento agora importa mais.')
 ];
 
 function runMapLoading(mapId,diffId,onReady,modeId='campaign'){
@@ -1765,7 +3103,7 @@ function runMapLoading(mapId,diffId,onReady,modeId='campaign'){
   const preview=$('#loading-preview');
   if(preview) preview.className=`loading-preview preview-${mapId in maps?mapId:'grove'}`;
   if($('#loading-map-name')) $('#loading-map-name').textContent=map.name;
-  if($('#loading-diff-name')) $('#loading-diff-name').textContent=modeId==='infinite'?`∞ Infinito • ${diff.name} • sem rodada final`:`${diff.name} • ${mapRounds(mapId,diffId)} rodadas`;
+  if($('#loading-diff-name')) $('#loading-diff-name').textContent=modeId==='infinite'?$T`∞ Infinito • ${diff.name} • sem rodada final`:$T`${diff.name} • ${mapRounds(mapId,diffId)} rodadas`;
   if($('#loading-tip')) $('#loading-tip').textContent=loadingTips[Math.floor(Math.random()*loadingTips.length)];
   const fill=$('#loading-bar-fill');
   if(fill) fill.style.width='0%';
@@ -1822,7 +3160,7 @@ function initPersonalTd(){
     masteryXpGranted:false,masterySession:Object.fromEntries(Object.keys(types).map(id=>[id,{used:false,damage:0,pops:0,income:0,actions:0}])),
     effects:{frenzy:0,focus:0,blizzard:0},powerUiClock:0,synergyAnnounced:{},
     playtest:{visible:false,frames:0,fps:0,lastFpsAt:performance.now(),lastPanelAt:0},
-    msg:'Escolha um mapa e uma dificuldade no lobby Play.'
+    msg:$t('Escolha um mapa e uma dificuldade no lobby Play.')
   };
 
   // A maioria dos mapas tem uma única rota (`map.path`). Mapas com duas rotas paralelas
@@ -1844,7 +3182,7 @@ function initPersonalTd(){
     const panel=$('#playtest-debug');if(!panel)return;
     state.playtest.visible=typeof force==='boolean'?force:!state.playtest.visible;
     panel.hidden=!state.playtest.visible;
-    if(state.playtest.visible){state.playtest.lastPanelAt=0;setMsg('🧪 Painel de playtest ativado. Pressione F8 para ocultar.');}
+    if(state.playtest.visible){state.playtest.lastPanelAt=0;setMsg($t('🧪 Painel de playtest ativado. Pressione F8 para ocultar.'));}
   }
   function renderPlaytestDebug(ts){
     if(!state.playtest)return;
@@ -1863,8 +3201,8 @@ function initPersonalTd(){
     const heroText=state.hero?`${HEROES[state.hero.type]?.name||state.hero.type} Nv.${state.hero.level||1}`:'—';
     const mem=performance.memory&&performance.memory.usedJSHeapSize?`${Math.round(performance.memory.usedJSHeapSize/1048576)} MB`:'n/d';
     const bossText=boss?`${Math.max(0,Math.ceil(boss.hp||0))}/${Math.max(1,Math.ceil(boss.maxHp||boss.hp||1))}`:'—';
-    const warn=state.playtest.fps&&state.playtest.fps<45?' <span class="playtest-debug-warn">⚠ FPS baixo</span>':'';
-    body.innerHTML=`
+    const warn=state.playtest.fps&&state.playtest.fps<45?$t(' <span class="playtest-debug-warn">⚠ FPS baixo</span>'):'';
+    body.innerHTML=$T`
       <div class="playtest-debug-row"><span>FPS</span><b>${state.playtest.fps||'…'}${warn}</b></div>
       <div class="playtest-debug-row"><span>Velocidade</span><b>${state.gameSpeed}×</b></div>
       <div class="playtest-debug-row"><span>Rodada</span><b>${state.wave}/${isInfinite()?'∞':mapRounds(state.map,state.difficulty)}</b></div>
@@ -1891,7 +3229,7 @@ function initPersonalTd(){
     const root=$('#td-synergy-panel');if(!root)return;
     const active=activeSynergies();
     root.hidden=!active.length;
-    root.innerHTML=active.length?`<div class="synergy-head"><span>🔗 SINERGIAS ATIVAS</span><b>${active.length}</b></div><div class="synergy-pills">${active.map(([id,syn])=>`<span class="synergy-pill" title="${syn.description}">${syn.icon} ${syn.name}</span>`).join('')}</div>`:'';
+    root.innerHTML=active.length?$T`<div class="synergy-head"><span>🔗 SINERGIAS ATIVAS</span><b>${active.length}</b></div><div class="synergy-pills">${active.map(([id,syn])=>`<span class="synergy-pill" title="${syn.description}">${syn.icon} ${syn.name}</span>`).join('')}</div>`:'';
   }
   function announceNewSynergies(){
     const fresh=activeSynergies().filter(([id])=>!state.synergyAnnounced[id]);
@@ -1899,7 +3237,7 @@ function initPersonalTd(){
     renderSynergies();
     if(fresh.length){
       const names=fresh.map(([,syn])=>`${syn.icon} ${syn.name}`).join(' • ');
-      setMsg(`🔗 SINERGIA ATIVADA: ${names}`);sfx('ui');
+      setMsg($T`🔗 SINERGIA ATIVADA: ${names}`);sfx('ui');
     }
     return fresh.length;
   }
@@ -1924,11 +3262,11 @@ function initPersonalTd(){
     const gained=[];
     while(h.level<10&&h.xp>=heroRequiredXp(h.level)){
       h.xp-=heroRequiredXp(h.level);h.level++;gained.push(h.level);sfx('ui');
-      spawnFloatText(h.x,h.y-42,`🦸 NÍVEL ${h.level}!`,HEROES[h.type].color);
+      spawnFloatText(h.x,h.y-42,$T`🦸 NÍVEL ${h.level}!`,HEROES[h.type].color);
     }
     if(gained.length){
-      const unlock=gained.includes(10)?` ⭐ ULTIMATE ${HEROES[h.type].ultimate.name} liberada!`:gained.includes(5)?` ${HEROES[h.type].skill.icon} ${HEROES[h.type].skill.name} liberada!`:'';
-      setMsg(`🦸 ${HEROES[h.type].name} chegou ao nível ${h.level}!${unlock}`);
+      const unlock=gained.includes(10)?$T` ⭐ ULTIMATE ${HEROES[h.type].ultimate.name} liberada!`:gained.includes(5)?$T` ${HEROES[h.type].skill.icon} ${HEROES[h.type].skill.name} liberada!`:'';
+      setMsg($T`🦸 ${HEROES[h.type].name} chegou ao nível ${h.level}!${unlock}`);
     }
     renderHeroHud();return gained;
   }
@@ -1937,10 +3275,10 @@ function initPersonalTd(){
   function heroLevelUpCost(level){return Math.round(180+(Math.max(1,level)-1)*70);}
   function buyHeroLevel(){
     const h=state.hero;
-    if(!h){setMsg('Coloque um Herói em campo antes de upar com salmões.');return;}
-    if(h.level>=10){setMsg('🦸 Herói já está no nível máximo.');return;}
+    if(!h){setMsg($t('Coloque um Herói em campo antes de upar com salmões.'));return;}
+    if(h.level>=10){setMsg($t('🦸 Herói já está no nível máximo.'));return;}
     const cost=heroLevelUpCost(h.level);
-    if(state.money<cost){setMsg(`Faltam 🐟 ${cost-Math.floor(state.money)} para upar ${HEROES[h.type].name}.`);return;}
+    if(state.money<cost){setMsg($T`Faltam 🐟 ${cost-Math.floor(state.money)} para upar ${HEROES[h.type].name}.`);return;}
     state.money-=cost;
     const missing=Math.max(0,heroRequiredXp(h.level)-(h.xp||0));
     grantHeroXp(missing);
@@ -2072,33 +3410,37 @@ function initPersonalTd(){
     state.menuOpen=true;state.paused=true;syncVolumeUi();
     $$('.match-only-action').forEach(btn=>btn.hidden=false);
     $$('.settings-only-action').forEach(btn=>btn.hidden=true);
-    if($('#menu-kicker'))$('#menu-kicker').textContent='PARTIDA PAUSADA';
+    if($('#menu-language')){$('#menu-language').disabled=true;}
+    if($('#menu-language-hint'))$('#menu-language-hint').style.display='';
+    if($('#menu-kicker'))$('#menu-kicker').textContent=$t('PARTIDA PAUSADA');
     if($('#menu-title'))$('#menu-title').textContent='Menu';
-    if($('#menu-subtitle'))$('#menu-subtitle').textContent='Ajuste o som ou escolha o que fazer com a partida atual.';
+    if($('#menu-subtitle'))$('#menu-subtitle').textContent=$t('Ajuste o som ou escolha o que fazer com a partida atual.');
     showGameModal('#pause-menu');
-    if($('#td-pause')){$('#td-pause').textContent='▶';$('#td-pause').title='Continuar';}
+    if($('#td-pause')){$('#td-pause').textContent='▶';$('#td-pause').title=$t('Continuar');}
   }
   function closePauseMenu(resume=true){
     state.menuOpen=false;hideGameModal('#pause-menu');
-    if(resume){state.paused=false;if($('#td-pause')){$('#td-pause').textContent='⏸';$('#td-pause').title='Pausar';}}
+    if(resume){state.paused=false;if($('#td-pause')){$('#td-pause').textContent='⏸';$('#td-pause').title=$t('Pausar');}}
   }
-  // Acessível pelo botão "⚙️ Som" da barra de navegação — mesmas duas barras de volume,
+  // Acessível pelo botão "⚙️ Configurações" da barra de navegação — mesmas duas barras de volume,
   // fora de uma partida (esconde os botões "Continuar/Reiniciar/Voltar", que não fazem
   // sentido sem uma partida em andamento, e mostra só um botão de fechar).
   function openSettingsModal(){
     syncVolumeUi();
     $$('.match-only-action').forEach(btn=>btn.hidden=true);
     $$('.settings-only-action').forEach(btn=>btn.hidden=false);
-    if($('#menu-kicker'))$('#menu-kicker').textContent='CONFIGURAÇÕES';
-    if($('#menu-title'))$('#menu-title').textContent='Som';
-    if($('#menu-subtitle'))$('#menu-subtitle').textContent='Ajuste o volume dos efeitos e da música — vale pra qualquer tela do jogo.';
+    if($('#menu-kicker'))$('#menu-kicker').textContent='LOBBY';
+    if($('#menu-title'))$('#menu-title').textContent=$t('Configurações');
+    if($('#menu-subtitle'))$('#menu-subtitle').textContent=$t('Ajuste som, idioma, tela e save — vale pra qualquer tela do jogo.');
+    if($('#menu-language')){$('#menu-language').disabled=false;}
+    if($('#menu-language-hint'))$('#menu-language-hint').style.display='none';
     showGameModal('#pause-menu');
   }
   function nextStageSelection(){
     const ids=MAP_CATEGORIES.flatMap(c=>c.maps).filter(id=>maps[id]),index=ids.indexOf(state.map);
-    if(index>=0&&index<ids.length-1)return{map:ids[index+1],difficulty:state.difficulty,label:`Próxima fase: ${maps[ids[index+1]].name}`};
+    if(index>=0&&index<ids.length-1)return{map:ids[index+1],difficulty:state.difficulty,label:$T`Próxima fase: ${maps[ids[index+1]].name}`};
     const dIndex=difficultyOrder.indexOf(state.difficulty);
-    if(dIndex>=0&&dIndex<difficultyOrder.length-1)return{map:ids[0],difficulty:difficultyOrder[dIndex+1],label:`Próxima dificuldade: ${difficulties[difficultyOrder[dIndex+1]].name}`};
+    if(dIndex>=0&&dIndex<difficultyOrder.length-1)return{map:ids[0],difficulty:difficultyOrder[dIndex+1],label:$T`Próxima dificuldade: ${difficulties[difficultyOrder[dIndex+1]].name}`};
     return null;
   }
   function showResult(victory,details={}){
@@ -2109,18 +3451,18 @@ function initPersonalTd(){
     const resultCard=$('#result-screen .result-card');
     if(resultCard){resultCard.classList.toggle('victory',victory);resultCard.classList.toggle('defeat',!victory);}
     if($('#result-icon'))$('#result-icon').textContent=victory?'🏆':(endless?'∞':'💔');
-    if($('#result-kicker'))$('#result-kicker').textContent=victory?'FASE CONCLUÍDA':(endless?'MODO INFINITO ENCERRADO':'DEFESA ROMPIDA');
-    if($('#result-title'))$('#result-title').textContent=victory?'Vitória!':(endless?'Fim do Infinito':'Derrota');
+    if($('#result-kicker'))$('#result-kicker').textContent=victory?$t('FASE CONCLUÍDA'):(endless?$t('MODO INFINITO ENCERRADO'):$t('DEFESA ROMPIDA'));
+    if($('#result-title'))$('#result-title').textContent=victory?$t('Vitória!'):(endless?$t('Fim do Infinito'):$t('Derrota'));
     if($('#result-text'))$('#result-text').textContent=victory
-      ?`${currentMap().name} • ${currentDifficulty().name} concluído.`
-      :(endless?`Você chegou até a rodada ${Math.max(state.wave,state.lastClearedWave)}. Seu recorde fica salvo para a próxima tentativa.`:'Os inimigos atravessaram sua defesa. Reorganize as torres e tente novamente.');
+      ?$T`${currentMap().name} • ${currentDifficulty().name} concluído.`
+      :(endless?$T`Você chegou até a rodada ${Math.max(state.wave,state.lastClearedWave)}. Seu recorde fica salvo para a próxima tentativa.`:$t('Os inimigos atravessaram sua defesa. Reorganize as torres e tente novamente.'));
     if($('#result-summary'))$('#result-summary').innerHTML=victory
-      ?`<span>⭐ ${mapStars(state.map)}/3 no mapa</span><span>🪙 +${(details.coins||0)+masteryCoinTotal}</span><span>XP conta +${details.xp||0}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`
+      ?$T`<span>⭐ ${mapStars(state.map)}/3 no mapa</span><span>🪙 +${(details.coins||0)+masteryCoinTotal}</span><span>XP conta +${details.xp||0}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`
       :(endless
-        ?`<span>✓ ${state.lastClearedWave} rodadas concluídas</span><span>∞ Recorde ${infiniteBestFor(state.map,state.difficulty)}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`
-        :`<span>Rodada ${state.wave}/${mapRounds(state.map,state.difficulty)}</span><span>Torres ${state.towers.length}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`);
-    const nextBtn=$('#result-next');if(nextBtn){nextBtn.hidden=!next;nextBtn.textContent=next?`${next.label} →`:'Próxima fase →';nextBtn.dataset.nextMap=next?next.map:'';nextBtn.dataset.nextDifficulty=next?next.difficulty:'';}
-    if($('#result-retry'))$('#result-retry').textContent=victory?'↻ Jogar novamente':'↻ Tentar novamente';
+        ?$T`<span>✓ ${state.lastClearedWave} rodadas concluídas</span><span>∞ Recorde ${infiniteBestFor(state.map,state.difficulty)}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`
+        :$T`<span>Rodada ${state.wave}/${mapRounds(state.map,state.difficulty)}</span><span>Torres ${state.towers.length}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`);
+    const nextBtn=$('#result-next');if(nextBtn){nextBtn.hidden=!next;nextBtn.textContent=next?`${next.label} →`:$t('Próxima fase →');nextBtn.dataset.nextMap=next?next.map:'';nextBtn.dataset.nextDifficulty=next?next.difficulty:'';}
+    if($('#result-retry'))$('#result-retry').textContent=victory?$t('↻ Jogar novamente'):$t('↻ Tentar novamente');
     showGameModal('#result-screen');
     sfx(victory?'win':'lose');
   }
@@ -2933,8 +4275,8 @@ function initPersonalTd(){
     const income=Math.max(0,Math.round(t.incomeGenerated||0));
     const ml=masteryState(t.type).level;
     return types[t.type]?.farm
-      ?`📊 Renda gerada 🐟 ${income} • Maestria ${ml}/50 • Investido 🐟 ${spent} • Venda 🐟 ${refund} (50%)`
-      :`📊 Dano causado ${damage} • Eliminações ${pops} • Maestria ${ml}/50 • Investido 🐟 ${spent} • Venda 🐟 ${refund} (50%)`;
+      ?$T`📊 Renda gerada 🐟 ${income} • Maestria ${ml}/50 • Investido 🐟 ${spent} • Venda 🐟 ${refund} (50%)`
+      :$T`📊 Dano causado ${damage} • Eliminações ${pops} • Maestria ${ml}/50 • Investido 🐟 ${spent} • Venda 🐟 ${refund} (50%)`;
   }
 
   function syncPlacementUi(){
@@ -2948,13 +4290,13 @@ function initPersonalTd(){
   function cancelPlacement(silent=false){
     const previous=state.selected==='__hero__'?currentHeroDef():(state.selected?types[state.selected]:null);
     state.selected=null;syncPlacementUi();
-    if(!silent&&previous)setMsg(`Posicionamento de ${previous.name} cancelado.`);
+    if(!silent&&previous)setMsg($T`Posicionamento de ${previous.name} cancelado.`);
   }
 
   function cancelReposition(silent=false){
     const t=repositioningTower();
     state.repositionTower=null;syncPlacementUi();
-    if(!silent&&t)setMsg(`Reposicionamento de ${types[t.type].name} cancelado.`);
+    if(!silent&&t)setMsg($T`Reposicionamento de ${types[t.type].name} cancelado.`);
   }
 
   function armPlacement(id){
@@ -2963,14 +4305,14 @@ function initPersonalTd(){
   }
 
   function armHeroPlacement(){
-    if(state.hero){setMsg(`🦸 ${HEROES[state.hero.type].name} já está em campo. Só é permitido 1 herói por partida.`);return;}
+    if(state.hero){setMsg($T`🦸 ${HEROES[state.hero.type].name} já está em campo. Só é permitido 1 herói por partida.`);return;}
     cancelReposition(true);state.selected='__hero__';state.selectedTower=null;state.selectedHero=false;syncPlacementUi();updateUpgradePanel();renderHeroHud();
   }
 
   function closeUpgradePanel(silent=true){
     if(!state.selectedTower)return;
     state.selectedTower=null;updateUpgradePanel();
-    if(!silent)setMsg('Painel de upgrades fechado.');
+    if(!silent)setMsg($t('Painel de upgrades fechado.'));
   }
 
   function beginReposition(){
@@ -2978,7 +4320,7 @@ function initPersonalTd(){
     cancelPlacement(true);
     state.repositionTower=t.id;state.selectedTower=null;
     updateUpgradePanel();syncPlacementUi();
-    setMsg(`↔ ${types[t.type].name}: escolha um novo ponto válido. Reposicionar é grátis. ESC cancela.`);
+    setMsg($T`↔ ${types[t.type].name}: escolha um novo ponto válido. Reposicionar é grátis. ESC cancela.`);
   }
 
   function sellSelectedTower(){
@@ -2988,108 +4330,108 @@ function initPersonalTd(){
     state.towers=state.towers.filter(x=>x.id!==t.id);
     state.selectedTower=null;
     updateUpgradePanel();renderUnlocks();updateStats();renderSynergies();
-    setMsg(`🐟 ${name} vendido por ${refund} salmões — 50% dos ${Math.round(t.spent||0)} investidos.`);
+    setMsg($T`🐟 ${name} vendido por ${refund} salmões — 50% dos ${Math.round(t.spent||0)} investidos.`);
   }
 
   function moveRepositionedTower(x,y){
     const t=repositioningTower();if(!t){cancelReposition(true);return false;}
-    if(distPath(x,y)<43){setMsg('↔ Reposicionamento: muito perto da estrada. Escolha outro ponto.');return false;}
-    if(obstacleAt(x,y,24)){setMsg('↔ Reposicionamento: há um obstáculo nesse ponto.');return false;}
-    if(state.towers.some(other=>other.id!==t.id&&Math.hypot(other.x-x,other.y-y)<46)){setMsg('↔ Reposicionamento: muito perto de outra torre.');return false;}
+    if(distPath(x,y)<43){setMsg($t('↔ Reposicionamento: muito perto da estrada. Escolha outro ponto.'));return false;}
+    if(obstacleAt(x,y,24)){setMsg($t('↔ Reposicionamento: há um obstáculo nesse ponto.'));return false;}
+    if(state.towers.some(other=>other.id!==t.id&&Math.hypot(other.x-x,other.y-y)<46)){setMsg($t('↔ Reposicionamento: muito perto de outra torre.'));return false;}
     t.x=x;t.y=y;t.elevated=Boolean(perchAt(x,y));
     state.pulses.push({x,y,range:54,life:.55,maxLife:.55,color:types[t.type].accent||types[t.type].color});
     state.repositionTower=null;syncPlacementUi();
-    setMsg(t.elevated?`✓ ${types[t.type].name} reposicionado sobre um banco: visão elevada, sem bloqueio dos pilares.`:`✓ ${types[t.type].name} reposicionado sem custo.`);
+    setMsg(t.elevated?$T`✓ ${types[t.type].name} reposicionado sobre um banco: visão elevada, sem bloqueio dos pilares.`:$T`✓ ${types[t.type].name} reposicionado sem custo.`);
     updateStats();return true;
   }
 
   function dartPathLockReason(t,pathIndex){
     const p=dartPaths(t),main=dartPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=DART_MAX_TIER)return'Nível máximo';
+    if(current>=DART_MAX_TIER)return$t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
-    if(next>DART_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${DART_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
+    if(next>DART_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${DART_SECONDARY_MAX}`;
     return'';
   }
 
   function sniperPathLockReason(t,pathIndex){
     const p=sniperPaths(t),main=sniperPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=SNIPER_MAX_TIER)return'Nível máximo';
+    if(current>=SNIPER_MAX_TIER)return$t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
-    if(next>SNIPER_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${SNIPER_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
+    if(next>SNIPER_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${SNIPER_SECONDARY_MAX}`;
     return'';
   }
 
   function frostPathLockReason(t,pathIndex){
     const p=frostPaths(t),main=frostPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=FROST_MAX_TIER)return'Nível máximo';
+    if(current>=FROST_MAX_TIER)return$t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
-    if(next>FROST_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${FROST_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
+    if(next>FROST_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${FROST_SECONDARY_MAX}`;
     return'';
   }
 
   function vinePathLockReason(t,pathIndex){
     const p=vinePaths(t),main=vinePrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=VINE_MAX_TIER)return'Nível máximo';
+    if(current>=VINE_MAX_TIER)return$t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
-    if(next>VINE_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${VINE_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
+    if(next>VINE_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${VINE_SECONDARY_MAX}`;
     return'';
   }
 
   function burstPathLockReason(t,pathIndex){
     const p=burstPaths(t),main=burstPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=BURST_MAX_TIER)return'Nível máximo';
+    if(current>=BURST_MAX_TIER)return$t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
-    if(next>BURST_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${BURST_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
+    if(next>BURST_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${BURST_SECONDARY_MAX}`;
     return'';
   }
 
   function ninjaPathLockReason(t,pathIndex){
     const p=ninjaPaths(t),main=ninjaPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=NINJA_MAX_TIER)return'Nível máximo';
+    if(current>=NINJA_MAX_TIER)return$t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
-    if(next>NINJA_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${NINJA_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
+    if(next>NINJA_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${NINJA_SECONDARY_MAX}`;
     return'';
   }
 
   function laserPathLockReason(t,pathIndex){
     const p=laserPaths(t),main=laserPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=LASER_MAX_TIER)return'Nível máximo';
+    if(current>=LASER_MAX_TIER)return$t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
-    if(next>LASER_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${LASER_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
+    if(next>LASER_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${LASER_SECONDARY_MAX}`;
     return'';
   }
 
   function wizardPathLockReason(t,pathIndex){
     const p=wizardPaths(t),main=wizardPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=WIZARD_MAX_TIER)return'Nível máximo';
+    if(current>=WIZARD_MAX_TIER)return$t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
-    if(next>WIZARD_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${WIZARD_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
+    if(next>WIZARD_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${WIZARD_SECONDARY_MAX}`;
     return'';
   }
 
   function electricPathLockReason(t,pathIndex){
     const p=electricPaths(t),main=electricPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=ELECTRIC_MAX_TIER)return'Nível máximo';
+    if(current>=ELECTRIC_MAX_TIER)return$t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
-    if(next>ELECTRIC_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${ELECTRIC_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
+    if(next>ELECTRIC_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${ELECTRIC_SECONDARY_MAX}`;
     return'';
   }
 
   function celestialPathLockReason(t,pathIndex){
     const p=celestialPaths(t),main=celestialPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=CELESTIAL_MAX_TIER)return'Nível máximo';
+    if(current>=CELESTIAL_MAX_TIER)return$t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return'Máximo de 2 caminhos';
-    if(next>CELESTIAL_SECONDARY_MAX&&main!==null&&main!==pathIndex)return`Secundário limitado ao T${CELESTIAL_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
+    if(next>CELESTIAL_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${CELESTIAL_SECONDARY_MAX}`;
     return'';
   }
 
@@ -3107,9 +4449,9 @@ function initPersonalTd(){
       const level=levels[i],next=level+1,lock=lockFn(t,i),tier=path.tiers[Math.max(0,Math.min(level-1,path.tiers.length-1))];
       const nextTier=level<5?path.tiers[level]:null,isMain=mainPath===i;
       return`<article class="dart-path-card ${isMain?'main-path':''} ${lock&&level<5?'path-locked':''}" style="--path-color:${path.color}">
-        <div class="dart-path-head"><span>${path.icon} <b>${path.name}</b></span><strong>T${level}/5${isMain?' • PRINCIPAL':''}</strong></div>
-        <small>${level===0?'Ainda não escolhido.':tier.name}${nextTier?` → ${nextTier.description}`:' • caminho completo'}</small>
-        <button type="button" ${buttonAttr}="${i}" ${lock?'disabled':''}>${level>=5?'T5 completo':lock||`T${next} • 🐟 ${upgradePrice(nextTier.cost)}`}</button>
+        <div class="dart-path-head"><span>${path.icon} <b>${path.name}</b></span><strong>T${level}/5${isMain?$t(' • PRINCIPAL'):''}</strong></div>
+        <small>${level===0?$t('Ainda não escolhido.'):tier.name}${nextTier?` → ${nextTier.description}`:$t(' • caminho completo')}</small>
+        <button type="button" ${buttonAttr}="${i}" ${lock?'disabled':''}>${level>=5?$t('T5 completo'):lock||`T${next} • 🐟 ${upgradePrice(nextTier.cost)}`}</button>
       </article>`;
     }).join('');
   }
@@ -3250,34 +4592,34 @@ function initPersonalTd(){
       updatePriorityRow(null);
       if(perf)perf.textContent='';
       if(actions)actions.hidden=true;if(abilityBtn)abilityBtn.hidden=true;
-      name.textContent='Nenhuma torre selecionada';
-      stats.textContent='Clique em um gatinho colocado para abrir os upgrades aqui.';
+      name.textContent=$t('Nenhuma torre selecionada');
+      stats.textContent=$t('Clique em um gatinho colocado para abrir os upgrades aqui.');
       btn.hidden=false;btn.textContent='Upgrade';btn.disabled=true;return;
     }
     if(bar)bar.hidden=false;if(dock)dock.classList.add('upgrade-open');
     if(actions)actions.hidden=false;
     if(perf)perf.textContent=towerPerformanceText(t);
-    if(sellBtn)sellBtn.textContent=`🐟 Vender ${towerRefund(t)}`;
-    if(moveBtn)moveBtn.textContent='↔ Reposicionar';
-    if(abilityBtn){const m=masteryState(t.type),ab=MASTERY_ABILITIES[t.type];abilityBtn.hidden=m.level<50;abilityBtn.disabled=(t.masteryAbilityCd||0)>0;abilityBtn.textContent=m.level>=50?`${ab.icon} ${ab.name}${(t.masteryAbilityCd||0)>0?` • ${Math.ceil(t.masteryAbilityCd)}s`:''}`:'⭐ Habilidade Nv.50';}
+    if(sellBtn)sellBtn.textContent=$T`🐟 Vender ${towerRefund(t)}`;
+    if(moveBtn)moveBtn.textContent=$t('↔ Reposicionar');
+    if(abilityBtn){const m=masteryState(t.type),ab=MASTERY_ABILITIES[t.type];abilityBtn.hidden=m.level<50;abilityBtn.disabled=(t.masteryAbilityCd||0)>0;abilityBtn.textContent=m.level>=50?`${ab.icon} ${ab.name}${(t.masteryAbilityCd||0)>0?` • ${Math.ceil(t.masteryAbilityCd)}s`:''}`:$t('⭐ Habilidade Nv.50');}
     updatePriorityRow(t);
     const st=towerStats(t);
 
     if(t.type==='dart'){
       if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
       const p=dartPaths(t),active=p.filter(v=>v>0).length;
-      const weapon=st.weapon==='bow'?'🏹 Arco':st.weapon==='fireSpear'?'🔥 Lança de Fogo':st.weapon==='spear'?'🗡️ Lança':'➤ Dardo';
+      const weapon=st.weapon==='bow'?$t('🏹 Arco'):st.weapon==='fireSpear'?$t('🔥 Lança de Fogo'):st.weapon==='spear'?$t('🗡️ Lança'):$t('➤ Dardo');
       const buffs=[];
-      if(st.detectsCamo)buffs.push('🥷 vê Camo');
+      if(st.detectsCamo)buffs.push($t('🥷 vê Camo'));
       if(st.chainTargets)buffs.push(`cadeia ${st.chainTargets}`);
-      if(st.multiShot>1)buffs.push(`${st.multiShot} projéteis`);
+      if(st.multiShot>1)buffs.push($T`${st.multiShot} projéteis`);
       if(st.burn)buffs.push('🔥 Burn 4 ticks');
-      if(st.supportDamage)buffs.push(`aura dano +${Math.round(st.supportDamage*100)}%`);
-      if(st.salmonBonus)buffs.push(`salmão +${Math.round(st.salmonBonus*100)}%`);
-      if(st.supportRange)buffs.push(`aura range +${Math.round(st.supportRange*100)}%`);
-      if(st.supportAttack)buffs.push(`aura vel. +${Math.round(st.supportAttack*100)}%`);
+      if(st.supportDamage)buffs.push($T`aura dano +${Math.round(st.supportDamage*100)}%`);
+      if(st.salmonBonus)buffs.push($T`salmão +${Math.round(st.salmonBonus*100)}%`);
+      if(st.supportRange)buffs.push($T`aura range +${Math.round(st.supportRange*100)}%`);
+      if(st.supportAttack)buffs.push($T`aura vel. +${Math.round(st.supportAttack*100)}%`);
       name.textContent=`${st.name} • ${weapon}`;
-      stats.textContent=`Dano ${st.damage.toFixed(2)} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(1)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.dartMainPath)?` • principal C${t.dartMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      stats.textContent=$T`Dano ${st.damage.toFixed(2)} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(1)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.dartMainPath)?$T` • principal C${t.dartMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderDartUpgradeTree(t);return;
     }
 
@@ -3285,140 +4627,140 @@ function initPersonalTd(){
       if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
       const p=sniperPaths(t),active=p.filter(v=>v>0).length,buffs=[];
       if(st.pierceTargets>1)buffs.push(`perfura ${st.pierceTargets}`);
-      if(st.critChance)buffs.push(`crítico ${Math.round(st.critChance*100)}% ×${st.critMultiplier}`);
-      if(st.hunterSpecialBonus)buffs.push(`especiais +${Math.round(st.hunterSpecialBonus*100)}%`);
+      if(st.critChance)buffs.push($T`crítico ${Math.round(st.critChance*100)}% ×${st.critMultiplier}`);
+      if(st.hunterSpecialBonus)buffs.push($T`especiais +${Math.round(st.hunterSpecialBonus*100)}%`);
       if(st.hunterBossBonus)buffs.push(`Boss +${Math.round(st.hunterBossBonus*100)}%`);
-      if(st.breaksArmor)buffs.push('💥 quebra blindagem');
-      if(st.markBonus)buffs.push(`marca +${Math.round(st.markBonus*100)}%`);
-      if(st.revealsCamo)buffs.push('👁 revela Camo p/ todos');
+      if(st.breaksArmor)buffs.push($t('💥 quebra blindagem'));
+      if(st.markBonus)buffs.push($T`marca +${Math.round(st.markBonus*100)}%`);
+      if(st.revealsCamo)buffs.push($t('👁 revela Camo p/ todos'));
       if(st.observerRange)buffs.push(`global range +${Math.round(st.observerRange*100)}%`);
-      if(st.observerDamage)buffs.push(`global precisão +${Math.round(st.observerDamage*100)}%`);
-      if(st.observerMark)buffs.push(`designador +${Math.round(st.observerMark*100)}%`);
-      if(st.airstrike)buffs.push('✈ avião 2 rodadas/25s');
-      name.textContent=`${st.name} • árvore de especialização`;
-      stats.textContent=`Dano ${st.damage.toFixed(2)} • Range GLOBAL • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.sniperMainPath)?` • principal C${t.sniperMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      if(st.observerDamage)buffs.push($T`global precisão +${Math.round(st.observerDamage*100)}%`);
+      if(st.observerMark)buffs.push($T`designador +${Math.round(st.observerMark*100)}%`);
+      if(st.airstrike)buffs.push($t('✈ avião 2 rodadas/25s'));
+      name.textContent=$T`${st.name} • árvore de especialização`;
+      stats.textContent=$T`Dano ${st.damage.toFixed(2)} • Range GLOBAL • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.sniperMainPath)?$T` • principal C${t.sniperMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderSniperUpgradeTree(t);return;
     }
 
     if(t.type==='frost'){
       if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
       const p=frostPaths(t),active=p.filter(v=>v>0).length,buffs=[];
-      if(st.frostVulnBonus)buffs.push(`+${Math.round(st.frostVulnBonus*100)}% vs. já lentos`);
-      if(st.deepFreezeOnSlowed)buffs.push('❄️ congela quem já está lento');
-      if(st.slowFactor)buffs.push(`lentidão ${Math.round(st.slowFactor*100)}% da velocidade`);
-      if(st.markBonus)buffs.push(`marca +${Math.round(st.markBonus*100)}%`);
-      name.textContent=`${st.name} • árvore de especialização`;
-      stats.textContent=`Dano ${st.damage.toFixed(2)} (FULL AOE) • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • lentidão ${st.slow.toFixed(1)}s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.frostMainPath)?` • principal C${t.frostMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      if(st.frostVulnBonus)buffs.push($T`+${Math.round(st.frostVulnBonus*100)}% vs. já lentos`);
+      if(st.deepFreezeOnSlowed)buffs.push($t('❄️ congela quem já está lento'));
+      if(st.slowFactor)buffs.push($T`lentidão ${Math.round(st.slowFactor*100)}% da velocidade`);
+      if(st.markBonus)buffs.push($T`marca +${Math.round(st.markBonus*100)}%`);
+      name.textContent=$T`${st.name} • árvore de especialização`;
+      stats.textContent=$T`Dano ${st.damage.toFixed(2)} (FULL AOE) • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • lentidão ${st.slow.toFixed(1)}s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.frostMainPath)?$T` • principal C${t.frostMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderFrostUpgradeTree(t);return;
     }
 
     if(t.type==='vine'){
       if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
       const p=vinePaths(t),active=p.filter(v=>v>0).length,buffs=[];
-      if(st.burn)buffs.push(`☠️ veneno ${st.burn.damage}×${st.burn.ticks}`);
-      if(st.markBonus)buffs.push(`vulnerável +${Math.round(st.markBonus*100)}%`);
-      name.textContent=`${st.name} • árvore de especialização`;
-      stats.textContent=`Prende ${st.rootCount} (ou 1 Boss) • Duração ${st.rootDuration.toFixed(1)}s • Recarga ${st.rate.toFixed(1)}s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.vineMainPath)?` • principal C${t.vineMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      if(st.burn)buffs.push($T`☠️ veneno ${st.burn.damage}×${st.burn.ticks}`);
+      if(st.markBonus)buffs.push($T`vulnerável +${Math.round(st.markBonus*100)}%`);
+      name.textContent=$T`${st.name} • árvore de especialização`;
+      stats.textContent=$T`Prende ${st.rootCount} (ou 1 Boss) • Duração ${st.rootDuration.toFixed(1)}s • Recarga ${st.rate.toFixed(1)}s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.vineMainPath)?$T` • principal C${t.vineMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderVineUpgradeTree(t);return;
     }
 
     if(t.type==='burst'){
       if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
       const p=burstPaths(t),active=p.filter(v=>v>0).length,buffs=[];
-      buffs.push('💥 quebra blindagem');
-      if(st.burn)buffs.push(`🔥 queimadura ${st.burn.damage}×${st.burn.ticks}`);
-      if(st.slow)buffs.push(`lentidão ${st.slow.toFixed(1)}s a ${Math.round((st.slowFactor||.55)*100)}%`);
-      if(st.markBonus)buffs.push(`marca +${Math.round(st.markBonus*100)}%`);
-      name.textContent=`${st.name} • árvore de especialização`;
-      stats.textContent=`Dano ${st.damage.toFixed(2)} • Splash ${st.splash} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.burstMainPath)?` • principal C${t.burstMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      buffs.push($t('💥 quebra blindagem'));
+      if(st.burn)buffs.push($T`🔥 queimadura ${st.burn.damage}×${st.burn.ticks}`);
+      if(st.slow)buffs.push($T`lentidão ${st.slow.toFixed(1)}s a ${Math.round((st.slowFactor||.55)*100)}%`);
+      if(st.markBonus)buffs.push($T`marca +${Math.round(st.markBonus*100)}%`);
+      name.textContent=$T`${st.name} • árvore de especialização`;
+      stats.textContent=$T`Dano ${st.damage.toFixed(2)} • Splash ${st.splash} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.burstMainPath)?$T` • principal C${t.burstMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderBurstUpgradeTree(t);return;
     }
 
     if(t.type==='ninja'){
       if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
       const p=ninjaPaths(t),active=p.filter(v=>v>0).length,buffs=[];
-      if(st.detectsCamo)buffs.push('🥷 vê Camo');
-      if(st.burn)buffs.push(`🧪 veneno ${st.burn.damage}×${st.burn.ticks}`);
-      if(st.hunterSpecialBonus)buffs.push(`especiais +${Math.round(st.hunterSpecialBonus*100)}%`);
+      if(st.detectsCamo)buffs.push($t('🥷 vê Camo'));
+      if(st.burn)buffs.push($T`🧪 veneno ${st.burn.damage}×${st.burn.ticks}`);
+      if(st.hunterSpecialBonus)buffs.push($T`especiais +${Math.round(st.hunterSpecialBonus*100)}%`);
       if(st.hunterBossBonus)buffs.push(`Boss +${Math.round(st.hunterBossBonus*100)}%`);
-      if(st.markBonus)buffs.push(`marca +${Math.round(st.markBonus*100)}%`);
-      if(st.breaksArmor)buffs.push('💥 quebra blindagem');
-      name.textContent=`${st.name} • árvore de especialização`;
-      stats.textContent=`Dano ${st.damage.toFixed(2)} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.ninjaMainPath)?` • principal C${t.ninjaMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      if(st.markBonus)buffs.push($T`marca +${Math.round(st.markBonus*100)}%`);
+      if(st.breaksArmor)buffs.push($t('💥 quebra blindagem'));
+      name.textContent=$T`${st.name} • árvore de especialização`;
+      stats.textContent=$T`Dano ${st.damage.toFixed(2)} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.ninjaMainPath)?$T` • principal C${t.ninjaMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderNinjaUpgradeTree(t);return;
     }
 
     if(t.type==='laser'){
       if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
       const p=laserPaths(t),active=p.filter(v=>v>0).length,buffs=[];
-      if(st.burn)buffs.push(`♨️ queimadura ${st.burn.damage}×${st.burn.ticks}`);
-      if(st.chainTargets>1)buffs.push(`salta ${st.chainTargets} alvos`);
-      name.textContent=`${st.name} • árvore de especialização`;
-      stats.textContent=`Dano ${st.damage.toFixed(2)} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.laserMainPath)?` • principal C${t.laserMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      if(st.burn)buffs.push($T`♨️ queimadura ${st.burn.damage}×${st.burn.ticks}`);
+      if(st.chainTargets>1)buffs.push($T`salta ${st.chainTargets} alvos`);
+      name.textContent=$T`${st.name} • árvore de especialização`;
+      stats.textContent=$T`Dano ${st.damage.toFixed(2)} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.laserMainPath)?$T` • principal C${t.laserMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderLaserUpgradeTree(t);return;
     }
 
     if(t.type==='wizard'){
       if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
       const p=wizardPaths(t),active=p.filter(v=>v>0).length,buffs=[];
-      if(st.burn)buffs.push(`🔥 fogo ${st.burn.damage}×${st.burn.ticks}`);
-      if(st.slowFactor)buffs.push(`lentidão ${st.slow.toFixed(1)}s a ${Math.round(st.slowFactor*100)}%`);
-      if(st.markBonus)buffs.push(`marca +${Math.round(st.markBonus*100)}%`);
-      name.textContent=`${st.name} • árvore de especialização`;
-      stats.textContent=`Dano ${st.damage.toFixed(2)} • Splash ${st.splash} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.wizardMainPath)?` • principal C${t.wizardMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      if(st.burn)buffs.push($T`🔥 fogo ${st.burn.damage}×${st.burn.ticks}`);
+      if(st.slowFactor)buffs.push($T`lentidão ${st.slow.toFixed(1)}s a ${Math.round(st.slowFactor*100)}%`);
+      if(st.markBonus)buffs.push($T`marca +${Math.round(st.markBonus*100)}%`);
+      name.textContent=$T`${st.name} • árvore de especialização`;
+      stats.textContent=$T`Dano ${st.damage.toFixed(2)} • Splash ${st.splash} • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.wizardMainPath)?$T` • principal C${t.wizardMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderWizardUpgradeTree(t);return;
     }
 
     if(t.type==='electric'){
       if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
       const p=electricPaths(t),active=p.filter(v=>v>0).length,buffs=[];
-      if(st.markBonus)buffs.push(`marca +${Math.round(st.markBonus*100)}%`);
+      if(st.markBonus)buffs.push($T`marca +${Math.round(st.markBonus*100)}%`);
       if(st.slow)buffs.push(`atordoa ${st.slow.toFixed(1)}s a ${Math.round((st.slowFactor||.55)*100)}%`);
-      name.textContent=`${st.name} • árvore de especialização`;
-      stats.textContent=`Dano ${st.damage.toFixed(2)} • Cadeia ${st.chainTargets} alvos (raio ${st.chainRadius}) • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.electricMainPath)?` • principal C${t.electricMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      name.textContent=$T`${st.name} • árvore de especialização`;
+      stats.textContent=$T`Dano ${st.damage.toFixed(2)} • Cadeia ${st.chainTargets} alvos (raio ${st.chainRadius}) • Range ${st.range} • Vel. ${(1/st.rate).toFixed(2)}/s • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.electricMainPath)?$T` • principal C${t.electricMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderElectricUpgradeTree(t);return;
     }
 
     if(t.type==='celestial'){
       if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
       const p=celestialPaths(t),active=p.filter(v=>v>0).length,buffs=[];
-      if(st.detectsCamo)buffs.push('👁 detecta Camo');if(st.revealsCamo)buffs.push('revela Camo');if(st.breaksArmor)buffs.push('💥 quebra blindagem');if(st.stripArmor)buffs.push('desblinda');if(st.normalizeField)buffs.push('✨ normaliza Camo/Blindado');
-      name.textContent=`${st.name} • comandante de drones`;
-      stats.textContent=`${st.droneCount} drone(s) • Dano ${st.damage.toFixed(2)} • Range ${st.range} • Cadência ${(1/st.rate).toFixed(2)}/s • voo ${st.droneSpeed}px/s${st.splash?` • área ${st.splash}`:''} • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.celestialMainPath)?` • principal C${t.celestialMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      if(st.detectsCamo)buffs.push($t('👁 detecta Camo'));if(st.revealsCamo)buffs.push($t('revela Camo'));if(st.breaksArmor)buffs.push($t('💥 quebra blindagem'));if(st.stripArmor)buffs.push('desblinda');if(st.normalizeField)buffs.push($t('✨ normaliza Camo/Blindado'));
+      name.textContent=$T`${st.name} • comandante de drones`;
+      stats.textContent=$T`${st.droneCount} drone(s) • Dano ${st.damage.toFixed(2)} • Range ${st.range} • Cadência ${(1/st.rate).toFixed(2)}/s • voo ${st.droneSpeed}px/s${st.splash?$T` • área ${st.splash}`:''} • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.celestialMainPath)?$T` • principal C${t.celestialMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
       renderCelestialUpgradeTree(t);return;
     }
 
     if(tree){tree.hidden=true;tree.innerHTML='';tree.__lastHtml='';}if(bar)bar.classList.remove('dart-mode');btn.hidden=false;
     const max=t.level>=MAX_LEVEL,cost=upgradeCost(t);
     let special='';
-    if(st.farm)special=` • 🎣 +🐟 ${st.farmIncome} por rodada`;
-    else if(st.globalRange)special=' • 🎯 Range GLOBAL';
+    if(st.farm)special=$T` • 🎣 +🐟 ${st.farmIncome} por rodada`;
+    else if(st.globalRange)special=$t(' • 🎯 Range GLOBAL');
     else if(st.fullAoe)special=' • ❄️ FULL AOE';
-    else if(st.breaksArmor)special=' • 💥 Quebra blindagem';
-    else if(st.chainTargets)special=` • ⚡ Cadeia ${st.chainTargets} alvos`;
-    else if(st.rootHold)special=` • 🌿 Segura ${st.rootCount} ou 1 boss por ${st.rootDuration}s`;
-    else if(t.type==='boomerang')special=` • 🪃 ${st.boomerangTargets} alvos + retorno ×${st.returnMultiplier.toFixed(2)}`;
-    else if(t.type==='alchemist')special=` • 🧪 Veneno → Fraqueza → Explosão`;
-    else if(t.type==='chronomancer')special=` • ⏳ Retorno temporal em ${st.temporalDelay.toFixed(1)}s`;
-    else if(t.type==='demonking')special=` • 😨 Medo ${st.fearRadius}px / ${st.fearInterval.toFixed(1)}s • 🌑 sombras ${st.shadowCap}`;
-    const speedBonus=effectActive('frenzy')&&!st.rootHold&&!st.farm?' • ⚡ 2× velocidade ATIVO':'';
-    const damageBonus=effectActive('focus')&&!st.rootHold&&!st.farm?' • 🔥 2× dano ATIVO':'';
+    else if(st.breaksArmor)special=$t(' • 💥 Quebra blindagem');
+    else if(st.chainTargets)special=$T` • ⚡ Cadeia ${st.chainTargets} alvos`;
+    else if(st.rootHold)special=$T` • 🌿 Segura ${st.rootCount} ou 1 boss por ${st.rootDuration}s`;
+    else if(t.type==='boomerang')special=$T` • 🪃 ${st.boomerangTargets} alvos + retorno ×${st.returnMultiplier.toFixed(2)}`;
+    else if(t.type==='alchemist')special=$T` • 🧪 Veneno → Fraqueza → Explosão`;
+    else if(t.type==='chronomancer')special=$T` • ⏳ Retorno temporal em ${st.temporalDelay.toFixed(1)}s`;
+    else if(t.type==='demonking')special=$T` • 😨 Medo ${st.fearRadius}px / ${st.fearInterval.toFixed(1)}s • 🌑 sombras ${st.shadowCap}`;
+    const speedBonus=effectActive('frenzy')&&!st.rootHold&&!st.farm?$t(' • ⚡ 2× velocidade ATIVO'):'';
+    const damageBonus=effectActive('focus')&&!st.rootHold&&!st.farm?$t(' • 🔥 2× dano ATIVO'):'';
     const received=st.receivedSupport||{},observer=st.receivedObserver||{};
-    const supportText=(received.damage||received.range||received.attack||received.salmon)?' • 🐟 buff de Suporte ativo':'';
-    const observerText=(observer.damage||observer.range)?' • 🛰️ buff de Observador ativo':'';
-    name.textContent=`${st.name} • nível ${t.level}/${MAX_LEVEL}`;
-    const cadence=st.farm?`Renda 🐟 ${st.farmIncome}/rodada`:st.rootHold?`Recarga ${st.rate.toFixed(1)}s`:`Vel. ${(1/st.rate).toFixed(1)}/s`;
+    const supportText=(received.damage||received.range||received.attack||received.salmon)?$t(' • 🐟 buff de Suporte ativo'):'';
+    const observerText=(observer.damage||observer.range)?$t(' • 🛰️ buff de Observador ativo'):'';
+    name.textContent=$T`${st.name} • nível ${t.level}/${MAX_LEVEL}`;
+    const cadence=st.farm?$T`Renda 🐟 ${st.farmIncome}/rodada`:st.rootHold?$T`Recarga ${st.rate.toFixed(1)}s`:$T`Vel. ${(1/st.rate).toFixed(1)}/s`;
     stats.textContent=st.farm
-      ?`${st.role} • não ataca • ${cadence}${special}${supportText}${observerText} • limite ${TOWER_LIMIT_PER_TYPE} por tipo • ${max?'nível máximo':`próximo upgrade 🐟 ${cost}`}`
-      :`${st.role} • ${st.rootHold?'Controle':`Dano ${st.damage.toFixed(2)}`} • ${st.globalRange?'Range GLOBAL':`Range ${st.range}`} • ${cadence}${special}${supportText}${observerText}${speedBonus}${damageBonus} • ${max?'nível máximo':`próximo upgrade 🐟 ${cost}`}`;
-    btn.textContent=max?'Nível máximo':`Upgrade 🐟 ${cost}`;btn.disabled=max;
+      ?$T`${st.role} • não ataca • ${cadence}${special}${supportText}${observerText} • limite ${TOWER_LIMIT_PER_TYPE} por tipo • ${max?$t('nível máximo'):$T`próximo upgrade 🐟 ${cost}`}`
+      :`${st.role} • ${st.rootHold?$t('Controle'):$T`Dano ${st.damage.toFixed(2)}`} • ${st.globalRange?$t('Range GLOBAL'):`Range ${st.range}`} • ${cadence}${special}${supportText}${observerText}${speedBonus}${damageBonus} • ${max?$t('nível máximo'):$T`próximo upgrade 🐟 ${cost}`}`;
+    btn.textContent=max?$t('Nível máximo'):`Upgrade 🐟 ${cost}`;btn.disabled=max;
   }
 
   function renderHotbar(){
     const root=$('#power-hotbar');if(!root)return;
     root.innerHTML=Object.entries(powers).map(([id,p])=>{
       const qty=profile.inventory[id]||0,active=effectActive(id);
-      const remaining=active?`${state.effects[id].toFixed(1)}s`:`${qty} carga${qty===1?'':'s'}`;
+      const remaining=active?`${state.effects[id].toFixed(1)}s`:$T`${qty} carga${qty===1?'':'s'}`;
       return`<button type="button" class="power-use ${qty>0?'ready':''} ${active?'active':''}" data-use-power="${id}" ${qty<=0||active?'disabled':''} title="${p.description}">
         <span class="icon">${p.icon}</span><b>${p.name}</b><small>${remaining}</small>
       </button>`;
@@ -3430,8 +4772,8 @@ function initPersonalTd(){
     const root=$('#active-effects');if(!root)return;
     const items=[];
     if(effectActive('frenzy'))items.push(`⚡ 2× attack speed • ${state.effects.frenzy.toFixed(1)}s`);
-    if(effectActive('focus'))items.push(`🔥 2× dano • ${state.effects.focus.toFixed(1)}s`);
-    if(effectActive('blizzard'))items.push(`🌨️ inimigos a 35% da velocidade • ${state.effects.blizzard.toFixed(1)}s`);
+    if(effectActive('focus'))items.push($T`🔥 2× dano • ${state.effects.focus.toFixed(1)}s`);
+    if(effectActive('blizzard'))items.push($T`🌨️ inimigos a 35% da velocidade • ${state.effects.blizzard.toFixed(1)}s`);
     root.innerHTML=items.map(x=>`<span class="effect-pill">${x}</span>`).join('');
     renderSynergies();
   }
@@ -3441,17 +4783,17 @@ function initPersonalTd(){
   }
 
   const SPECIAL_ENEMY_INFO={
-    healer:{icon:'❤️',name:'Curandeiro',color:'#62d887',description:'A cada 1s regenera 1 camada dos balões próximos em um raio pequeno.'},
-    trickster:{icon:'🤡',name:'Atrapalhão',color:'#ff9f5d',description:'Às vezes estoura 1 camada do balão da frente e atordoa gatinhos próximos por 1,2s.'},
-    jester:{icon:'🃏',name:'Bobo da Corte',color:'#ce78ff',description:'Tem apenas 1 de vida. O dano do tiro que o acerta vira perda de salmões, limitada a 500.'},
-    angel:{icon:'😇',name:'Anjo',color:'#f4efc7',description:'Concede 1 escudo a um balão próximo. O escudo bloqueia um ataque, mas deixa o protegido 18% mais lento.'},
-    demon:{icon:'😈',name:'Demônio',color:'#a94455',description:'Rouba camadas de balões próximos para aumentar permanentemente sua vida máxima, até 2× a vida original.'}
+    healer:{icon:'❤️',name:$t('Curandeiro'),color:'#62d887',description:$t('A cada 1s regenera 1 camada dos balões próximos em um raio pequeno.')},
+    trickster:{icon:'🤡',name:$t('Atrapalhão'),color:'#ff9f5d',description:$t('Às vezes estoura 1 camada do balão da frente e atordoa gatinhos próximos por 1,2s.')},
+    jester:{icon:'🃏',name:$t('Bobo da Corte'),color:'#ce78ff',description:$t('Tem apenas 1 de vida. O dano do tiro que o acerta vira perda de salmões, limitada a 500.')},
+    angel:{icon:'😇',name:$t('Anjo'),color:'#f4efc7',description:$t('Concede 1 escudo a um balão próximo. O escudo bloqueia um ataque, mas deixa o protegido 18% mais lento.')},
+    demon:{icon:'😈',name:$t('Demônio'),color:'#a94455',description:$t('Rouba camadas de balões próximos para aumentar permanentemente sua vida máxima, até 2× a vida original.')}
   };
 
   const waveKindLabels={
-    camo:'🥷 Camo',armored:'🛡 Blindado',heavyArmored:'🛡🛡 Pesado',
-    camoArmored:'🥷🛡 Camo+Blindado',fast:'⚡ Rápido',regen:'➕ Regenerador',
-    healer:'❤️ Curandeiro',trickster:'🤡 Atrapalhão',jester:'🃏 Bobo da Corte',angel:'😇 Anjo',demon:'😈 Demônio'
+    camo:'🥷 Camo',armored:$t('🛡 Blindado'),heavyArmored:$t('🛡🛡 Pesado'),
+    camoArmored:$t('🥷🛡 Camo+Blindado'),fast:$t('⚡ Rápido'),regen:$t('➕ Regenerador'),
+    healer:$t('❤️ Curandeiro'),trickster:$t('🤡 Atrapalhão'),jester:$t('🃏 Bobo da Corte'),angel:$t('😇 Anjo'),demon:$t('😈 Demônio')
   };
 
   function waveEnemyCount(round){
@@ -3480,7 +4822,7 @@ function initPersonalTd(){
     const totalRounds=mapRounds(state.map,state.difficulty),next=state.wave+1;
     if(!isInfinite()&&(state.completed||next>totalRounds)){
       root.className='next-wave-alert done';
-      root.innerHTML='<span class="next-wave-icon">✓</span><div><b>Última rodada chamada</b><small>Termine os inimigos restantes.</small></div>';
+      root.innerHTML=$t('<span class="next-wave-icon">✓</span><div><b>Última rodada chamada</b><small>Termine os inimigos restantes.</small></div>');
       return;
     }
     const previous=waveFeatureSet(state.wave),upcoming=waveFeatureSet(next),news=[];
@@ -3488,12 +4830,12 @@ function initPersonalTd(){
     for(const kind of upcoming.kinds)if(!previous.kinds.has(kind))news.push(waveKindLabels[kind]||kind);
     if(upcoming.boss)news.push('👑 BOSS');
     const milestone=isInfinite()&&next%10===0;
-    if(milestone)news.push(`🪙 +${infiniteMilestoneReward(next)} moedas permanentes ao concluir`);
+    if(milestone)news.push($T`🪙 +${infiniteMilestoneReward(next)} moedas permanentes ao concluir`);
     root.className=`next-wave-alert ${news.length?'warning':'quiet'}`;
-    const headline=milestone&&!upcoming.boss?`Rodada ${next}: marco do Infinito`:(news.length?`Rodada ${next}: vem coisa nova`:`Rodada ${next}: sem novos tipos`);
+    const headline=milestone&&!upcoming.boss?$T`Rodada ${next}: marco do Infinito`:(news.length?$T`Rodada ${next}: vem coisa nova`:$T`Rodada ${next}: sem novos tipos`);
     root.innerHTML=news.length
       ?`<span class="next-wave-icon">${milestone?'🪙':'⚠'}</span><div><b>${headline}</b><small>${news.join(' • ')}</small></div>`
-      :`<span class="next-wave-icon">✓</span><div><b>${headline}</b><small>As ameaças conhecidas continuam, só ficam mais numerosas/fortes.</small></div>`;
+      :$T`<span class="next-wave-icon">✓</span><div><b>${headline}</b><small>As ameaças conhecidas continuam, só ficam mais numerosas/fortes.</small></div>`;
   }
 
   function renderHeroHud(){
@@ -3501,7 +4843,7 @@ function initPersonalTd(){
     const price=heroPrice(profile.selectedHero,state.map);
     if(icon)icon.textContent=def.icon;if(name)name.textContent=def.name;
     if(btn){btn.disabled=!!h;btn.classList.toggle('placed',!!h);}
-    if(stateEl)stateEl.textContent=h?`Em campo • Nv. ${h.level}/10`:`🐟 ${price} • pronto para entrar`;
+    if(stateEl)stateEl.textContent=h?$T`Em campo • Nv. ${h.level}/10`:$T`🐟 ${price} • pronto para entrar`;
     const progress=$('#td-hero-progress'),actions=$('#td-hero-actions');
     // O XP/nível (e o botão de upar com salmões, que mora no mesmo bloco) só aparece com o herói
     // selecionado — clique nele em campo para ver/gerenciar o progresso, como já funciona para
@@ -3510,22 +4852,22 @@ function initPersonalTd(){
     if(actions)actions.hidden=!h;
     if(!h)return;
     const hs=heroStats(h),need=heroRequiredXp(h.level),pct=h.level>=10?100:Math.max(0,Math.min(100,(h.xp/need)*100));
-    if($('#td-hero-level'))$('#td-hero-level').textContent=h.level>=10?'⭐ Nv. 10 MAX':`Nv. ${h.level}/10`;
-    if($('#td-hero-xp'))$('#td-hero-xp').textContent=h.level>=10?'Ultimate liberada':`${h.xp}/${need} XP`;
+    if($('#td-hero-level'))$('#td-hero-level').textContent=h.level>=10?$t('⭐ Nv. 10 MAX'):`Nv. ${h.level}/10`;
+    if($('#td-hero-xp'))$('#td-hero-xp').textContent=h.level>=10?$t('Ultimate liberada'):`${h.xp}/${need} XP`;
     if($('#td-hero-xp-fill'))$('#td-hero-xp-fill').style.width=`${pct}%`;
-    if($('#td-hero-passive'))$('#td-hero-passive').textContent=`${def.passive}${def.farm?` • Renda própria: +🐟 ${hs.farmIncome}/rodada`:` • Dano ${hs.damage} • Range ${hs.range}`}`;
+    if($('#td-hero-passive'))$('#td-hero-passive').textContent=`${def.passive}${def.farm?$T` • Renda própria: +🐟 ${hs.farmIncome}/rodada`:$T` • Dano ${hs.damage} • Range ${hs.range}`}`;
     const buyBtn=$('#td-hero-buy-level');
     if(buyBtn){
       if(h.level>=10){buyBtn.hidden=true;}
       else{
         const cost=heroLevelUpCost(h.level);
         buyBtn.hidden=false;buyBtn.disabled=state.money<cost;
-        buyBtn.textContent=`🐟 Upar com salmões • ${cost}`;
+        buyBtn.textContent=$T`🐟 Upar com salmões • ${cost}`;
       }
     }
     const skill=$('#td-hero-skill'),ult=$('#td-hero-ultimate');
-    if(skill){skill.disabled=h.level<5||(h.skillCd||0)>0||(h.stunTimer||0)>0;skill.textContent=(h.stunTimer||0)>0?`😵 Atordoado • ${Math.ceil(h.stunTimer*10)/10}s`:h.level<5?`🔒 Nv.5 • ${def.skill.name}`:`${def.skill.icon} ${def.skill.name}${h.skillCd>0?` • ${Math.ceil(h.skillCd)}s`:''}`;}
-    if(ult){ult.disabled=h.level<10||(h.ultimateCd||0)>0||(h.stunTimer||0)>0;ult.textContent=(h.stunTimer||0)>0?`😵 Atordoado • ${Math.ceil(h.stunTimer*10)/10}s`:h.level<10?`🔒 Nv.10 • ${def.ultimate.name}`:`${def.ultimate.icon} ${def.ultimate.name}${h.ultimateCd>0?` • ${Math.ceil(h.ultimateCd)}s`:''}`;}
+    if(skill){skill.disabled=h.level<5||(h.skillCd||0)>0||(h.stunTimer||0)>0;skill.textContent=(h.stunTimer||0)>0?$T`😵 Atordoado • ${Math.ceil(h.stunTimer*10)/10}s`:h.level<5?`🔒 Nv.5 • ${def.skill.name}`:`${def.skill.icon} ${def.skill.name}${h.skillCd>0?` • ${Math.ceil(h.skillCd)}s`:''}`;}
+    if(ult){ult.disabled=h.level<10||(h.ultimateCd||0)>0||(h.stunTimer||0)>0;ult.textContent=(h.stunTimer||0)>0?$T`😵 Atordoado • ${Math.ceil(h.stunTimer*10)/10}s`:h.level<10?`🔒 Nv.10 • ${def.ultimate.name}`:`${def.ultimate.icon} ${def.ultimate.name}${h.ultimateCd>0?` • ${Math.ceil(h.ultimateCd)}s`:''}`;}
   }
 
   function updateStats(){
@@ -3537,12 +4879,12 @@ function initPersonalTd(){
     if($('#td-wave-max'))$('#td-wave-max').textContent=endless?'∞':totalRounds;
     if($('#td-count'))$('#td-count').textContent=state.enemies.length+state.spawn.length;
     if($('#td-map-meta'))$('#td-map-meta').textContent=endless
-      ?`${map.description} • ∞ Infinito ${diff.name} • recorde ${infiniteBestFor(state.map,state.difficulty)} • moedas permanentes a cada 10 rodadas.`
-      :`${map.description} • ${diff.name} • estrelas do mapa ${mapStars(state.map)}/3.`;
+      ?$T`${map.description} • ∞ Infinito ${diff.name} • recorde ${infiniteBestFor(state.map,state.difficulty)} • moedas permanentes a cada 10 rodadas.`
+      :$T`${map.description} • ${diff.name} • estrelas do mapa ${mapStars(state.map)}/3.`;
     if($('#game-map-title'))$('#game-map-title').textContent=map.name;
     if($('#game-difficulty-text'))$('#game-difficulty-text').textContent=endless
-      ?`∞ Modo Infinito • ${diff.name} • melhor: rodada ${infiniteBestFor(state.map,state.difficulty)}`
-      :`🏁 Campanha • ${diff.name} • ${profile.maps[state.map].cleared[state.difficulty]?'⭐ já concluída':'☆ estrela ainda não conquistada'}`;
+      ?$T`∞ Modo Infinito • ${diff.name} • melhor: rodada ${infiniteBestFor(state.map,state.difficulty)}`
+      :$T`🏁 Campanha • ${diff.name} • ${profile.maps[state.map].cleared[state.difficulty]?$t('⭐ já concluída'):$t('☆ estrela ainda não conquistada')}`;
     const start=$('#td-start');
     if(start){
       // Mantém os mesmos elementos durante o clique. Recriar o conteúdo a cada frame fazia
@@ -3553,16 +4895,16 @@ function initPersonalTd(){
         if(labelNode&&labelNode.textContent!==nextLabel)labelNode.textContent=nextLabel;
       };
       if(!endless&&state.completed){
-        start.disabled=true;start.title='Mapa concluído';setStartContent('✓','Concluído');
+        start.disabled=true;start.title=$t('Mapa concluído');setStartContent('✓',$t('Concluído'));
       }else if(!endless&&state.wave>=totalRounds){
         start.disabled=true;
-        const label=state.enemies.length||state.spawn.length?'Final em campo':'Finalizando';
+        const label=state.enemies.length||state.spawn.length?$t('Final em campo'):$t('Finalizando');
         start.title=label;setStartContent('⌛',label);
       }else{
         start.disabled=false;
         const next=state.wave+1,overlap=state.enemies.length||state.spawn.length;
-        start.title=overlap?`Chamar rodada ${next} agora`:`Iniciar rodada ${next}`;
-        setStartContent(overlap?'🚀':'▶',`${endless?'∞ ':''}Rodada ${next}`);
+        start.title=overlap?$T`Chamar rodada ${next} agora`:$T`Iniciar rodada ${next}`;
+        setStartContent(overlap?'🚀':'▶',$T`${endless?'∞ ':''}Rodada ${next}`);
       }
     }
     // HOTFIX 0.6.5.1: não recriar a árvore de upgrades a cada frame.
@@ -3571,7 +4913,7 @@ function initPersonalTd(){
     if(state.selectedTower){
       const t=selectedTower(),perf=$('#td-selected-performance'),sellBtn=$('#td-sell');
       if(t&&perf)perf.textContent=towerPerformanceText(t);
-      if(t&&sellBtn)sellBtn.textContent=`🐟 Vender ${towerRefund(t)}`;
+      if(t&&sellBtn)sellBtn.textContent=$T`🐟 Vender ${towerRefund(t)}`;
     }
     updateSpeedButtons();renderNextWavePreview();
   }
@@ -3587,13 +4929,13 @@ function initPersonalTd(){
     state.effects={frenzy:0,focus:0,blizzard:0};state.powerUiClock=0;
     configurePath();syncPlacementUi();updateUpgradePanel();
     playMusicTheme(state.map);
-    if($('#td-pause')){$('#td-pause').textContent='⏸';$('#td-pause').title='Pausar';}
+    if($('#td-pause')){$('#td-pause').textContent='⏸';$('#td-pause').title=$t('Pausar');}
     hideGameModal('#pause-menu');hideGameModal('#result-screen');
     setMsg(isInfinite()
-      ?`${map.name} • ∞ Infinito ${diff.name}. Não existe rodada final: a dificuldade sobe continuamente e cada 10 rodadas concluídas rende moedas permanentes.`
+      ?$T`${map.name} • ∞ Infinito ${diff.name}. Não existe rodada final: a dificuldade sobe continuamente e cada 10 rodadas concluídas rende moedas permanentes.`
       :state.map==='church'
-        ?`${map.name} • ${diff.name}. ⛪ Coloque gatinhos nos bancos marcados com patinhas para enxergar por cima dos pilares. As duas rotas se cruzam no centro.`
-        :`${map.name} • ${diff.name}. Obstáculos grandes bloqueiam a visão. Chame as rodadas no seu ritmo — você pode sobrepor ondas.`);
+        ?$T`${map.name} • ${diff.name}. ⛪ Coloque gatinhos nos bancos marcados com patinhas para enxergar por cima dos pilares. As duas rotas se cruzam no centro.`
+        :$T`${map.name} • ${diff.name}. Obstáculos grandes bloqueiam a visão. Chame as rodadas no seu ritmo — você pode sobrepor ondas.`);
     renderHotbar();renderEffects();renderUnlocks();renderHeroHud();updateStats();
   }
 
@@ -3607,11 +4949,11 @@ function initPersonalTd(){
 
   function usePower(id){
     const p=powers[id];if(!p)return;
-    if((profile.inventory[id]||0)<=0){setMsg(`Sem cargas de ${p.name}. Compre no lobby Poderes.`);return;}
-    if(p.duration&&(!state.wave||(!state.enemies.length&&!state.spawn.length))){setMsg(`${p.name} é temporário. Inicie uma rodada antes de usar.`);return;}
-    if(p.duration&&effectActive(id)){setMsg(`${p.name} já está ativo.`);return;}
+    if((profile.inventory[id]||0)<=0){setMsg($T`Sem cargas de ${p.name}. Compre no lobby Poderes.`);return;}
+    if(p.duration&&(!state.wave||(!state.enemies.length&&!state.spawn.length))){setMsg($T`${p.name} é temporário. Inicie uma rodada antes de usar.`);return;}
+    if(p.duration&&effectActive(id)){setMsg($T`${p.name} já está ativo.`);return;}
     const maxLives=currentMap().lives+currentDifficulty().extraLives;
-    if(p.effect==='heal'&&state.lives>=maxLives){setMsg('Suas vidas já estão cheias.');return;}
+    if(p.effect==='heal'&&state.lives>=maxLives){setMsg($t('Suas vidas já estão cheias.'));return;}
     profile.inventory[id]--;
     if(p.effect==='attackSpeed')state.effects.frenzy=p.duration;
     if(p.effect==='damage')state.effects.focus=p.duration;
@@ -3619,7 +4961,7 @@ function initPersonalTd(){
     if(p.effect==='cash')state.money+=350;
     if(p.effect==='heal')state.lives=Math.min(maxLives,state.lives+6);
     saveProfile();
-    sfx('ui');setMsg(`${p.icon} ${p.name} ativado! ${p.description}`);
+    sfx('ui');setMsg($T`${p.icon} ${p.name} ativado! ${p.description}`);
     renderHotbar();renderEffects();
     if(state.selectedTower)updateUpgradePanel();
     updateStats();
@@ -3690,8 +5032,8 @@ function initPersonalTd(){
   }
 
   const BOSS_NAMES={
-    grove:'Dirigível do Bosque',meadow:'Dirigível do Prado',creek:'Dirigível do Riacho',ridge:'Dirigível da Neblina',garden:'Dirigível das Lanternas',toll:'Dirigível do Pedágio',
-    harbor:'Dirigível do Porto',canyon:'Dirigível do Desfiladeiro',ruins:'Dirigível Ancestral',factory:'Dirigível Mecânico',fork:'Dirigível Gêmeo',storm:'Dirigível da Tempestade',blind:'Dirigível das Sombras',church:'Dirigível do Sino Partido'
+    grove:$t('Dirigível do Bosque'),meadow:$t('Dirigível do Prado'),creek:$t('Dirigível do Riacho'),ridge:$t('Dirigível da Neblina'),garden:$t('Dirigível das Lanternas'),toll:$t('Dirigível do Pedágio'),
+    harbor:$t('Dirigível do Porto'),canyon:$t('Dirigível do Desfiladeiro'),ruins:$t('Dirigível Ancestral'),factory:$t('Dirigível Mecânico'),fork:$t('Dirigível Gêmeo'),storm:$t('Dirigível da Tempestade'),blind:$t('Dirigível das Sombras'),church:$t('Dirigível do Sino Partido')
   };
 
   function strongestRegularDurability(round){
@@ -3706,7 +5048,7 @@ function initPersonalTd(){
     const hp=Number((strongest*30).toFixed(1));
     const speed=(50+round*3.15)*map.speedMultiplier*diff.speed*.62;
     const reward=Math.round((45+round*5)*map.rewardMultiplier*diff.waveReward);
-    return{at:0,round,kind:'boss',miniBoss:true,armored:false,camo:false,name:'Mini Dirigível',hp,maxHp:hp,elite:false,speed,reward,regenPause:0,d:0,slowTimer:0,color:'#f29b54',bossScale:30,strongestHp:strongest};
+    return{at:0,round,kind:'boss',miniBoss:true,armored:false,camo:false,name:$t('Mini Dirigível'),hp,maxHp:hp,elite:false,speed,reward,regenPause:0,d:0,slowTimer:0,color:'#f29b54',bossScale:30,strongestHp:strongest};
   }
 
   function makeBoss(round){
@@ -3716,7 +5058,7 @@ function initPersonalTd(){
     const speed=(50+round*3.15)*map.speedMultiplier*diff.speed*.44*.55;
     // Recompensa própria para não transformar o boss em uma fonte absurda de salmões.
     const reward=Math.round((90+round*8)*map.rewardMultiplier*diff.waveReward);
-    return{at:0,round,kind:'boss',armored:false,camo:false,name:BOSS_NAMES[state.map]||'Chefão',
+    return{at:0,round,kind:'boss',armored:false,camo:false,name:BOSS_NAMES[state.map]||$t('Chefão'),
       hp,maxHp:hp,elite:false,speed,reward,regenPause:0,d:0,slowTimer:0,color:'#ffb347',bossScale:75,strongestHp:strongest};
   }
 
@@ -3794,8 +5136,8 @@ function initPersonalTd(){
   function startWave(){
     const map=currentMap(),diff=currentDifficulty(),totalRounds=mapRounds(state.map,state.difficulty),endless=isInfinite();
     if(state.lives<=0){reset();return;}
-    if(!endless&&state.completed){setMsg(`${map.name} já foi concluído. Reinicie ou escolha outra dificuldade.`);return;}
-    if(!endless&&state.wave>=totalRounds){setMsg('A rodada final já foi chamada. Termine os inimigos restantes.');return;}
+    if(!endless&&state.completed){setMsg($T`${map.name} já foi concluído. Reinicie ou escolha outra dificuldade.`);return;}
+    if(!endless&&state.wave>=totalRounds){setMsg($t('A rodada final já foi chamada. Termine os inimigos restantes.'));return;}
     const overlapping=state.enemies.length||state.spawn.length;
     state.wave++;state.waveActive=true;notifyMatchTutorialAction('waveStarted');
     const final=!endless&&state.wave===totalRounds,count=waveEnemyCount(state.wave);
@@ -3821,10 +5163,10 @@ function initPersonalTd(){
     const armored=newcomers.filter(e=>e.armored).length,camo=newcomers.filter(e=>e.camo).length;
     const fast=newcomers.filter(e=>e.kind==='fast').length,regen=newcomers.filter(e=>e.kind==='regen').length;
     const specialCounts=Object.fromEntries(Object.keys(SPECIAL_ENEMY_INFO).map(k=>[k,newcomers.filter(e=>e.kind===k).length]));
-    const extra=[fast?`${fast} rápido(s)`:'',regen?`${regen} regenerador(es)`:'',...Object.entries(specialCounts).filter(([,n])=>n).map(([k,n])=>`${SPECIAL_ENEMY_INFO[k].icon} ${n} ${SPECIAL_ENEMY_INFO[k].name}`)].filter(Boolean).join(' • ');
+    const extra=[fast?$T`${fast} rápido(s)`:'',regen?$T`${regen} regenerador(es)`:'',...Object.entries(specialCounts).filter(([,n])=>n).map(([k,n])=>`${SPECIAL_ENEMY_INFO[k].icon} ${n} ${SPECIAL_ENEMY_INFO[k].name}`)].filter(Boolean).join(' • ');
     const roundLabel=endless?`${state.wave}/∞`:`${state.wave}/${totalRounds}`;
-    const milestone=endless&&state.wave%10===0?` 🪙 MARCO: conclua a rodada ${state.wave} para receber +${infiniteMilestoneReward(state.wave)} moedas permanentes.`:'';
-    sfx(final?'boss':'wave');setMsg(`${overlapping?'🚀 Rodada chamada antecipadamente! ':' '}${roundLabel}: ${count} alvos • ${armored} blindado(s) • ${camo} camo${extra?' • '+extra:''}.${miniBoss?` MINI BOSS! 👹 ${miniBoss.name} com ${miniBoss.hp.toFixed(0)} HP — 30× o inimigo mais resistente até aqui.`:''}${final?` RODADA FINAL! 👑 ${boss.name} chegou com ${boss.hp.toFixed(0)} HP — 75× a vida do inimigo regular mais resistente e anda a 55% da velocidade-base!`:''}${milestone}`);
+    const milestone=endless&&state.wave%10===0?$T` 🪙 MARCO: conclua a rodada ${state.wave} para receber +${infiniteMilestoneReward(state.wave)} moedas permanentes.`:'';
+    sfx(final?'boss':'wave');setMsg($T`${overlapping?$t('🚀 Rodada chamada antecipadamente! '):' '}${roundLabel}: ${count} alvos • ${armored} blindado(s) • ${camo} camo${extra?' • '+extra:''}.${miniBoss?$T` MINI BOSS! 👹 ${miniBoss.name} com ${miniBoss.hp.toFixed(0)} HP — 30× o inimigo mais resistente até aqui.`:''}${final?$T` RODADA FINAL! 👑 ${boss.name} chegou com ${boss.hp.toFixed(0)} HP — 75× a vida do inimigo regular mais resistente e anda a 55% da velocidade-base!`:''}${milestone}`);
     updateStats();
   }
 
@@ -3832,13 +5174,13 @@ function initPersonalTd(){
 
   function placeTower(x,y){
     const typeId=state.selected,type=types[typeId];if(!type)return false;
-    if(!isTowerUnlocked(typeId)){setMsg(`${type.name} libera no nível ${type.unlockLevel}.`);return false;}
+    if(!isTowerUnlocked(typeId)){setMsg($T`${type.name} libera no nível ${type.unlockLevel}.`);return false;}
     const placed=towerCount(typeId),price=towerPrice(typeId,state.map),limit=type.limit||TOWER_LIMIT_PER_TYPE;
-    if(placed>=limit){setMsg(`🐾 Limite atingido: no máximo ${limit} ${type.name} por mapa.`);renderUnlocks();return false;}
-    if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${type.name} neste tier de mapa.`);return false;}
-    if(distPath(x,y)<43){setMsg('Muito perto da estrada. Escolha outro ponto para confirmar.');return false;}
-    if(obstacleAt(x,y,24)){setMsg('🌳 Esse obstáculo ocupa o espaço e também bloquearia a visão. Escolha outro ponto.');return false;}
-    if(state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<46)||(state.hero&&Math.hypot(state.hero.x-x,state.hero.y-y)<52)){setMsg('Muito perto de outra unidade. Escolha outro ponto.');return false;}
+    if(placed>=limit){setMsg($T`🐾 Limite atingido: no máximo ${limit} ${type.name} por mapa.`);renderUnlocks();return false;}
+    if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${type.name} neste tier de mapa.`);return false;}
+    if(distPath(x,y)<43){setMsg($t('Muito perto da estrada. Escolha outro ponto para confirmar.'));return false;}
+    if(obstacleAt(x,y,24)){setMsg($t('🌳 Esse obstáculo ocupa o espaço e também bloquearia a visão. Escolha outro ponto.'));return false;}
+    if(state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<46)||(state.hero&&Math.hypot(state.hero.x-x,state.hero.y-y)<52)){setMsg($t('Muito perto de outra unidade. Escolha outro ponto.'));return false;}
     state.money-=price;
     const pathTower=typeId==='dart'||typeId==='sniper';
     const tower={id:state.nextTowerId++,x,y,type:typeId,cool:0,level:1,angle:0,paths:pathTower?[0,0,0]:undefined,dartMainPath:null,dartLastPath:null,sniperMainPath:null,sniperLastPath:null,planeTimer:0,planeLastWave:state.wave,
@@ -3846,22 +5188,22 @@ function initPersonalTd(){
     state.towers.push(tower);state.masterySession[typeId].used=true;
     const count=towerCount(typeId);
     state.selectedTower=null;state.selectedHero=false;cancelPlacement(true);
-    setMsg(`✓ ${type.name} posicionado. ${count}/${type.limit||TOWER_LIMIT_PER_TYPE} deste tipo. Para colocar outro, selecione o gatinho novamente na barra.`);
+    setMsg($T`✓ ${type.name} posicionado. ${count}/${type.limit||TOWER_LIMIT_PER_TYPE} deste tipo. Para colocar outro, selecione o gatinho novamente na barra.`);
     notifyMatchTutorialAction('towerPlaced');
     renderUnlocks();updateStats();announceNewSynergies();return true;
   }
 
   function placeHero(x,y){
-    if(state.hero){setMsg('🦸 Só é permitido 1 Herói Gatinho por partida.');return false;}
+    if(state.hero){setMsg($t('🦸 Só é permitido 1 Herói Gatinho por partida.'));return false;}
     const id=profile.selectedHero||'king',h=HEROES[id]||HEROES.king,price=heroPrice(id,state.map);
-    if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} para colocar ${h.name}.`);return false;}
-    if(distPath(x,y)<46){setMsg('O herói está muito perto da estrada. Escolha outro ponto.');return false;}
-    if(obstacleAt(x,y,27)){setMsg('🌳 Esse obstáculo ocupa o espaço do herói. Escolha outro ponto.');return false;}
-    if(state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<52)){setMsg('Muito perto de outro gatinho. Escolha outro ponto.');return false;}
+    if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} para colocar ${h.name}.`);return false;}
+    if(distPath(x,y)<46){setMsg($t('O herói está muito perto da estrada. Escolha outro ponto.'));return false;}
+    if(obstacleAt(x,y,27)){setMsg($t('🌳 Esse obstáculo ocupa o espaço do herói. Escolha outro ponto.'));return false;}
+    if(state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<52)){setMsg($t('Muito perto de outro gatinho. Escolha outro ponto.'));return false;}
     state.money-=price;
     state.hero={type:id,x,y,level:1,xp:0,cool:0,skillCd:0,ultimateCd:0,commandTimer:0,ultimateTimer:0,farmBoostWaves:0,damageDealt:0,pops:0,spent:price,priority:id==='warrior'?'strong':'first'};
     cancelPlacement(true);sfx('place');
-    setMsg(`🦸 ${h.name} entrou em campo! Ele sobe do nível 1 ao 10 nesta partida. Habilidade no Nv.5 e Ultimate no Nv.10.`);
+    setMsg($T`🦸 ${h.name} entrou em campo! Ele sobe do nível 1 ao 10 nesta partida. Habilidade no Nv.5 e Ultimate no Nv.10.`);
     renderHeroHud();updateStats();announceNewSynergies();return true;
   }
 
@@ -3871,12 +5213,12 @@ function initPersonalTd(){
 
   function upgradeDartPath(pathIndex){
     const t=selectedTower();
-    if(!t||t.type!=='dart'){setMsg('Selecione um Gatinho Dardo para usar os caminhos de upgrade.');return;}
+    if(!t||t.type!=='dart'){setMsg($t('Selecione um Gatinho Dardo para usar os caminhos de upgrade.'));return;}
     if(pathIndex<0||pathIndex>=DART_PATHS.length)return;
     const p=dartPaths(t),current=p[pathIndex],lock=dartPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${DART_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=DART_PATHS[pathIndex].tiers[current];
-    const price=upgradePrice(tier.cost);if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    const price=upgradePrice(tier.cost);if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
     state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.dartLastPath=pathIndex;
     if(next===4)t.dartMainPath=pathIndex;
     const st=towerStats(t);
@@ -3888,12 +5230,12 @@ function initPersonalTd(){
 
   function upgradeSniperPath(pathIndex){
     const t=selectedTower();
-    if(!t||t.type!=='sniper'){setMsg('Selecione um Gato Sniper para usar os caminhos de upgrade.');return;}
+    if(!t||t.type!=='sniper'){setMsg($t('Selecione um Gato Sniper para usar os caminhos de upgrade.'));return;}
     if(pathIndex<0||pathIndex>=SNIPER_PATHS.length)return;
     const p=sniperPaths(t),current=p[pathIndex],lock=sniperPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${SNIPER_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=SNIPER_PATHS[pathIndex].tiers[current];
-    const price=upgradePrice(tier.cost);if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    const price=upgradePrice(tier.cost);if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
     state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.sniperLastPath=pathIndex;
     if(next===4)t.sniperMainPath=pathIndex;
     if(pathIndex===2&&next===5){t.planeTimer=0;t.planeLastWave=state.wave;}
@@ -3906,12 +5248,12 @@ function initPersonalTd(){
 
   function upgradeFrostPath(pathIndex){
     const t=selectedTower();
-    if(!t||t.type!=='frost'){setMsg('Selecione um Gato Gelinho para usar os caminhos de upgrade.');return;}
+    if(!t||t.type!=='frost'){setMsg($t('Selecione um Gato Gelinho para usar os caminhos de upgrade.'));return;}
     if(pathIndex<0||pathIndex>=FROST_PATHS.length)return;
     const p=frostPaths(t),current=p[pathIndex],lock=frostPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${FROST_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=FROST_PATHS[pathIndex].tiers[current];
-    const price=upgradePrice(tier.cost);if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    const price=upgradePrice(tier.cost);if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
     state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.frostLastPath=pathIndex;
     if(next===4)t.frostMainPath=pathIndex;
     state.pulses.push({x:t.x,y:t.y,range:48+next*10,life:.55,maxLife:.55,color:FROST_PATHS[pathIndex].color});
@@ -3922,12 +5264,12 @@ function initPersonalTd(){
 
   function upgradeVinePath(pathIndex){
     const t=selectedTower();
-    if(!t||t.type!=='vine'){setMsg('Selecione um Gato Cipó para usar os caminhos de upgrade.');return;}
+    if(!t||t.type!=='vine'){setMsg($t('Selecione um Gato Cipó para usar os caminhos de upgrade.'));return;}
     if(pathIndex<0||pathIndex>=VINE_PATHS.length)return;
     const p=vinePaths(t),current=p[pathIndex],lock=vinePathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${VINE_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=VINE_PATHS[pathIndex].tiers[current];
-    const price=upgradePrice(tier.cost);if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    const price=upgradePrice(tier.cost);if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
     state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.vineLastPath=pathIndex;
     if(next===4)t.vineMainPath=pathIndex;
     state.pulses.push({x:t.x,y:t.y,range:48+next*10,life:.55,maxLife:.55,color:VINE_PATHS[pathIndex].color});
@@ -3938,12 +5280,12 @@ function initPersonalTd(){
 
   function upgradeBurstPath(pathIndex){
     const t=selectedTower();
-    if(!t||t.type!=='burst'){setMsg('Selecione um Gato Bombinha para usar os caminhos de upgrade.');return;}
+    if(!t||t.type!=='burst'){setMsg($t('Selecione um Gato Bombinha para usar os caminhos de upgrade.'));return;}
     if(pathIndex<0||pathIndex>=BURST_PATHS.length)return;
     const p=burstPaths(t),current=p[pathIndex],lock=burstPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${BURST_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=BURST_PATHS[pathIndex].tiers[current];
-    const price=upgradePrice(tier.cost);if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    const price=upgradePrice(tier.cost);if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
     state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.burstLastPath=pathIndex;
     if(next===4)t.burstMainPath=pathIndex;
     const st=towerStats(t);
@@ -3955,12 +5297,12 @@ function initPersonalTd(){
 
   function upgradeNinjaPath(pathIndex){
     const t=selectedTower();
-    if(!t||t.type!=='ninja'){setMsg('Selecione um Gato Ninja para usar os caminhos de upgrade.');return;}
+    if(!t||t.type!=='ninja'){setMsg($t('Selecione um Gato Ninja para usar os caminhos de upgrade.'));return;}
     if(pathIndex<0||pathIndex>=NINJA_PATHS.length)return;
     const p=ninjaPaths(t),current=p[pathIndex],lock=ninjaPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${NINJA_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=NINJA_PATHS[pathIndex].tiers[current];
-    const price=upgradePrice(tier.cost);if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    const price=upgradePrice(tier.cost);if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
     state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.ninjaLastPath=pathIndex;
     if(next===4)t.ninjaMainPath=pathIndex;
     const st=towerStats(t);
@@ -3972,12 +5314,12 @@ function initPersonalTd(){
 
   function upgradeLaserPath(pathIndex){
     const t=selectedTower();
-    if(!t||t.type!=='laser'){setMsg('Selecione um Gato Laser para usar os caminhos de upgrade.');return;}
+    if(!t||t.type!=='laser'){setMsg($t('Selecione um Gato Laser para usar os caminhos de upgrade.'));return;}
     if(pathIndex<0||pathIndex>=LASER_PATHS.length)return;
     const p=laserPaths(t),current=p[pathIndex],lock=laserPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${LASER_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=LASER_PATHS[pathIndex].tiers[current];
-    const price=upgradePrice(tier.cost);if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    const price=upgradePrice(tier.cost);if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
     state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.laserLastPath=pathIndex;
     if(next===4)t.laserMainPath=pathIndex;
     const st=towerStats(t);
@@ -3989,12 +5331,12 @@ function initPersonalTd(){
 
   function upgradeWizardPath(pathIndex){
     const t=selectedTower();
-    if(!t||t.type!=='wizard'){setMsg('Selecione um Gato Mago para usar os caminhos de upgrade.');return;}
+    if(!t||t.type!=='wizard'){setMsg($t('Selecione um Gato Mago para usar os caminhos de upgrade.'));return;}
     if(pathIndex<0||pathIndex>=WIZARD_PATHS.length)return;
     const p=wizardPaths(t),current=p[pathIndex],lock=wizardPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${WIZARD_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=WIZARD_PATHS[pathIndex].tiers[current];
-    const price=upgradePrice(tier.cost);if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    const price=upgradePrice(tier.cost);if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
     state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.wizardLastPath=pathIndex;
     if(next===4)t.wizardMainPath=pathIndex;
     const st=towerStats(t);
@@ -4006,12 +5348,12 @@ function initPersonalTd(){
 
   function upgradeElectricPath(pathIndex){
     const t=selectedTower();
-    if(!t||t.type!=='electric'){setMsg('Selecione um Gato Volts para usar os caminhos de upgrade.');return;}
+    if(!t||t.type!=='electric'){setMsg($t('Selecione um Gato Volts para usar os caminhos de upgrade.'));return;}
     if(pathIndex<0||pathIndex>=ELECTRIC_PATHS.length)return;
     const p=electricPaths(t),current=p[pathIndex],lock=electricPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${ELECTRIC_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=ELECTRIC_PATHS[pathIndex].tiers[current];
-    const price=upgradePrice(tier.cost);if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    const price=upgradePrice(tier.cost);if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
     state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.electricLastPath=pathIndex;
     if(next===4)t.electricMainPath=pathIndex;
     const st=towerStats(t);
@@ -4023,12 +5365,12 @@ function initPersonalTd(){
 
   function upgradeCelestialPath(pathIndex){
     const t=selectedTower();
-    if(!t||t.type!=='celestial'){setMsg('Selecione um Gato Celestial para usar os caminhos de upgrade.');return;}
+    if(!t||t.type!=='celestial'){setMsg($t('Selecione um Gato Celestial para usar os caminhos de upgrade.'));return;}
     if(pathIndex<0||pathIndex>=CELESTIAL_PATHS.length)return;
     const p=celestialPaths(t),current=p[pathIndex],lock=celestialPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${CELESTIAL_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
     const next=current+1,tier=CELESTIAL_PATHS[pathIndex].tiers[current],price=upgradePrice(tier.cost);
-    if(state.money<price){setMsg(`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
     state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.celestialLastPath=pathIndex;
     if(next===4)t.celestialMainPath=pathIndex;
     const st=towerStats(t);state.pulses.push({x:t.x,y:t.y,range:48+next*10,life:.55,maxLife:.55,color:CELESTIAL_PATHS[pathIndex].color});
@@ -4039,21 +5381,21 @@ function initPersonalTd(){
 
   function upgradeTower(){
     const t=selectedTower();
-    if(!t){setMsg('Clique primeiro em um gatinho já posicionado.');return;}
-    if(t.type==='dart'||t.type==='sniper'||t.type==='frost'||t.type==='vine'||t.type==='burst'||t.type==='ninja'||t.type==='laser'||t.type==='wizard'||t.type==='electric'||t.type==='celestial'){setMsg(`${types[t.type].name} usa a árvore de 3 caminhos na aba de upgrades da direita.`);updateUpgradePanel();return;}
-    if(t.level>=MAX_LEVEL){setMsg(`${types[t.type].name} já está no nível máximo.`);return;}
+    if(!t){setMsg($t('Clique primeiro em um gatinho já posicionado.'));return;}
+    if(t.type==='dart'||t.type==='sniper'||t.type==='frost'||t.type==='vine'||t.type==='burst'||t.type==='ninja'||t.type==='laser'||t.type==='wizard'||t.type==='electric'||t.type==='celestial'){setMsg($T`${types[t.type].name} usa a árvore de 3 caminhos na aba de upgrades da direita.`);updateUpgradePanel();return;}
+    if(t.level>=MAX_LEVEL){setMsg($T`${types[t.type].name} já está no nível máximo.`);return;}
     const cost=upgradeCost(t);
-    if(state.money<cost){setMsg(`Faltam 🐟 ${cost-Math.floor(state.money)} salmões para o upgrade.`);return;}
+    if(state.money<cost){setMsg($T`Faltam 🐟 ${cost-Math.floor(state.money)} salmões para o upgrade.`);return;}
     const before=towerStats(t);state.money-=cost;t.spent=(t.spent||towerPrice(t.type,state.map))+cost;t.level++;
     const st=towerStats(t);
     state.pulses.push({x:t.x,y:t.y,range:46+t.level*10,life:.5,maxLife:.5,color:st.accent||st.color});
-    spawnFloatText(t.x,t.y-30,`⬆ nível ${t.level}`,st.accent||'#ffe89a');
+    spawnFloatText(t.x,t.y-30,$T`⬆ nível ${t.level}`,st.accent||'#ffe89a');
     if(st.farm){
-      setMsg(`${st.name} → nível ${t.level}: renda 🐟 ${before.farmIncome}→${st.farmIncome} por rodada concluída.`);
+      setMsg($T`${st.name} → nível ${t.level}: renda 🐟 ${before.farmIncome}→${st.farmIncome} por rodada concluída.`);
     }else if(st.rootHold){
-      setMsg(`${st.name} → nível ${t.level}: recarga ${before.rate.toFixed(1)}s→${st.rate.toFixed(1)}s • imobiliza por ${st.rootDuration}s • range ${st.range}.`);
+      setMsg($T`${st.name} → nível ${t.level}: recarga ${before.rate.toFixed(1)}s→${st.rate.toFixed(1)}s • imobiliza por ${st.rootDuration}s • range ${st.range}.`);
     }else{
-      setMsg(`${st.name} → nível ${t.level}: dano ${before.damage.toFixed(2)}→${st.damage.toFixed(2)} • velocidade ${(1/before.rate).toFixed(1)}→${(1/st.rate).toFixed(1)}/s${st.globalRange?' • range continua GLOBAL':` • range ${st.range}`}.`);
+      setMsg($T`${st.name} → nível ${t.level}: dano ${before.damage.toFixed(2)}→${st.damage.toFixed(2)} • velocidade ${(1/before.rate).toFixed(1)}→${(1/st.rate).toFixed(1)}/s${st.globalRange?$t(' • range continua GLOBAL'):` • range ${st.range}`}.`);
     }
     updateUpgradePanel();updateStats();
   }
@@ -4061,13 +5403,13 @@ function initPersonalTd(){
   function recordMastery(type,field,amount=1){const s=state.masterySession[type];if(s)s[field]=(s[field]||0)+Math.max(0,Number(amount)||0);}
   function activateMasteryAbility(){
     const t=selectedTower();if(!t||masteryState(t.type).level<50)return;
-    if((t.masteryAbilityCd||0)>0){setMsg(`⭐ ${MASTERY_ABILITIES[t.type].name} recarrega em ${Math.ceil(t.masteryAbilityCd)}s.`);return;}
-    const st=towerStats(t),ab=MASTERY_ABILITIES[t.type],alive=state.enemies.filter(e=>!e.dead);if(!alive.length&&t.type!=='salmon'){setMsg('Não há inimigos no mapa para usar essa habilidade.');return;}
+    if((t.masteryAbilityCd||0)>0){setMsg($T`⭐ ${MASTERY_ABILITIES[t.type].name} recarrega em ${Math.ceil(t.masteryAbilityCd)}s.`);return;}
+    const st=towerStats(t),ab=MASTERY_ABILITIES[t.type],alive=state.enemies.filter(e=>!e.dead);if(!alive.length&&t.type!=='salmon'){setMsg($t('Não há inimigos no mapa para usar essa habilidade.'));return;}
     const strongest=()=>alive.slice().sort((a,b)=>(b.hp||0)-(a.hp||0))[0];
     if(t.type==='dart'){
       alive.forEach(e=>damageEnemy(e,st.damage*.5,{...st,detectsCamo:true,breaksArmor:true}));state.pulses.push({x:W/2,y:H/2,range:Math.max(W,H),life:.45,maxLife:.45,color:'#f3bf67'});
     }else if(t.type==='sniper'){
-      const e=strongest();damageEnemy(e,st.damage*10,{...st,detectsCamo:true,breaksArmor:true});const p=pointAt(e.d,e.path);spawnFloatText(p.x,p.y-30,'💥 EXECUÇÃO ×10','#ffd36b');
+      const e=strongest();damageEnemy(e,st.damage*10,{...st,detectsCamo:true,breaksArmor:true});const p=pointAt(e.d,e.path);spawnFloatText(p.x,p.y-30,$t('💥 EXECUÇÃO ×10'),'#ffd36b');
     }else if(t.type==='frost'){
       alive.forEach(e=>{if(e.kind==='boss'){e.slowTimer=Math.max(e.slowTimer||0,4);e.slowFactor=Math.min(e.slowFactor||1,.18);}else e.rootTimer=Math.max(e.rootTimer||0,3);});
       state.pulses.push({x:W/2,y:H/2,range:Math.max(W,H),life:.5,maxLife:.5,color:'#70caea'});
@@ -4107,7 +5449,7 @@ function initPersonalTd(){
       t.masteryBuffTimer=12;state.pulses.push({x:t.x,y:t.y,range:st.range,life:1,maxLife:1,color:'#8fdcff'});
       for(const e of alive){const p=pointAt(e.d,e.path);if(Math.hypot(p.x-t.x,p.y-t.y)<=st.range&&e.camo)e.revealed=true;}
     }
-    t.masteryAbilityCd=ab.cooldown;recordMastery(t.type,'actions',8);sfx('boss');setMsg(`${ab.icon} ${types[t.type].name}: ${ab.name} ativada!`);updateUpgradePanel();updateStats();
+    t.masteryAbilityCd=ab.cooldown;recordMastery(t.type,'actions',8);sfx('boss');setMsg($T`${ab.icon} ${types[t.type].name}: ${ab.name} ativada!`);updateUpgradePanel();updateStats();
   }
   function heroTargetsInRange(h,st){
     return state.enemies.filter(e=>{if(e.dead)return false;if(!canTowerTarget(h,e,st))return false;const p=pointAt(e.d,e.path);return Math.hypot(p.x-h.x,p.y-h.y)<=st.range&&hasLineOfSight(h,p);});
@@ -4115,26 +5457,26 @@ function initPersonalTd(){
 
   function activateHeroSkill(){
     const h=state.hero;if(!h)return;const def=HEROES[h.type],st=heroStats(h);
-    if((h.stunTimer||0)>0){setMsg(`😵 ${def.name} está atordoado por mais ${Math.ceil(h.stunTimer*10)/10}s.`);return;}
-    if(h.level<5){setMsg(`🔒 ${def.skill.name} libera no nível 5 do herói.`);return;}
-    if(h.skillCd>0){setMsg(`${def.skill.icon} ${def.skill.name} recarrega em ${Math.ceil(h.skillCd)}s.`);return;}
+    if((h.stunTimer||0)>0){setMsg($T`😵 ${def.name} está atordoado por mais ${Math.ceil(h.stunTimer*10)/10}s.`);return;}
+    if(h.level<5){setMsg($T`🔒 ${def.skill.name} libera no nível 5 do herói.`);return;}
+    if(h.skillCd>0){setMsg($T`${def.skill.icon} ${def.skill.name} recarrega em ${Math.ceil(h.skillCd)}s.`);return;}
     if(h.type==='king'){h.commandTimer=8;state.pulses.push({x:h.x,y:h.y,range:st.auraRange,life:.8,maxLife:.8,color:def.color});}
-    if(h.type==='warrior'){const targets=heroTargetsInRange(h,st).sort((a,b)=>((b.hp||0)+(b.innerHp||0))-((a.hp||0)+(a.innerHp||0)));const e=targets[0];if(!e){setMsg('Nenhum inimigo no alcance para o Golpe Heroico.');return;}damageEnemy(e,st.damage*5,st);const p=pointAt(e.d,e.path);spawnFloatText(p.x,p.y-30,'⚔️ ×5',def.color);}
-    if(h.type==='luna'){const targets=heroTargetsInRange(h,st).sort((a,b)=>((b.hp||0)+(b.innerHp||0))-((a.hp||0)+(a.innerHp||0))).slice(0,3);if(!targets.length){setMsg('Nenhum inimigo no alcance para o Passo Lunar.');return;}targets.forEach(e=>{e.d=Math.max(0,e.d-120);const p=pointAt(e.d,e.path);spawnFloatText(p.x,p.y-22,'🌙 RECUO',def.color);});}
+    if(h.type==='warrior'){const targets=heroTargetsInRange(h,st).sort((a,b)=>((b.hp||0)+(b.innerHp||0))-((a.hp||0)+(a.innerHp||0)));const e=targets[0];if(!e){setMsg($t('Nenhum inimigo no alcance para o Golpe Heroico.'));return;}damageEnemy(e,st.damage*5,st);const p=pointAt(e.d,e.path);spawnFloatText(p.x,p.y-30,'⚔️ ×5',def.color);}
+    if(h.type==='luna'){const targets=heroTargetsInRange(h,st).sort((a,b)=>((b.hp||0)+(b.innerHp||0))-((a.hp||0)+(a.innerHp||0))).slice(0,3);if(!targets.length){setMsg($t('Nenhum inimigo no alcance para o Passo Lunar.'));return;}targets.forEach(e=>{e.d=Math.max(0,e.d-120);const p=pointAt(e.d,e.path);spawnFloatText(p.x,p.y-22,$t('🌙 RECUO'),def.color);});}
     if(h.type==='merchant'){const cash=180+h.level*55;state.money+=cash;spawnFloatText(h.x,h.y-34,`🐟 +${cash}`,def.color);}
-    h.skillCd=def.skill.cooldown;sfx('ui');setMsg(`${def.skill.icon} ${def.name}: ${def.skill.name} ativada!`);renderHeroHud();updateStats();
+    h.skillCd=def.skill.cooldown;sfx('ui');setMsg($T`${def.skill.icon} ${def.name}: ${def.skill.name} ativada!`);renderHeroHud();updateStats();
   }
 
   function activateHeroUltimate(){
     const h=state.hero;if(!h)return;const def=HEROES[h.type],st=heroStats(h);
-    if((h.stunTimer||0)>0){setMsg(`😵 ${def.name} está atordoado por mais ${Math.ceil(h.stunTimer*10)/10}s.`);return;}
-    if(h.level<10){setMsg(`🔒 ${def.ultimate.name} libera no nível 10 do herói.`);return;}
-    if(h.ultimateCd>0){setMsg(`${def.ultimate.icon} ${def.ultimate.name} recarrega em ${Math.ceil(h.ultimateCd)}s.`);return;}
+    if((h.stunTimer||0)>0){setMsg($T`😵 ${def.name} está atordoado por mais ${Math.ceil(h.stunTimer*10)/10}s.`);return;}
+    if(h.level<10){setMsg($T`🔒 ${def.ultimate.name} libera no nível 10 do herói.`);return;}
+    if(h.ultimateCd>0){setMsg($T`${def.ultimate.icon} ${def.ultimate.name} recarrega em ${Math.ceil(h.ultimateCd)}s.`);return;}
     if(h.type==='king'){h.ultimateTimer=10;state.pulses.push({x:h.x,y:h.y,range:Math.max(W,H),life:1,maxLife:1,color:def.color});}
-    if(h.type==='warrior'){const targets=heroTargetsInRange(h,st);if(!targets.length){setMsg('Nenhum inimigo no alcance para Mil Cortes.');return;}for(let i=0;i<4;i++)targets.forEach(e=>{if(!e.dead)damageEnemy(e,st.damage*1.25,st);});state.pulses.push({x:h.x,y:h.y,range:st.range,life:.9,maxLife:.9,color:def.color});}
+    if(h.type==='warrior'){const targets=heroTargetsInRange(h,st);if(!targets.length){setMsg($t('Nenhum inimigo no alcance para Mil Cortes.'));return;}for(let i=0;i<4;i++)targets.forEach(e=>{if(!e.dead)damageEnemy(e,st.damage*1.25,st);});state.pulses.push({x:h.x,y:h.y,range:st.range,life:.9,maxLife:.9,color:def.color});}
     if(h.type==='luna'){state.enemies.forEach(e=>{if(e.dead)return;e.slowTimer=Math.max(e.slowTimer||0,8);e.slowFactor=Math.min(e.slowFactor||1,.35);e.markTimer=Math.max(e.markTimer||0,8);e.markBonus=Math.max(e.markBonus||0,.25);});state.pulses.push({x:W/2,y:H/2,range:Math.max(W,H),life:1.2,maxLife:1.2,color:def.color});}
     if(h.type==='merchant'){const cash=700+h.level*80;state.money+=cash;h.farmBoostWaves=2;spawnFloatText(h.x,h.y-36,`🐟 +${cash}`,def.color);}
-    h.ultimateCd=def.ultimate.cooldown;sfx('boss');setMsg(`${def.ultimate.icon} ${def.name}: ${def.ultimate.name} ativada!`);renderHeroHud();updateStats();
+    h.ultimateCd=def.ultimate.cooldown;sfx('boss');setMsg($T`${def.ultimate.icon} ${def.name}: ${def.ultimate.name} ativada!`);renderHeroHud();updateStats();
   }
 
   // v0.19.0: no ritmo antigo, mastear UM gatinho (chegar ao Nv.50) exigia algo
@@ -4182,14 +5524,14 @@ function initPersonalTd(){
       });
       if(spotted){
         e.revealed=true;
-        spawnFloatText(p.x,p.y-20,'👁 Camo revelado!','#70caea');
+        spawnFloatText(p.x,p.y-20,$t('👁 Camo revelado!'),'#70caea');
       }
     }
   }
 
   const TOWER_TURN_RATE=11; // rad/s — velocidade com que o gatinho gira o corpo/arma até o alvo
   const TARGET_PRIORITIES=['first','last','strong','weak','camo','armored'];
-  const TARGET_PRIORITY_LABELS={first:'Primeiro',last:'Último',strong:'Mais forte',weak:'Mais fraco',camo:'Camuflado primeiro',armored:'Blindado primeiro'};
+  const TARGET_PRIORITY_LABELS={first:$t('Primeiro'),last:$t('Último'),strong:$t('Mais forte'),weak:$t('Mais fraco'),camo:$t('Camuflado primeiro'),armored:$t('Blindado primeiro')};
   function targetPriorityScore(e,mode){
     const power=(e.hp||0)+(e.armored?(e.innerHp||0):0);
     switch(mode){
@@ -4281,7 +5623,7 @@ function initPersonalTd(){
     if(markTower?.type==='sniper')enemy.sniperMarkTimer=Math.max(enemy.sniperMarkTimer||0,duration);
     if(bonus>previous+.001||previousTimer<.35){
       const p=pointAt(enemy.d,enemy.path);
-      spawnFloatText(p.x,p.y-28,`🎯 MARCADO +${Math.round(enemy.markBonus*100)}%`,'#c8b2ff');
+      spawnFloatText(p.x,p.y-28,$T`🎯 MARCADO +${Math.round(enemy.markBonus*100)}%`,'#c8b2ff');
     }
   }
 
@@ -4312,8 +5654,8 @@ function initPersonalTd(){
     const p=pointAt(target.d,target.path);
     state.airstrikes.push({x:-72,y:54+((t.id*23)%70),speed:430,targetId:target.id,targetX:p.x,targetY:p.y,dropped:false,towerId:t.id,sourceStats:{...st,breaksArmor:true,detectsCamo:true,markBonus:0,observerMark:0}});
     t.planeTimer=0;t.planeLastWave=state.wave;
-    spawnFloatText(t.x,t.y-32,'✈ COMANDO AÉREO','#70caea');
-    setMsg(`✈ ${st.name}: avião enviado contra o inimigo mais forte da rodada.`);
+    spawnFloatText(t.x,t.y-32,$t('✈ COMANDO AÉREO'),'#70caea');
+    setMsg($T`✈ ${st.name}: avião enviado contra o inimigo mais forte da rodada.`);
     return true;
   }
 
@@ -4386,13 +5728,13 @@ function initPersonalTd(){
     if(label)spawnFloatText(p.x,p.y-18,label,'#ffd6a0');
   }
 
-  function stripOneLayer(enemy,label='-1 camada'){
+  function stripOneLayer(enemy,label=$t('-1 camada')){
     if(!enemy||enemy.dead||enemy.kind==='boss'||enemy.armored)return 0;
     const stolen=Math.min(1,Math.max(0,enemy.hp||0));
     if(stolen<=0)return 0;
     enemy.hp-=stolen;
     const p=pointAt(enemy.d,enemy.path);spawnFloatText(p.x,p.y-16,label,'#ffbd7a');
-    if(enemy.hp<=0)popEnemyWithoutReward(enemy,'💨 camada perdida');
+    if(enemy.hp<=0)popEnemyWithoutReward(enemy,$t('💨 camada perdida'));
     return stolen;
   }
 
@@ -4410,7 +5752,7 @@ function initPersonalTd(){
           const op=pointAt(other.d,other.path);if(Math.hypot(op.x-ep.x,op.y-ep.y)>(e.healRadius||76))continue;
           const before=other.hp;other.hp=Math.min(other.maxHp,other.hp+1);if(other.hp>before)healed++;
         }
-        if(healed){state.pulses.push({x:ep.x,y:ep.y,range:e.healRadius||76,life:.34,maxLife:.34,color:'#62d887'});spawnFloatText(ep.x,ep.y-28,`❤️ +1 camada ×${healed}`,'#8dffad');}
+        if(healed){state.pulses.push({x:ep.x,y:ep.y,range:e.healRadius||76,life:.34,maxLife:.34,color:'#62d887'});spawnFloatText(ep.x,ep.y-28,$T`❤️ +1 camada ×${healed}`,'#8dffad');}
       }else if(e.kind==='trickster'){
         e.specialTimer+=7;
         const target=state.enemies.filter(o=>!o.dead&&o!==e&&o.kind!=='boss'&&!o.armored&&o.path===e.path&&o.d>e.d).sort((a,b)=>a.d-b.d)[0];
@@ -4427,15 +5769,15 @@ function initPersonalTd(){
         const candidates=state.enemies.filter(o=>!o.dead&&o!==e&&o.kind!=='angel'&&(o.divineShield||0)<=0);
         let target=null,best=Infinity;
         for(const o of candidates){const op=pointAt(o.d,o.path),dist=Math.hypot(op.x-ep.x,op.y-ep.y);if(dist<=(e.shieldRadius||88)&&dist<best){best=dist;target=o;}}
-        if(target){target.divineShield=1;target.angelSlowFactor=.82;const tp=pointAt(target.d,target.path);state.pulses.push({x:tp.x,y:tp.y,range:34,life:.5,maxLife:.5,color:'#f4efc7'});spawnFloatText(tp.x,tp.y-28,'🛡 ESCUDO DIVINO','#fff2a8');}
+        if(target){target.divineShield=1;target.angelSlowFactor=.82;const tp=pointAt(target.d,target.path);state.pulses.push({x:tp.x,y:tp.y,range:34,life:.5,maxLife:.5,color:'#f4efc7'});spawnFloatText(tp.x,tp.y-28,$t('🛡 ESCUDO DIVINO'),'#fff2a8');}
       }else if(e.kind==='demon'){
         e.specialTimer+=2.5;
         const donors=[];
         for(const o of state.enemies){if(o.dead||o===e||o.kind==='boss'||o.kind==='demon'||o.armored)continue;const op=pointAt(o.d,o.path);if(Math.hypot(op.x-ep.x,op.y-ep.y)<=(e.drainRadius||78))donors.push(o);}
         donors.sort((a,b)=>Math.abs(a.d-e.d)-Math.abs(b.d-e.d));
         let gained=0;
-        for(const donor of donors.slice(0,2)){if(e.maxHp>=e.demonMaxHp-.001)break;const stolen=stripOneLayer(donor,'😈 -1 camada');if(stolen>0){const add=Math.min(stolen,e.demonMaxHp-e.maxHp);e.maxHp+=add;e.hp+=add;gained+=add;}}
-        if(gained>0){state.pulses.push({x:ep.x,y:ep.y,range:e.drainRadius||78,life:.4,maxLife:.4,color:'#a94455'});spawnFloatText(ep.x,ep.y-30,`😈 +${Number(gained.toFixed(1))} VIDA MÁX`,'#ff8b8f');}
+        for(const donor of donors.slice(0,2)){if(e.maxHp>=e.demonMaxHp-.001)break;const stolen=stripOneLayer(donor,$t('😈 -1 camada'));if(stolen>0){const add=Math.min(stolen,e.demonMaxHp-e.maxHp);e.maxHp+=add;e.hp+=add;gained+=add;}}
+        if(gained>0){state.pulses.push({x:ep.x,y:ep.y,range:e.drainRadius||78,life:.4,maxLife:.4,color:'#a94455'});spawnFloatText(ep.x,ep.y-30,$T`😈 +${Number(gained.toFixed(1))} VIDA MÁX`,'#ff8b8f');}
       }
     }
   }
@@ -4452,7 +5794,7 @@ function initPersonalTd(){
       enemy.fearBonus=Math.max(enemy.fearBonus||0,vuln);
       enemy.fearSource={...st,sourceTowerId:t.id,sourceType:'demonking'};
       affected++;
-      spawnFloatText(p.x,p.y-30,'😨 MEDO','#d48cff');
+      spawnFloatText(p.x,p.y-30,$t('😨 MEDO'),'#d48cff');
     }
     if(affected){state.pulses.push({x:t.x,y:t.y,range:radius,life:.75,maxLife:.75,color:'#a64dff'});recordMastery('demonking','actions',affected);}
     return affected;
@@ -4465,7 +5807,7 @@ function initPersonalTd(){
       const baseHp=Math.max(1,enemy.maxHp||1);
       state.shadowBloons.push({path:enemy.path||0,d:Math.max(0,pathTotal(enemy.path)-4-i*12),hp:isBoss?6:Math.max(2,Math.min(6,2+Math.floor(baseHp/3))),damage:(isBoss?8.5:Math.max(2,Math.min(8,1.6+baseHp*.34)))*(source?.shadowDamageMult||1),speed:isBoss?105:92,cool:0,life:18,source:{...(source||types.demonking),sourceType:'demonking',isShadowSummon:true}});
     }
-    const p=pointAt(pathTotal(enemy.path),enemy.path);spawnFloatText(p.x,p.y-26,isBoss?'🌑 ×3 SOMBRAS':'🌑 SOMBRA INVOCADA','#d48cff');
+    const p=pointAt(pathTotal(enemy.path),enemy.path);spawnFloatText(p.x,p.y-26,isBoss?$t('🌑 ×3 SOMBRAS'):$t('🌑 SOMBRA INVOCADA'),'#d48cff');
   }
 
   function updateShadowBloons(dt){
@@ -4497,7 +5839,7 @@ function initPersonalTd(){
 
     if((enemy.divineShield||0)>0){
       enemy.divineShield=0;enemy.angelSlowFactor=1;
-      const p=pointAt(enemy.d,enemy.path);spawnFloatText(p.x,p.y-28,'🛡 BLOQUEADO','#fff1a6');
+      const p=pointAt(enemy.d,enemy.path);spawnFloatText(p.x,p.y-28,$t('🛡 BLOQUEADO'),'#fff1a6');
       state.pulses.push({x:p.x,y:p.y,range:34,life:.34,maxLife:.34,color:'#f4efc7'});
       return false;
     }
@@ -4505,7 +5847,7 @@ function initPersonalTd(){
       const cap=enemy.moneyPenaltyCap||500,penalty=Math.min(cap,Math.max(1,Math.ceil(dealt))),lost=Math.min(state.money,penalty);
       state.money=Math.max(0,state.money-lost);
       const p=pointAt(enemy.d,enemy.path);spawnFloatText(p.x,p.y-32,`🃏 -🐟 ${lost}`,'#ff8fbf');
-      if(penalty>=cap)spawnFloatText(p.x,p.y-46,'LIMITE 🐟 500','#ffd0e4');
+      if(penalty>=cap)spawnFloatText(p.x,p.y-46,$t('LIMITE 🐟 500'),'#ffd0e4');
     }
 
     const sourceTower=Number.isFinite(source.sourceTowerId)?state.towers.find(t=>t.id===source.sourceTowerId):null;
@@ -4519,7 +5861,7 @@ function initPersonalTd(){
       if(sourceTower){sourceTower.damageDealt=(sourceTower.damageDealt||0)+actual;recordMastery(sourceTower.type,'damage',actual);}
       if(sourceHero)sourceHero.damageDealt=(sourceHero.damageDealt||0)+actual;
       if(source.sourceType==='burst'&&synergyActive('improvisedArtillery'))enemy.powderTimer=Math.max(enemy.powderTimer||0,4);
-      if(enemy.armorHp<=0){breakArmor(enemy);setMsg('💥 Blindagem quebrada: saiu um balão normal de dentro!');}
+      if(enemy.armorHp<=0){breakArmor(enemy);setMsg($t('💥 Blindagem quebrada: saiu um balão normal de dentro!'));}
       return true;
     }
     if(enemy.kind==='regen'||enemy.kind==='boss')enemy.regenPause=1.6;
@@ -4544,7 +5886,7 @@ function initPersonalTd(){
         const bonusCoins=Math.round(20*currentDifficulty().coinMultiplier);
         profile.coins+=bonusCoins;saveProfile();
         spawnFloatText(p.x,p.y-18,`👑 +🐟 ${enemy.reward} • +🪙${bonusCoins}`,'#ffd36b');
-        setMsg(`👑 Você derrotou ${enemy.name}! +🐟 ${enemy.reward} na partida e +🪙${bonusCoins} moedas permanentes.`);
+        setMsg($T`👑 Você derrotou ${enemy.name}! +🐟 ${enemy.reward} na partida e +🪙${bonusCoins} moedas permanentes.`);
       }else{
         sfx('pop');
         state.money+=enemy.reward;
@@ -4557,7 +5899,7 @@ function initPersonalTd(){
   function applyBurn(enemy,burn,source){
     if(!enemy||enemy.dead||!burn)return;
     enemy.burn={damage:burn.damage||1,interval:burn.interval||2,ticks:burn.ticks||4,timer:burn.interval||2,source};
-    const p=pointAt(enemy.d,enemy.path);spawnFloatText(p.x,p.y-24,'🔥 queimando','#ff9b63');
+    const p=pointAt(enemy.d,enemy.path);spawnFloatText(p.x,p.y-24,$t('🔥 queimando'),'#ff9b63');
   }
 
   function processFarmIncome(){
@@ -4586,7 +5928,7 @@ function initPersonalTd(){
       if(cash>0&&synergyActive('fishMarket')&&next%5===0){
         const festival=Math.max(1,Math.round(cash*.35));cash+=festival;
         const fx=state.hero||farms[0];if(fx)spawnFloatText(fx.x,fx.y-52,`🎣🐟 FESTIVAL +${festival}`,'#ffe0a1');
-        setMsg(`🎣🐟 Mercado de Peixes: Festival do Salmão! +${festival} salmões de renda extra na rodada ${next}.`);
+        setMsg($T`🎣🐟 Mercado de Peixes: Festival do Salmão! +${festival} salmões de renda extra na rodada ${next}.`);
       }
       if(cash>0){state.money+=cash;awards.push({wave:next,cash});}
     }
@@ -4616,7 +5958,7 @@ function initPersonalTd(){
       if(next%10===0&&!state.paidMilestones.has(next)){
         const coins=infiniteMilestoneReward(next);
         state.paidMilestones.add(next);profile.coins+=coins;awards.push({wave:next,coins});
-        sfx('win');setMsg(`🪙 Marco do Infinito! Rodada ${next} concluída: +${coins} moedas permanentes. Próximo prêmio na rodada ${next+10}.`);
+        sfx('win');setMsg($T`🪙 Marco do Infinito! Rodada ${next} concluída: +${coins} moedas permanentes. Próximo prêmio na rodada ${next+10}.`);
       }
     }
     if(advanced)saveProfile();
@@ -4635,8 +5977,8 @@ function initPersonalTd(){
     const levels=grantXp(xpReward);
     const secretUnlocks=discoverSecretUnlocks();
     saveProfile();
-    const levelText=levels.length?` • 🎖️ Subiu para o nível ${profile.level}!`:'';
-    setMsg(`🏆 ${map.name} • ${diff.name} concluído! ${newStar?'⭐ Nova estrela! ':''}+🪙 ${coinReward} • +${xpReward} XP${levelText}`);
+    const levelText=levels.length?$T` • 🎖️ Subiu para o nível ${profile.level}!`:'';
+    setMsg($T`🏆 ${map.name} • ${diff.name} concluído! ${newStar?$t('⭐ Nova estrela! '):''}+🪙 ${coinReward} • +${xpReward} XP${levelText}`);
     updateStats();
     showResult(true,{coins:coinReward,xp:xpReward});
     if(secretUnlocks.length)setTimeout(()=>queueSecretReveals(secretUnlocks),450);
@@ -4691,7 +6033,7 @@ function initPersonalTd(){
             const blast=Math.min(e.temporalArcaneDamage,Math.max(4,(e.maxHp||20)*.28)),src=e.temporalArcaneSource||{detectsCamo:true,breaksArmor:true};
             state.enemies.forEach(other=>{if(other.dead)return;const op=pointAt(other.d,other.path);if(Math.hypot(op.x-tp.x,op.y-tp.y)<=72)damageEnemy(other,blast,src);});
             state.pulses.push({x:tp.x,y:tp.y,range:72,life:.45,maxLife:.45,color:'#c9adff'});
-            spawnFloatText(tp.x,tp.y-42,'✨ PARADOXO!','#e5d6ff');
+            spawnFloatText(tp.x,tp.y-42,$t('✨ PARADOXO!'),'#e5d6ff');
             e.temporalArcaneDamage=0;e.temporalArcaneSource=null;e.temporalArcaneCharges=0;
           }
           e.temporalMark=null;
@@ -4712,12 +6054,12 @@ function initPersonalTd(){
         const p=pointAt(pathTotal(e.path),e.path);
         if(e.kind==='boss'&&e.miniBoss){
           const lost=Math.min(state.lives,8);state.lives=Math.max(0,state.lives-lost);
-          spawnFloatText(p.x,p.y-18,`👹 -${lost} vidas`,'#f29b54');
+          spawnFloatText(p.x,p.y-18,$T`👹 -${lost} vidas`,'#f29b54');
           sfx('bossleak');
         }else if(e.kind==='boss'){
           // O chefão final que escapa tira TODAS as vidas restantes na hora.
           state.lives=0;
-          spawnFloatText(p.x,p.y-18,'💀 Chefão escapou!','#ff5b5b');
+          spawnFloatText(p.x,p.y-18,$t('💀 Chefão escapou!'),'#ff5b5b');
           sfx('bossleak');
           playMusicTheme(state.map);
         }else{
@@ -4764,8 +6106,8 @@ function initPersonalTd(){
           }).sort((a,b)=>b.d-a.d)[0];
           if(candidate){
             const p=pointAt(candidate.d,candidate.path);
-            if(candidate.camo){candidate.camo=false;candidate.revealed=true;spawnFloatText(p.x,p.y-28,'👁 NORMALIZADO','#f5e7a6');}
-            if(candidate.armored){breakArmor(candidate);spawnFloatText(p.x,p.y-42,'✨ BLINDAGEM REMOVIDA','#f5e7a6');}
+            if(candidate.camo){candidate.camo=false;candidate.revealed=true;spawnFloatText(p.x,p.y-28,$t('👁 NORMALIZADO'),'#f5e7a6');}
+            if(candidate.armored){breakArmor(candidate);spawnFloatText(p.x,p.y-42,$t('✨ BLINDAGEM REMOVIDA'),'#f5e7a6');}
             t.normalizeCooldown=1.5;
           }
         }
@@ -4797,7 +6139,7 @@ function initPersonalTd(){
           if(st.markBonus)applyTargetMark(enemy,st);
           const ep=pointAt(enemy.d,enemy.path);
           state.pulses.push({x:ep.x,y:ep.y,range:enemy.kind==='boss'?42:28,life:.42,maxLife:.42,color:st.color});
-          spawnFloatText(ep.x,ep.y-24,enemy.kind==='boss'?'🌿 BOSS preso':'🌿 preso',st.color);
+          spawnFloatText(ep.x,ep.y-24,enemy.kind==='boss'?$t('🌿 BOSS preso'):$t('🌿 preso'),st.color);
         }
         return;
       }
@@ -4873,7 +6215,7 @@ function initPersonalTd(){
         const shotDamage=st.damage*damageBoost*(critical?st.critMultiplier:1);
         state.shots.push({x:t.x,y:t.y,tx:p.x,ty:p.y,target:target.id,type:'sniper',sourceType:t.type,sourceStats:st,towerId:t.id,
           speed:1280,damage:shotDamage,slow:0,splash:0,color:critical?'#ffd36b':st.color,level:Math.max(...sniperPaths(t)),pierceTargets:st.pierceTargets||1,critical});
-        if(critical)spawnFloatText(t.x,t.y-30,'🎯 CRÍTICO!','#ffd36b');
+        if(critical)spawnFloatText(t.x,t.y-30,$t('🎯 CRÍTICO!'),'#ffd36b');
         return;
       }
 
@@ -4922,25 +6264,25 @@ function initPersonalTd(){
           if(hit)applyTargetMark(target,source);
           if(hit&&s.sourceType==='sniper'&&synergyActive('silentHunt')){
             const fresh=(target.sniperMarkTimer||0)<=0;target.sniperMarkTimer=Math.max(target.sniperMarkTimer||0,3.5);
-            if(fresh){const sp=pointAt(target.d,target.path);spawnFloatText(sp.x,sp.y-36,'🎯 ALVO DA CAÇADA','#cdb8ff');}
+            if(fresh){const sp=pointAt(target.d,target.path);spawnFloatText(sp.x,sp.y-36,$t('🎯 ALVO DA CAÇADA'),'#cdb8ff');}
           }
           if(hit&&s.burn&&!target.dead)applyBurn(target,s.burn,source);
           if(hit&&s.slow&&!target.armored)applySlow(target,s.slow,source&&source.slowFactor);
           if(hit&&s.sourceType==='dart'&&synergyActive('improvisedArtillery')&&(target.powderTimer||0)>0){
             target.powderTimer=0;const dp=pointAt(target.d,target.path);
             state.enemies.forEach(other=>{if(other.dead||other===target)return;const op=pointAt(other.d,other.path);if(Math.hypot(op.x-dp.x,op.y-dp.y)<=58)damageEnemy(other,impactDamage*.40,source);});
-            state.pulses.push({x:dp.x,y:dp.y,range:58,life:.30,maxLife:.30,color:'#ffb16d'});spawnFloatText(dp.x,dp.y-34,'🐱💥 ESTILHAÇOS','#ffd19b');
+            state.pulses.push({x:dp.x,y:dp.y,range:58,life:.30,maxLife:.30,color:'#ffb16d'});spawnFloatText(dp.x,dp.y-34,$t('🐱💥 ESTILHAÇOS'),'#ffd19b');
           }
           if(hit&&s.sourceType==='wizard'&&synergyActive('enchantedForest')&&(target.rootTimer||0)>0&&(target.arcaneBloomCd||0)<=0){
             target.arcaneBloomCd=1.05;const wp=pointAt(target.d,target.path);
             state.enemies.forEach(other=>{if(other.dead)return;const op=pointAt(other.d,other.path);if(Math.hypot(op.x-wp.x,op.y-wp.y)<=68)damageEnemy(other,impactDamage*.55,source);});
-            state.pulses.push({x:wp.x,y:wp.y,range:68,life:.36,maxLife:.36,color:'#bca8ff'});spawnFloatText(wp.x,wp.y-34,'🌿✨ FLOR ARCANA','#e1d7ff');
+            state.pulses.push({x:wp.x,y:wp.y,range:68,life:.36,maxLife:.36,color:'#bca8ff'});spawnFloatText(wp.x,wp.y-34,$t('🌿✨ FLOR ARCANA'),'#e1d7ff');
           }
           if(hit&&s.sourceType==='laser'&&synergyActive('plasmaCatalyst')&&(target.alchemyStage||0)>0){
             target.plasmaCatalystHits=(target.plasmaCatalystHits||0)+1;
             if(target.plasmaCatalystHits>=4){target.plasmaCatalystHits=0;const lp=pointAt(target.d,target.path),blast=Math.max(2.5,impactDamage*2.4);
               state.enemies.forEach(other=>{if(other.dead)return;const op=pointAt(other.d,other.path);if(Math.hypot(op.x-lp.x,op.y-lp.y)<=62)damageEnemy(other,blast,source);});
-              target.alchemyStage=0;state.pulses.push({x:lp.x,y:lp.y,range:62,life:.33,maxLife:.33,color:'#c6ff79'});spawnFloatText(lp.x,lp.y-34,'🔴🧪 CATALISADO!','#e4ff9d');}
+              target.alchemyStage=0;state.pulses.push({x:lp.x,y:lp.y,range:62,life:.33,maxLife:.33,color:'#c6ff79'});spawnFloatText(lp.x,lp.y-34,$t('🔴🧪 CATALISADO!'),'#e4ff9d');}
           }
           if(hit&&s.sourceType==='wizard'&&synergyActive('arcaneParadox')&&target.temporalMark){
             target.temporalArcaneCharges=Math.min(5,(target.temporalArcaneCharges||0)+1);
@@ -4950,27 +6292,27 @@ function initPersonalTd(){
           if(hit&&s.sourceType==='boomerang'){
             const center=pointAt(target.d,target.path),near=state.enemies.filter(e=>{if(e.dead||e===target)return false;const ep=pointAt(e.d,e.path);return Math.hypot(ep.x-center.x,ep.y-center.y)<=150;}).sort((a,b)=>{const ap=pointAt(a.d,a.path),bp=pointAt(b.d,b.path);return Math.hypot(ap.x-center.x,ap.y-center.y)-Math.hypot(bp.x-center.x,bp.y-center.y);}).slice(0,Math.max(0,(s.boomerangTargets||3)-1));
             const hitList=[target,...near];near.forEach(e=>damageEnemy(e,s.damage*.82,source));hitList.forEach(e=>{if(e.dead)return;const chilled=(e.slowTimer||0)>0&&synergyActive('glacialReturn'),mult=(s.returnMultiplier||.58)*(chilled?1.35:1);damageEnemy(e,s.damage*mult,source);if(chilled&&!e.armored)applySlow(e,1.2,.38);});
-            if(hitList.some(e=>(e.slowTimer||0)>0)&&synergyActive('glacialReturn')){const bp=pointAt(target.d,target.path);spawnFloatText(bp.x,bp.y-40,'🪃❄️ RETORNO GLACIAL','#c7f1ff');}
+            if(hitList.some(e=>(e.slowTimer||0)>0)&&synergyActive('glacialReturn')){const bp=pointAt(target.d,target.path);spawnFloatText(bp.x,bp.y-40,$t('🪃❄️ RETORNO GLACIAL'),'#c7f1ff');}
             const pts=[{x:s.x,y:s.y},...hitList.map(e=>pointAt(e.d,e.path)),{x:s.x,y:s.y}];state.lightning.push({points:pts,life:.22,maxLife:.22,color:'#f3c168',kind:'boomerang'});
           }
           if(hit&&s.sourceType==='alchemist'){
             const full=s.alchemyPhilosopher,stage=full?3:((target.alchemyStage||0)%3)+1,ap=pointAt(target.d,target.path);
-            if(stage===1||full){applyBurn(target,{damage:source.alchemyPoison||.65,interval:1.1,ticks:4},source);spawnFloatText(ap.x,ap.y-24,'🧪 VENENO','#9df36f');}
-            if(stage===2||full){target.markTimer=Math.max(target.markTimer||0,4.5);target.markBonus=Math.max(target.markBonus||0,source.alchemyMark||.14);spawnFloatText(ap.x,ap.y-24,'⚗️ FRAQUEZA','#d0ff8a');}
-            if(stage===3||full){const radius=Math.max(72,source.splash||58)*1.35;state.enemies.forEach(e=>{if(e.dead)return;const ep=pointAt(e.d,e.path);if(Math.hypot(ep.x-ap.x,ep.y-ap.y)<=radius)damageEnemy(e,s.damage*(source.alchemyExplosion||1.45),source);});state.pulses.push({x:ap.x,y:ap.y,range:radius,life:.38,maxLife:.38,color:'#b7ff75'});spawnFloatText(ap.x,ap.y-30,'💥 REAÇÃO!','#e8ff9d');}
+            if(stage===1||full){applyBurn(target,{damage:source.alchemyPoison||.65,interval:1.1,ticks:4},source);spawnFloatText(ap.x,ap.y-24,$t('🧪 VENENO'),'#9df36f');}
+            if(stage===2||full){target.markTimer=Math.max(target.markTimer||0,4.5);target.markBonus=Math.max(target.markBonus||0,source.alchemyMark||.14);spawnFloatText(ap.x,ap.y-24,$t('⚗️ FRAQUEZA'),'#d0ff8a');}
+            if(stage===3||full){const radius=Math.max(72,source.splash||58)*1.35;state.enemies.forEach(e=>{if(e.dead)return;const ep=pointAt(e.d,e.path);if(Math.hypot(ep.x-ap.x,ep.y-ap.y)<=radius)damageEnemy(e,s.damage*(source.alchemyExplosion||1.45),source);});state.pulses.push({x:ap.x,y:ap.y,range:radius,life:.38,maxLife:.38,color:'#b7ff75'});spawnFloatText(ap.x,ap.y-30,$t('💥 REAÇÃO!'),'#e8ff9d');}
             target.alchemyStage=full?0:stage;
             target.alchemyStageTimer=full?0:8;
           }
           if(hit&&s.sourceType==='chronomancer'){
-            if(!target.temporalMark)target.temporalMark={timer:source.temporalDelay||3.2,snapshotD:target.d};if(!target.armored)applySlow(target,Math.max(1,source.slow||1.3),source.slowFactor||.72);const cp=pointAt(target.d,target.path);spawnFloatText(cp.x,cp.y-24,'⏳ MARCADO','#9de7ff');
+            if(!target.temporalMark)target.temporalMark={timer:source.temporalDelay||3.2,snapshotD:target.d};if(!target.armored)applySlow(target,Math.max(1,source.slow||1.3),source.slowFactor||.72);const cp=pointAt(target.d,target.path);spawnFloatText(cp.x,cp.y-24,$t('⏳ MARCADO'),'#9de7ff');
           }
-          if(hit&&s.sourceType==='demonking'){const dp=pointAt(target.d,target.path);state.pulses.push({x:dp.x,y:dp.y,range:Math.max(48,s.splash||78),life:.38,maxLife:.38,color:'#7d2dc2'});spawnFloatText(dp.x,dp.y-32,'🔥🌑 FOGO SOMBRIO','#d48cff');}
+          if(hit&&s.sourceType==='demonking'){const dp=pointAt(target.d,target.path);state.pulses.push({x:dp.x,y:dp.y,range:Math.max(48,s.splash||78),life:.38,maxLife:.38,color:'#7d2dc2'});spawnFloatText(dp.x,dp.y-32,$t('🔥🌑 FOGO SOMBRIO'),'#d48cff');}
           if(hit&&s.sourceType==='celestial'){
             const cp=pointAt(target.d,target.path);
-            if(s.celestialReveal&&target.camo){target.revealed=true;spawnFloatText(cp.x,cp.y-28,'👁 REVELADO','#8fdcff');}
+            if(s.celestialReveal&&target.camo){target.revealed=true;spawnFloatText(cp.x,cp.y-28,$t('👁 REVELADO'),'#8fdcff');}
             if(s.celestialStrip&&target.armored&&!target.dead){
               target.celestialStripHits=(target.celestialStripHits||0)+1;
-              if(target.celestialStripHits>=3){target.celestialStripHits=0;breakArmor(target);spawnFloatText(cp.x,cp.y-40,'✨ DESBLINDADO','#f5e7a6');}
+              if(target.celestialStripHits>=3){target.celestialStripHits=0;breakArmor(target);spawnFloatText(cp.x,cp.y-40,$t('✨ DESBLINDADO'),'#f5e7a6');}
               else spawnFloatText(cp.x,cp.y-40,`✨ ${target.celestialStripHits}/3`,'#f5e7a6');
             }
           }
@@ -5019,21 +6361,21 @@ function initPersonalTd(){
     const milestoneAwards=processClearedRounds();
     if(farmAwards.length&&(state.enemies.length||state.spawn.length)){
       const last=farmAwards[farmAwards.length-1],totalFarm=farmAwards.reduce((sum,x)=>sum+x.cash,0);
-      setMsg(`🎣 Pescadores renderam +🐟 ${totalFarm} ao concluir ${farmAwards.length>1?`${farmAwards.length} rodadas`:`a rodada ${last.wave}`}.`);
+      setMsg($T`🎣 Pescadores renderam +🐟 ${totalFarm} ao concluir ${farmAwards.length>1?$T`${farmAwards.length} rodadas`:$T`a rodada ${last.wave}`}.`);
     }
     if(state.waveActive&&!state.enemies.length&&!state.spawn.length){
       state.waveActive=false;
       const settled=settleCalledWaves();
       if(!isInfinite()&&state.wave>=mapRounds(state.map,state.difficulty))completeMap();
       else{
-        const levelText=settled.levels.length?` • 🎖️ Nível ${profile.level}!`:'';
-        const milestoneText=milestoneAwards.length?` • 🪙 +${milestoneAwards.reduce((sum,x)=>sum+x.coins,0)} moedas permanentes`:'';
-        const farmText=farmAwards.length?` • 🎣 +🐟 ${farmAwards.reduce((sum,x)=>sum+x.cash,0)} dos Pescadores`:'';
-        setMsg(`${isInfinite()?'∞ ':''}Campo limpo após a rodada ${state.wave}. +🐟 ${settled.cash} • +${settled.xp} XP${farmText}${milestoneText}${levelText} Você pode chamar a próxima.`);
+        const levelText=settled.levels.length?$T` • 🎖️ Nível ${profile.level}!`:'';
+        const milestoneText=milestoneAwards.length?$T` • 🪙 +${milestoneAwards.reduce((sum,x)=>sum+x.coins,0)} moedas permanentes`:'';
+        const farmText=farmAwards.length?$T` • 🎣 +🐟 ${farmAwards.reduce((sum,x)=>sum+x.cash,0)} dos Pescadores`:'';
+        setMsg($T`${isInfinite()?'∞ ':''}Campo limpo após a rodada ${state.wave}. +🐟 ${settled.cash} • +${settled.xp} XP${farmText}${milestoneText}${levelText} Você pode chamar a próxima.`);
       }
     }
     if(state.lives<=0&&!state.defeatShown){
-      state.defeatShown=true;playMusicTheme(state.map);setMsg(isInfinite()?`∞ Fim do Infinito. Você concluiu ${state.lastClearedWave} rodadas.`:'Fim de jogo. Reinicie o mapa e tente outra estratégia.');showResult(false);
+      state.defeatShown=true;playMusicTheme(state.map);setMsg(isInfinite()?$T`∞ Fim do Infinito. Você concluiu ${state.lastClearedWave} rodadas.`:$t('Fim de jogo. Reinicie o mapa e tente outra estratégia.'));showResult(false);
     }
     updateStats();
   }
@@ -5455,7 +6797,7 @@ function drawMap(){
     ctx.fillStyle=map.ground;ctx.fillRect(0,H*.49,W,H*.51);
     // Cabine do pedágio no miolo da praça ao redor da qual a rota faz a volta.
     ctx.fillStyle='#737984';ctx.fillRect(347,270,7,68);ctx.fillStyle='#a87aff';ctx.fillRect(312,266,76,9);
-    ctx.fillStyle='#f3f3fa';ctx.font='800 10px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText('PEDÁGIO',350,258);
+    ctx.fillStyle='#f3f3fa';ctx.font='800 10px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText($t('PEDÁGIO'),350,258);
     drawLamp(360,110,62);drawLamp(560,415,62);drawLamp(150,235,62);drawLamp(740,490,62);
   }else if(state.map==='meadow'){
     ctx.fillStyle=map.ground;ctx.fillRect(0,H*.40,W,H*.60);
@@ -5534,7 +6876,7 @@ function drawMap(){
       ctx.fillStyle='#fff0b7';ctx.font='900 13px Segoe UI Emoji,Segoe UI';ctx.textAlign='center';ctx.fillText('🐾',p.x+p.w/2,p.y+p.h/2+5);
     });
     ctx.fillStyle='#dcc59b';ctx.fillRect(W/2-65,112,130,12);ctx.fillStyle='#7c5664';ctx.fillRect(W/2-54,124,108,24);
-    ctx.fillStyle='#ffe7a8';ctx.font='900 16px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText('FESTA FELINA',W/2,141);
+    ctx.fillStyle='#ffe7a8';ctx.font='900 16px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText($t('FESTA FELINA'),W/2,141);
   }else if(state.map==='blind'){
     // Passagem Cega: neblina espessa o tempo todo — a visão curta das torres é o ponto do mapa.
     ctx.fillStyle=map.ground;ctx.fillRect(0,H*.08,W,H*.92);
@@ -5623,7 +6965,7 @@ function drawEnemy(e){
       ctx.fillStyle='#454e59';ctx.strokeStyle='#e7c66b';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();ctx.stroke();
       ctx.fillStyle='#333a43';ctx.beginPath();ctx.arc(0,0,r*.7,0,Math.PI*2);ctx.fill();
       ctx.strokeStyle='#dcc98a';ctx.lineWidth=2;for(let a=Math.PI/4;a<Math.PI*2;a+=Math.PI/2){ctx.beginPath();ctx.arc(Math.cos(a)*r*.74,Math.sin(a)*r*.74,2.4,0,Math.PI*2);ctx.stroke();}
-      ctx.fillStyle='#ffe9b0';ctx.font='900 7px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText('PESADO',0,3);
+      ctx.fillStyle='#ffe9b0';ctx.font='900 7px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText($t('PESADO'),0,3);
     }else if(e.armored){
       ctx.fillStyle='#77818e';ctx.strokeStyle='#d4d8df';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#4d5663';ctx.beginPath();ctx.arc(0,0,r*.68,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#cbd1da';ctx.lineWidth=2;for(let a=0;a<Math.PI*2;a+=Math.PI/2){ctx.beginPath();ctx.arc(Math.cos(a)*r*.72,Math.sin(a)*r*.72,2,0,Math.PI*2);ctx.stroke();}ctx.fillStyle='#fff';ctx.font='900 8px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText('ARM',0,3);
     }else if(e.camo){
@@ -5757,18 +7099,18 @@ function draw(){
   if(effectActive('frenzy')){ctx.strokeStyle='#ffd36b66';ctx.lineWidth=5;ctx.strokeRect(2.5,2.5,W-5,H-5);}
   if(effectActive('focus')){ctx.strokeStyle='#ff718066';ctx.lineWidth=3;ctx.strokeRect(8.5,8.5,W-17,H-17);}
 
-  ctx.save();ctx.textAlign='left';ctx.font='800 11px Segoe UI,Arial';ctx.fillStyle='#071019bb';ctx.fillRect(12,12,136,30);ctx.fillStyle='#dceef6';ctx.fillText(`⏩ Velocidade ${state.gameSpeed}×`,22,31);ctx.restore();
+  ctx.save();ctx.textAlign='left';ctx.font='800 11px Segoe UI,Arial';ctx.fillStyle='#071019bb';ctx.fillRect(12,12,136,30);ctx.fillStyle='#dceef6';ctx.fillText($T`⏩ Velocidade ${state.gameSpeed}×`,22,31);ctx.restore();
 
   if(state.completed){
     const stars=mapStars(state.map),diff=currentDifficulty();
     ctx.fillStyle='#05050bd4';ctx.fillRect(0,0,W,H);
-    ctx.fillStyle='#f3bf67';ctx.font='900 38px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText('🏆 MAPA CONCLUÍDO',W/2,H/2-58);
+    ctx.fillStyle='#f3bf67';ctx.font='900 38px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText($t('🏆 MAPA CONCLUÍDO'),W/2,H/2-58);
     ctx.fillStyle='#f6f4ff';ctx.font='800 20px Segoe UI,Arial';ctx.fillText(`${currentMap().name} • ${diff.name}`,W/2,H/2-20);
     ctx.fillStyle='#f3bf67';ctx.font='900 28px Segoe UI,Arial';ctx.fillText('★'.repeat(stars)+'☆'.repeat(3-stars),W/2,H/2+20);
-    ctx.fillStyle='#c9d8df';ctx.font='600 13px Segoe UI,Arial';ctx.fillText(`${stars}/3 dificuldades concluídas neste mapa`,W/2,H/2+50);
-    ctx.fillText(`Conta: nível ${profile.level} • ${profile.xp}/${requiredXp(profile.level)} XP`,W/2,H/2+72);
+    ctx.fillStyle='#c9d8df';ctx.font='600 13px Segoe UI,Arial';ctx.fillText($T`${stars}/3 dificuldades concluídas neste mapa`,W/2,H/2+50);
+    ctx.fillText($T`Conta: nível ${profile.level} • ${profile.xp}/${requiredXp(profile.level)} XP`,W/2,H/2+72);
   }else if(state.lives<=0){
-    ctx.fillStyle='#05050bd4';ctx.fillRect(0,0,W,H);ctx.fillStyle='#f6f4ff';ctx.font='900 34px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText('Fim de jogo',W/2,H/2-8);ctx.font='600 15px Segoe UI,Arial';ctx.fillText('Reinicie e reposicione seus gatinhos.',W/2,H/2+25);
+    ctx.fillStyle='#05050bd4';ctx.fillRect(0,0,W,H);ctx.fillStyle='#f6f4ff';ctx.font='900 34px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText($t('Fim de jogo'),W/2,H/2-8);ctx.font='600 15px Segoe UI,Arial';ctx.fillText($t('Reinicie e reposicione seus gatinhos.'),W/2,H/2+25);
   }
 }
 
@@ -5785,27 +7127,27 @@ canvas.addEventListener('click',e=>{
   const hitHero=heroAt(x,y);
   if(hitHero){
     cancelPlacement(true);state.selectedTower=null;state.selectedHero=true;updateUpgradePanel();const hs=heroStats(hitHero),def=HEROES[hitHero.type];
-    setMsg(`🦸 ${def.name} • Nv.${hitHero.level}/10 • ${def.role}${def.farm?` • +🐟 ${hs.farmIncome}/rodada`:` • Dano ${hs.damage} • Range ${hs.range}`} • eliminações ${hitHero.pops||0}. XP e habilidades ficam no painel HERÓI à direita.`);
+    setMsg($T`🦸 ${def.name} • Nv.${hitHero.level}/10 • ${def.role}${def.farm?$T` • +🐟 ${hs.farmIncome}/rodada`:$T` • Dano ${hs.damage} • Range ${hs.range}`} • eliminações ${hitHero.pops||0}. XP e habilidades ficam no painel HERÓI à direita.`);
     renderHeroHud();return;
   }
   const hit=towerAt(x,y);
   if(hit){
     cancelPlacement(true);state.selectedTower=hit.id;state.selectedHero=false;notifyMatchTutorialAction('towerInspected');renderHeroHud();const st=towerStats(hit);
-    const cadence=st.farm?`+🐟 ${st.farmIncome} por rodada`:st.rootHold?`recarga ${st.rate.toFixed(1)}s`:`${(1/st.rate).toFixed(1)} ataques/s`;
+    const cadence=st.farm?$T`+🐟 ${st.farmIncome} por rodada`:st.rootHold?$T`recarga ${st.rate.toFixed(1)}s`:$T`${(1/st.rate).toFixed(1)} ataques/s`;
     setMsg(hit.type==='dart'
-      ?`${st.name} selecionado • ${dartPaths(hit).map((v,i)=>`C${i+1}:T${v}`).join(' / ')} • os caminhos estão na aba da direita.`
+      ?$T`${st.name} selecionado • ${dartPaths(hit).map((v,i)=>`C${i+1}:T${v}`).join(' / ')} • os caminhos estão na aba da direita.`
       :hit.type==='sniper'
-        ?`${st.name} selecionado • ${sniperPaths(hit).map((v,i)=>`C${i+1}:T${v}`).join(' / ')} • escolha Atirador, Caçador ou Observador na aba da direita.`
+        ?$T`${st.name} selecionado • ${sniperPaths(hit).map((v,i)=>`C${i+1}:T${v}`).join(' / ')} • escolha Atirador, Caçador ou Observador na aba da direita.`
         :st.farm
-          ?`${st.name} nível ${hit.level} selecionado. Farm econômico • ${cadence} • upgrades na aba da direita.`
-          :`${st.name} nível ${hit.level} selecionado. ${st.rootHold?'Controle':`Dano ${st.damage.toFixed(2)}`} • ${st.globalRange?'range GLOBAL':`range ${st.range}`} • ${cadence}. Upgrades na aba da direita.`);
+          ?$T`${st.name} nível ${hit.level} selecionado. Farm econômico • ${cadence} • upgrades na aba da direita.`
+          :$T`${st.name} nível ${hit.level} selecionado. ${st.rootHold?$t('Controle'):$T`Dano ${st.damage.toFixed(2)}`} • ${st.globalRange?$t('range GLOBAL'):`range ${st.range}`} • ${cadence}. Upgrades na aba da direita.`);
     updateUpgradePanel();updateStats();return;
   }
-  if(state.selectedTower){closeUpgradePanel(true);setMsg('Painel de upgrades fechado. Clique em um gatinho para posicionar ou em uma unidade para abrir seus upgrades.');return;}
-  if(state.selectedHero){state.selectedHero=false;renderHeroHud();setMsg('Painel do Herói fechado. Clique no herói em campo para reabrir o XP e as habilidades.');return;}
+  if(state.selectedTower){closeUpgradePanel(true);setMsg($t('Painel de upgrades fechado. Clique em um gatinho para posicionar ou em uma unidade para abrir seus upgrades.'));return;}
+  if(state.selectedHero){state.selectedHero=false;renderHeroHud();setMsg($t('Painel do Herói fechado. Clique no herói em campo para reabrir o XP e as habilidades.'));return;}
   if(state.selected==='__hero__'){placeHero(x,y);return;}
   if(state.selected){placeTower(x,y);return;}
-  setMsg('Nenhum gatinho ou herói está pronto para posicionar. Selecione uma unidade na barra da direita primeiro.');
+  setMsg($t('Nenhum gatinho ou herói está pronto para posicionar. Selecione uma unidade na barra da direita primeiro.'));
 });
 
 if($('#td-start'))$('#td-start').onclick=startWave;
@@ -5814,10 +7156,10 @@ if($('#td-reset'))$('#td-reset').onclick=()=>{
 };
 if($('#td-exit'))$('#td-exit').onclick=()=>{sfx('ui');openPauseMenu();};
 if($('#td-pause'))$('#td-pause').onclick=()=>{
-  if(state.paused){closePauseMenu(true);setMsg(`Jogo rodando em ${state.gameSpeed}×.`);}
-  else{openPauseMenu();setMsg('Partida pausada.');}
+  if(state.paused){closePauseMenu(true);setMsg($T`Jogo rodando em ${state.gameSpeed}×.`);}
+  else{openPauseMenu();setMsg($t('Partida pausada.'));}
 };
-if($('#menu-resume'))$('#menu-resume').onclick=()=>{sfx('ui');closePauseMenu(true);setMsg(`Jogo rodando em ${state.gameSpeed}×.`);};
+if($('#menu-resume'))$('#menu-resume').onclick=()=>{sfx('ui');closePauseMenu(true);setMsg($T`Jogo rodando em ${state.gameSpeed}×.`);};
 if($('#menu-restart'))$('#menu-restart').onclick=()=>{sfx('ui');closePauseMenu(false);runMapLoading(state.map,state.difficulty,reset,state.mode);};
 if($('#menu-lobby'))$('#menu-lobby').onclick=()=>{sfx('ui');closePauseMenu(false);state.paused=true;setScreen('hub');};
 if($('#menu-close'))$('#menu-close').onclick=()=>{sfx('ui');hideGameModal('#pause-menu');};
@@ -5829,17 +7171,17 @@ if($('#support-copy-pix'))$('#support-copy-pix').onclick=async()=>{
   sfx('ui');
   try{
     await navigator.clipboard.writeText(CREATOR_PIX_PAYLOAD);
-    setMsg('📋 Código Pix copiado.');
+    setMsg($t('📋 Código Pix copiado.'));
   }catch(_err){
     try{
       const ta=document.createElement('textarea');ta.value=CREATOR_PIX_PAYLOAD;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
-      setMsg('📋 Código Pix copiado.');
+      setMsg($t('📋 Código Pix copiado.'));
     }catch(_err2){
-      setMsg('Não foi possível copiar automaticamente.');
+      setMsg($t('Não foi possível copiar automaticamente.'));
     }
   }
 };
-if($('#menu-replay-tutorial'))$('#menu-replay-tutorial').onclick=()=>{sfx('ui');profile.matchTutorialSeen=false;saveProfile();showSaveIoStatus('✓ Tutorial guiado será mostrado ao entrar na próxima partida.');};
+if($('#menu-replay-tutorial'))$('#menu-replay-tutorial').onclick=()=>{sfx('ui');profile.matchTutorialSeen=false;saveProfile();showSaveIoStatus($t('✓ Tutorial guiado será mostrado ao entrar na próxima partida.'));};
 if($('#menu-volume'))$('#menu-volume').oninput=e=>{
   profile.settings.volume=Math.max(0,Math.min(1,Number(e.target.value)/100));
   saveProfile();syncVolumeUi();
@@ -5884,13 +7226,13 @@ document.addEventListener('click',e=>{
 
 $$('[data-speed]').forEach(btn=>btn.onclick=()=>{
   state.gameSpeed=Math.max(1,Math.min(3,Number(btn.dataset.speed)||1));
-  updateSpeedButtons();setMsg(`Velocidade alterada para ${state.gameSpeed}×.`);
+  updateSpeedButtons();setMsg($T`Velocidade alterada para ${state.gameSpeed}×.`);
 });
 
 if($('#td-hero-deploy'))$('#td-hero-deploy').onclick=()=>{
-  if(state.hero){setMsg(`🦸 ${HEROES[state.hero.type].name} já está em campo. O limite é 1 herói por partida.`);return;}
+  if(state.hero){setMsg($T`🦸 ${HEROES[state.hero.type].name} já está em campo. O limite é 1 herói por partida.`);return;}
   if(state.selected==='__hero__'){cancelPlacement();return;}
-  armHeroPlacement();const h=currentHeroDef();setMsg(`📍 ${h.icon} ${h.name} pronto para posicionar por 🐟 ${heroPrice(profile.selectedHero,state.map)}. Limite: 1 Herói Gatinho por partida.`);
+  armHeroPlacement();const h=currentHeroDef();setMsg($T`📍 ${h.icon} ${h.name} pronto para posicionar por 🐟 ${heroPrice(profile.selectedHero,state.map)}. Limite: 1 Herói Gatinho por partida.`);
 };
 if($('#td-hero-skill'))$('#td-hero-skill').onclick=e=>{e.stopPropagation();activateHeroSkill();};
 if($('#td-hero-ultimate'))$('#td-hero-ultimate').onclick=e=>{e.stopPropagation();activateHeroUltimate();};
@@ -5899,22 +7241,22 @@ if($('#td-hero-buy-level'))$('#td-hero-buy-level').onclick=e=>{e.stopPropagation
 $$('.td-tower-picker [data-td-tower]').forEach(btn=>btn.onclick=()=>{
   const id=btn.dataset.tdTower,t=types[id];
   if(state.repositionTower)cancelReposition(true);
-  if(!isTowerUnlocked(id)){setMsg(`${t.name} libera no nível ${t.unlockLevel}.`);return;}
-  const limit=t.limit||TOWER_LIMIT_PER_TYPE;if(towerCount(id)>=limit){setMsg(`🐾 ${t.name}: limite de ${limit} unidade${limit===1?'':'s'} atingido.`);return;}
+  if(!isTowerUnlocked(id)){setMsg($T`${t.name} libera no nível ${t.unlockLevel}.`);return;}
+  const limit=t.limit||TOWER_LIMIT_PER_TYPE;if(towerCount(id)>=limit){setMsg($T`🐾 ${t.name}: limite de ${limit} unidade${limit===1?'':'s'} atingido.`);return;}
   if(state.selected===id){cancelPlacement();return;}
   armPlacement(id);notifyMatchTutorialAction('towerSelected');
   let warning='';
-  if(t.farm)warning=` Farm: +🐟 ${t.farmIncome} por rodada concluída e não ataca.`;
-  else if(t.globalRange)warning=' Alcance GLOBAL e detecção de CAMUFLADOS.';
-  else if(t.fullAoe)warning=' FULL AOE: atinge todos os alvos válidos no alcance.';
-  else if(t.breaksArmor)warning=' Quebra BLINDADOS.';
-  setMsg(`📍 ${t.name} pronto para posicionar por 🐟 ${towerPrice(id,state.map)} (${mapCategoryForMap(state.map).name}).${warning} Clique UMA vez em um local válido do mapa. Depois da colocação, a seleção será cancelada.`);
+  if(t.farm)warning=$T` Farm: +🐟 ${t.farmIncome} por rodada concluída e não ataca.`;
+  else if(t.globalRange)warning=$t(' Alcance GLOBAL e detecção de CAMUFLADOS.');
+  else if(t.fullAoe)warning=$t(' FULL AOE: atinge todos os alvos válidos no alcance.');
+  else if(t.breaksArmor)warning=$t(' Quebra BLINDADOS.');
+  setMsg($T`📍 ${t.name} pronto para posicionar por 🐟 ${towerPrice(id,state.map)} (${mapCategoryForMap(state.map).name}).${warning} Clique UMA vez em um local válido do mapa. Depois da colocação, a seleção será cancelada.`);
 });
 
 if($('#play-enter'))$('#play-enter').onclick=()=>{
   const enterBtn=$('#play-enter');
   if(enterBtn&&enterBtn.dataset.loading==='1')return;
-  if(enterBtn){enterBtn.dataset.loading='1';enterBtn.disabled=true;enterBtn.textContent='🐾 Preparando mapa...';}
+  if(enterBtn){enterBtn.dataset.loading='1';enterBtn.disabled=true;enterBtn.textContent=$t('🐾 Preparando mapa...');}
   sfx('ui');
   const mapId=lobbySelection.map,diffId=lobbySelection.difficulty,modeId=lobbySelection.mode;
   runMapLoading(mapId,diffId,()=>{

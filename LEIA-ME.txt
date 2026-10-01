@@ -1,4 +1,4 @@
-CATOONS TD v0.28.5 — BETA HOTFIX + CELESTIAL + GIRO DIÁRIO + PIX
+CATOONS TD v0.29.0 — INGLÊS + TROCA DE IDIOMA
 
 Esta edição não contém executáveis, launchers, arquivos .bat ou instaladores.
 Ela possui somente HTML, CSS, JavaScript e este arquivo de instruções.
@@ -6,24 +6,19 @@ Ela possui somente HTML, CSS, JavaScript e este arquivo de instruções.
 COMO ABRIR
 1. Extraia o ZIP para uma pasta.
 2. Abra o arquivo index.html com Google Chrome ou Microsoft Edge.
+   Ou jogue direto no navegador: https://luanhcp.github.io/CatoonsTD/
 
-NOVIDADES DESTA VERSÃO
-- Preserva a skin gratuita Gata Maga Élfica do Gato Mago.
-- Adiciona o Gatinho Rei Demônio como secreto do tier Impossível.
-- Desbloqueio: concluir Passagem Cega no Fácil, Normal e Difícil.
-- Limite de 1 Rei Demônio por partida.
-- Ataque Fogo Sombrio em área com queimadura.
-- Aura Medo recua inimigos e aumenta o dano recebido temporariamente.
-- Inimigos que morrem sob Medo geram Balões Sombrios aliados no final da pista; eles percorrem a rota ao contrário e atacam inimigos.
-- Chefões sofrem recuo reduzido e podem gerar até 3 sombras.
-- Skin original Rei Demônio da Academia: uniforme preto/carmesim, olhos vermelhos, detalhes dourados e magia violeta.
+NOVO v0.29.0 — IDIOMAS
+- O jogo inteiro agora existe em português e em inglês.
+- Na primeira vez, o idioma segue o do navegador (português para pt-*, inglês para os demais).
+- Para trocar: botão 🌐 no lobby ou Configurações → 🌐 Idioma. A página recarrega e a escolha fica salva.
+- Durante uma partida o seletor fica bloqueado; troque pelo lobby.
+- O botão "⚙️ Som" do lobby passou a se chamar "⚙️ Configurações".
+- O Pix do "Apoie o criador" agora usa chave aleatória.
 
 SKIN ÉLFICA
 Na loja, desça até Skins. Adquira a Gata Maga Élfica por 0 moedas e clique em Equipar.
 A skin modifica somente a aparência do Gato Mago. Dano, alcance e caminhos de melhoria permanecem iguais.
-
-OBSERVAÇÃO
-O Rei Demônio é um primeiro playtest de balanceamento. A mecânica foi implementada e o JavaScript foi validado sintaticamente, mas ainda vale testar partidas longas no modo Infinito para conferir FPS com muitas sombras.
 
 NOVO v0.28.5 — PAINEL DE UPGRADES
 - A tela de upgrades agora fica sempre acima do mapa e da interface normal da partida.
@@ -61,4 +56,4 @@ NOVO v0.28.0 — CELESTIAL + BALANCE
 - Boss final: 30% mais lento e 50% mais vida do que antes (75x a referência regular).
 - Nova Roleta Celestial: 1,5% Gato Celestial, 30% moedas, 68,5% XP de Maestria direcionável. O primeiro giro é grátis; os seguintes custam 150 moedas permanentes.
 - Gato Celestial: 1 drone base e +1 drone a cada 2 upgrades por caminho; caminhos de dano/velocidade, range/AOE e purificação Camo/Blindagem.
-- Configurações: botão 'Apoie o criador' abre uma tela separada e sem recompensa de gameplay. O QR Pix real aguarda a imagem do QR ou os dados Pix do criador; esta build já inclui um QR Pix configurado no botão Apoie o criador.
+- Configurações: botão 'Apoie o criador' abre uma tela separada com QR Code Pix, sem recompensa de gameplay.
