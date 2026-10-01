@@ -2,6 +2,8 @@
 
 [🇺🇸 English README](README_EN.md)
 
+![Partida no mapa Jardim das Lanternas](screenshots/pt/02-gameplay.jpg)
+
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
 **Status:** Beta público · **Build:** v0.29.0
@@ -17,6 +19,16 @@ Catoons TD é um Tower Defense focado em **progressão, composição de equipes 
 O `index.html` na raiz é o ponto de entrada da versão web. O link acima abre a build publicada diretamente no navegador, sem instalação.
 
 Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Para uma experiência mais consistente, prefira servir a pasta com um servidor HTTP local.
+
+## 🖼️ Capturas de tela
+
+| Lobby | Upgrades em 3 caminhos |
+|---|---|
+| ![Lobby](screenshots/pt/01-lobby.jpg) | ![Painel de upgrades](screenshots/pt/06-upgrades.jpg) |
+| **Mapa de duas rotas (Vale Bifurcado)** | **Heróis Gatinhos** |
+| ![Vale Bifurcado](screenshots/pt/05-dual-path.jpg) | ![Heróis](screenshots/pt/03-heroes.jpg) |
+| **Coleção e Maestria** | |
+| ![Maestria](screenshots/pt/04-mastery.jpg) | |
 
 ## ✨ Destaques do projeto
 

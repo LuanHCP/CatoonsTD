@@ -1,12 +1,17 @@
 # Screenshots
 
-Sugestão de imagens para a página do projeto:
+Capturas usadas nos READMEs, em 1600×900 (JPG), geradas a partir da build v0.29.0:
 
-1. `01-lobby.png` — tela inicial / progresso;
-2. `02-gameplay.png` — partida com torres, buffs e inimigos;
-3. `03-heroes.png` — tela dos Heróis Gatinhos;
-4. `04-mastery.png` — tela de Maestria;
-5. `05-dual-path.png` — mapa com duas rotas;
-6. `06-special-enemies.png` — inimigos especiais em ação.
+- `pt/` — jogo em português (README.md)
+- `en/` — jogo em inglês (README_EN.md)
 
-Mantenha as imagens em 16:9 sempre que possível e evite mostrar ferramentas de debug no screenshot principal.
+| Arquivo | Conteúdo |
+|---|---|
+| `01-lobby.jpg` | lobby / progresso da conta |
+| `02-gameplay.jpg` | partida no Jardim das Lanternas (capa) |
+| `03-heroes.jpg` | tela dos Heróis Gatinhos |
+| `04-mastery.jpg` | coleção de gatinhos e Maestria |
+| `05-dual-path.jpg` | Vale Bifurcado, mapa de duas rotas |
+| `06-upgrades.jpg` | painel de upgrades com 3 caminhos |
+
+Mantenha 16:9 e sem o painel de debug (F8) ao substituir.

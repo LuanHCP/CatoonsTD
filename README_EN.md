@@ -2,6 +2,10 @@
 
 [🇧🇷 README em Português](README.md)
 
+![Match on the Lantern Garden map](screenshots/en/02-gameplay.jpg)
+
+### [▶️ Play Catoons TD in your browser](https://luanhcp.github.io/CatoonsTD/)
+
 > **Web/desktop Tower Defense built with HTML, CSS and JavaScript, using AI as an engineering copilot.**
 
 **Status:** Public Beta · **Build:** v0.29.0
@@ -9,6 +13,16 @@
 **Languages:** English and Brazilian Portuguese (auto-detected, switchable in-game)
 
 Catoons TD is a personal software engineering project focused on **progression, team composition, combat readability and iterative product development**. It evolved from a small prototype into a game with map tiers, difficulty levels, upgrade paths, heroes, mastery, hidden units, synergies, special enemies, powers and an infinite mode.
+
+## Screenshots
+
+| Lobby | 3-path upgrades |
+|---|---|
+| ![Lobby](screenshots/en/01-lobby.jpg) | ![Upgrade panel](screenshots/en/06-upgrades.jpg) |
+| **Dual-track map (Forked Valley)** | **Hero Kittens** |
+| ![Forked Valley](screenshots/en/05-dual-path.jpg) | ![Heroes](screenshots/en/03-heroes.jpg) |
+| **Collection and Mastery** | |
+| ![Mastery](screenshots/en/04-mastery.jpg) | |
 
 ## Highlights
 

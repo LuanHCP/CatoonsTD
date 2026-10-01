@@ -4347,91 +4347,91 @@ function initPersonalTd(){
 
   function dartPathLockReason(t,pathIndex){
     const p=dartPaths(t),main=dartPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=DART_MAX_TIER)return$t('Nível máximo');
+    if(current>=DART_MAX_TIER)return $t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
-    if(next>DART_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${DART_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
+    if(next>DART_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${DART_SECONDARY_MAX}`;
     return'';
   }
 
   function sniperPathLockReason(t,pathIndex){
     const p=sniperPaths(t),main=sniperPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=SNIPER_MAX_TIER)return$t('Nível máximo');
+    if(current>=SNIPER_MAX_TIER)return $t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
-    if(next>SNIPER_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${SNIPER_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
+    if(next>SNIPER_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${SNIPER_SECONDARY_MAX}`;
     return'';
   }
 
   function frostPathLockReason(t,pathIndex){
     const p=frostPaths(t),main=frostPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=FROST_MAX_TIER)return$t('Nível máximo');
+    if(current>=FROST_MAX_TIER)return $t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
-    if(next>FROST_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${FROST_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
+    if(next>FROST_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${FROST_SECONDARY_MAX}`;
     return'';
   }
 
   function vinePathLockReason(t,pathIndex){
     const p=vinePaths(t),main=vinePrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=VINE_MAX_TIER)return$t('Nível máximo');
+    if(current>=VINE_MAX_TIER)return $t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
-    if(next>VINE_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${VINE_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
+    if(next>VINE_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${VINE_SECONDARY_MAX}`;
     return'';
   }
 
   function burstPathLockReason(t,pathIndex){
     const p=burstPaths(t),main=burstPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=BURST_MAX_TIER)return$t('Nível máximo');
+    if(current>=BURST_MAX_TIER)return $t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
-    if(next>BURST_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${BURST_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
+    if(next>BURST_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${BURST_SECONDARY_MAX}`;
     return'';
   }
 
   function ninjaPathLockReason(t,pathIndex){
     const p=ninjaPaths(t),main=ninjaPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=NINJA_MAX_TIER)return$t('Nível máximo');
+    if(current>=NINJA_MAX_TIER)return $t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
-    if(next>NINJA_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${NINJA_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
+    if(next>NINJA_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${NINJA_SECONDARY_MAX}`;
     return'';
   }
 
   function laserPathLockReason(t,pathIndex){
     const p=laserPaths(t),main=laserPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=LASER_MAX_TIER)return$t('Nível máximo');
+    if(current>=LASER_MAX_TIER)return $t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
-    if(next>LASER_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${LASER_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
+    if(next>LASER_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${LASER_SECONDARY_MAX}`;
     return'';
   }
 
   function wizardPathLockReason(t,pathIndex){
     const p=wizardPaths(t),main=wizardPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=WIZARD_MAX_TIER)return$t('Nível máximo');
+    if(current>=WIZARD_MAX_TIER)return $t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
-    if(next>WIZARD_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${WIZARD_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
+    if(next>WIZARD_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${WIZARD_SECONDARY_MAX}`;
     return'';
   }
 
   function electricPathLockReason(t,pathIndex){
     const p=electricPaths(t),main=electricPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=ELECTRIC_MAX_TIER)return$t('Nível máximo');
+    if(current>=ELECTRIC_MAX_TIER)return $t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
-    if(next>ELECTRIC_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${ELECTRIC_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
+    if(next>ELECTRIC_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${ELECTRIC_SECONDARY_MAX}`;
     return'';
   }
 
   function celestialPathLockReason(t,pathIndex){
     const p=celestialPaths(t),main=celestialPrimaryPath(t),current=p[pathIndex],next=current+1;
-    if(current>=CELESTIAL_MAX_TIER)return$t('Nível máximo');
+    if(current>=CELESTIAL_MAX_TIER)return $t('Nível máximo');
     const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
-    if(current===0&&active.length>=2)return$t('Máximo de 2 caminhos');
-    if(next>CELESTIAL_SECONDARY_MAX&&main!==null&&main!==pathIndex)return$T`Secundário limitado ao T${CELESTIAL_SECONDARY_MAX}`;
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
+    if(next>CELESTIAL_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${CELESTIAL_SECONDARY_MAX}`;
     return'';
   }
 
