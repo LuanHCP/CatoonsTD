@@ -6,8 +6,8 @@
 
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-**Status:** Beta público · **Build:** v0.29.0
-**Plataformas:** Navegador moderno · Windows x64 via launcher local  
+**Status:** Beta público · **Build:** v0.29.2
+**Plataformas:** Navegador moderno em computador e celular · Windows x64 via launcher local
 **Idiomas:** Português (Brasil) e English — detectado pelo navegador, com troca manual no jogo
 
 Catoons TD é um Tower Defense focado em **progressão, composição de equipes e leitura de combate**. O projeto começou como um protótipo simples e evoluiu para um jogo com mapas por tiers, dificuldades, caminhos de upgrade, heróis, maestria, unidades secretas, sinergias, inimigos especiais, poderes e modo infinito.
@@ -34,7 +34,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 
 - **14 mapas** organizados em 4 tiers: 6 Iniciantes, 4 Médios, 2 Difíceis e 2 Impossíveis. Em **Festa na Igreja**, duas rotas formam uma cruz e os bancos funcionam como posições elevadas.
 - **3 dificuldades por mapa**: Fácil, Normal e Difícil.
-- **15 gatinhos**, incluindo personagens secretos, o **Gatinho Rei Demônio** do tier Impossível e o exclusivo **Gato Celestial**.
+- **16 gatinhos**, incluindo personagens secretos, o **Gatinho Rei Demônio** do tier Impossível, o exclusivo **Gato Celestial** e o inútil (de propósito) **Gatinho Mister**.
 - **Roleta Celestial** com um giro gratuito a cada 24 horas, recompensas de moedas/XP e garantia do Gato Celestial no 50º giro sem sucesso.
 - **Árvores de upgrade** com caminhos e crosspath limitado em unidades específicas, incluindo o Rei Demônio com Senhor do Medo, Chamas do Abismo e Legião Sombria.
 - **Maestria até o nível 50**, com bônus permanentes, skin dourada e habilidade exclusiva no nível máximo.
@@ -46,6 +46,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 - **Campanha e modo Infinito**.
 - **Venda por 50% do investimento**, reposicionamento e estatísticas por torre.
 - **Português e inglês**, com troca de idioma no lobby/Configurações.
+- **Interface responsiva para celular**, priorizando o modo deitado e mantendo suporte ao modo retrato.
 - **Tutorial guiado**, configurações, exportação/importação de save e painel de playtest por `F8`.
 - **Launcher Windows em Go**, sem embutir ou extrair o jogo: ele apenas abre a build local em modo app no Edge/Chrome.
 

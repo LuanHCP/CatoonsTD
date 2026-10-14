@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#081017">
   <title>Catoons TD</title>
   <link rel="stylesheet" href="src/style.css">
@@ -11,7 +11,7 @@
   <main class="game-shell">
     <header class="hero">
       <div>
-        <span class="eyebrow">NAVEGADOR • v0.29.0 BETA</span>
+        <span class="eyebrow">NAVEGADOR • v0.29.2 BETA</span>
         <h1>Catoons TD</h1>
         <p>Escolha um lobby, evolua sua conta e monte sua defesa felina.</p>
       </div>
@@ -139,6 +139,9 @@
     </section>
 
     <section id="screen-game" class="screen game-screen">
+      <div class="mobile-landscape-hint" role="status">
+        <span>📱↻</span><b>Jogue com o celular deitado</b><small>O mapa e os controles ficam maiores.</small>
+      </div>
       <section id="game-area" class="panel game-panel">
         <div class="panel-head td-head">
           <div>
@@ -204,6 +207,7 @@
                 <button type="button" data-td-tower="chronomancer" aria-label="Gato Cronomante" title="Gato Cronomante" hidden><span class="tower-icon">⏳</span><small>🐟567</small></button>
                 <button type="button" data-td-tower="demonking" aria-label="Gatinho Rei Demônio" title="Gatinho Rei Demônio" hidden><span class="tower-icon">👑</span><small>🐟715</small></button>
                 <button type="button" data-td-tower="celestial" aria-label="Gato Celestial" title="Gato Celestial" hidden><span class="tower-icon">🛸</span><small>🐟462</small></button>
+                <button type="button" data-td-tower="mister" aria-label="Gatinho Mister" title="Gatinho Mister" hidden><span class="tower-icon">🎮</span><small>🐟999</small></button>
               </div>
 
               <section class="td-hero-slot" aria-label="Herói Gatinho da partida">
@@ -431,9 +435,9 @@
           <input type="file" id="menu-import-save-input" accept="application/json,.json" hidden>
         </div>
         <section class="beta-notice" aria-label="Informações do beta">
-          <b>🧪 Beta v0.29.0</b>
+          <b>🧪 Beta v0.29.2</b>
           <p>O progresso fica salvo somente neste navegador. Exporte seu save regularmente para não perder a evolução ao limpar os dados do navegador ou trocar de computador.</p>
-          <a class="ghost beta-feedback-button" href="https://github.com/LuanHCP/CatoonsTD/issues/new?template=bug_report.md&amp;title=%5BBETA%20v0.29.0%5D%20" target="_blank" rel="noopener noreferrer">🐞 Enviar feedback ou relatar bug</a>
+          <a class="ghost beta-feedback-button" href="https://github.com/LuanHCP/CatoonsTD/issues/new?template=bug_report.md&amp;title=%5BBETA%20v0.29.2%5D%20" target="_blank" rel="noopener noreferrer">🐞 Enviar feedback ou relatar bug</a>
         </section>
         <small id="menu-save-io-status" class="modal-hint" hidden></small>
       </div>
@@ -450,7 +454,7 @@
       <details class="enemy-guide credits-details">
         <summary>🎬 Créditos</summary>
         <div class="credits-body">
-          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.29.0</span></p>
+          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.29.2</span></p>
           <p>Criado por <b>Luan</b>.</p>
           <p>Trilha sonora, efeitos sonoros e toda a arte das torres, heróis e mapas são originais, feitos direto no jogo.</p>
           <p class="credits-thanks">Obrigado por jogar! 🐾</p>

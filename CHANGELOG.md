@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.29.2 — interface responsiva para celular
+
+- HUD da partida reorganizada para telas estreitas, com estatísticas e menu em uma única faixa compacta.
+- Poderes, gatinhos, herói e controles de rodada adaptados para toque e rolagem horizontal.
+- Mapa redimensionado pela área realmente disponível em retrato e paisagem, respeitando `safe-area` de celulares com recorte.
+- Painel de upgrades convertido em folha responsiva acima dos controles, com rolagem interna e botões de toque maiores.
+- Navegação do lobby e seleção de mapas ajustadas para telas móveis.
+- Recalibração automática do mapa ao girar o aparelho ou mudar a área visível do navegador.
+
+## v0.29.1 — Gatinho Mister
+
+- Novo gatinho secreto **Mister** 🎮: custa 999 salmões, dá 1 de dano com alcance 5 e, depois de 30 segundos em campo, larga a defesa para jogar Minecraft (balão de fala fixo na cabeça). Não aceita upgrades; limite de 1 por partida. O requisito de desbloqueio é segredo.
+- Correção: a janela de "Segredo descoberto" ficava escondida atrás da tela de resultado e só aparecia depois de fechá-la.
+
 ## v0.29.0 — inglês + troca de idioma
 
 - Jogo completo em **inglês e português**: menus, gatinhos, caminhos de upgrade, heróis, sinergias, poderes, mapas, inimigos, tutorial guiado, mensagens da partida e textos desenhados no mapa.

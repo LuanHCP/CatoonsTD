@@ -8,8 +8,8 @@
 
 > **Web/desktop Tower Defense built with HTML, CSS and JavaScript, using AI as an engineering copilot.**
 
-**Status:** Public Beta · **Build:** v0.29.0
-**Platforms:** Modern web browsers · Windows x64 through a lightweight Go launcher  
+**Status:** Public Beta · **Build:** v0.29.2
+**Platforms:** Modern desktop and mobile browsers · Windows x64 through a lightweight Go launcher
 **Languages:** English and Brazilian Portuguese (auto-detected, switchable in-game)
 
 Catoons TD is a personal software engineering project focused on **progression, team composition, combat readability and iterative product development**. It evolved from a small prototype into a game with map tiers, difficulty levels, upgrade paths, heroes, mastery, hidden units, synergies, special enemies, powers and an infinite mode.
@@ -28,7 +28,7 @@ Catoons TD is a personal software engineering project focused on **progression, 
 
 - 14 maps across 4 progression tiers, including the cross-shaped two-route **Church Festival** Impossible map with elevated bench positions;
 - 3 difficulty levels per map;
-- 15 cat units, including hidden unlocks, the **Demon King Cat** and the exclusive drone-based **Celestial Cat**;
+- 16 cat units, including hidden unlocks, the **Demon King Cat**, the exclusive drone-based **Celestial Cat** and the (deliberately) useless **Mister Kitten**;
 - Celestial Wheel with one free spin every 24 hours, coin/XP rewards and a guaranteed Celestial Cat by the 50th unsuccessful spin;
 - multi-path upgrade systems and limited crosspathing;
 - Mastery progression up to level 50 with permanent bonuses, a golden skin and a unique active ability;
@@ -39,7 +39,7 @@ Catoons TD is a personal software engineering project focused on **progression, 
 - persistent local progression, save export/import and backward save migration;
 - optional creator support through Pix, with no gameplay rewards;
 - full English and Portuguese localization with an in-game language switch;
-- guided tutorial, responsive HUD and a developer playtest panel (`F8`);
+- guided tutorial, touch-friendly mobile HUD (landscape preferred) and a developer playtest panel (`F8`);
 - Go-based Windows launcher that opens the local web build in Edge/Chrome app mode.
 
 ## AI-assisted engineering
@@ -82,7 +82,7 @@ The current build is client-side and offline-first. No backend is required to ru
 
 This is the **portfolio-oriented source repository**. Windows binaries should be published through GitHub Releases rather than committed to Git history.
 
-For deployment, architecture and testing details, read the documents under [`docs/`](docs/).
+For deployment, architecture and testing details, read the documents under [`docs/`](docs/). The itch.io HTML5 package can be generated with `scripts/package_itch.ps1`; publishing notes are in [`docs/ITCH_IO_RELEASE.md`](docs/ITCH_IO_RELEASE.md), and local-data details are in [`PRIVACY.md`](PRIVACY.md).
 
 ## Author
 

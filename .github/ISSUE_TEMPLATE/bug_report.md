@@ -21,7 +21,7 @@ Descreva o problema de forma objetiva.
 
 ## Contexto da partida
 
-- Versão: v0.29.0
+- Versão: v0.29.2
 - Idioma: Português / English
 - Mapa:
 - Tier:

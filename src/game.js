@@ -11,6 +11,21 @@ const I18N_LANG=(()=>{
   return /^pt/i.test(nav)?'pt':'en';
 })();
 const I18N_EN={
+  "• 🎮 jogando Minecraft": "• 🎮 playing Minecraft",
+  "• ⏱️ desiste em": "• ⏱️ quits in",
+  "🎮 Sem upgrades": "🎮 No upgrades",
+  "Gatinho Mister": "Mister Kitten",
+  "Gamer / dano simbólico": "Gamer / token damage",
+  "Gatinho secreto. Custa 999, dá 1 de dano com alcance minúsculo e, depois de 30 segundos em campo, larga a defesa para jogar Minecraft.": "Secret kitten. Costs 999, deals 1 damage with a tiny range and, after 30 seconds on the field, abandons the defense to play Minecraft.",
+  "Só mais uma partida": "Just one more game",
+  "Mister promete que vai ajudar: volta a dar 1 de dano por 10 segundos antes de voltar pro Minecraft.": "Mister promises to help: deals 1 damage again for 10 seconds before going back to Minecraft.",
+  "Não conte com ele. Alcance de 5, 1 de dano e, depois de 30 segundos, nenhum.": "Don't count on him. Range 5, 1 damage and, after 30 seconds, none at all.",
+  "🎮 Saiu pra jogar": "🎮 Gone gaming",
+  "Mister largou a defesa: agora ele só quer saber de Minecraft.": "Mister abandoned the defense: now all he cares about is Minecraft.",
+  "Mister não aceita upgrades. Ele está ocupado demais jogando.": "Mister doesn't take upgrades. He's way too busy gaming.",
+  "🎮 Só mais uma...": "🎮 Just one more...",
+  "Amo jogar minecraft por 14h seguidas": "I love playing Minecraft for 14 hours straight",
+  "Gatinho Mister, 999 salmões": "Mister Kitten, 999 salmon",
   "Fácil": "Easy",
   "Começa com 🐟 350 salmões. +3 vidas, menos rodadas e sem blindados.": "Starts with 🐟 350 salmon. +3 lives, fewer rounds and no armored enemies.",
   "Começa com 🐟 350 salmões. Ondas mais cheias, inimigos mais rápidos e blindados a partir daqui.": "Starts with 🐟 350 salmon. Fuller waves, faster enemies and armored enemies from here on.",
@@ -1215,6 +1230,11 @@ const I18N_EN={
   "🌐 Idioma": "🌐 Language",
   "Troque o idioma no lobby (a página recarrega).": "Change the language from the lobby (the page reloads).",
   "NAVEGADOR • v0.29.0 BETA": "BROWSER • v0.29.0 BETA",
+  "NAVEGADOR • v0.29.1 BETA": "BROWSER • v0.29.1 BETA",
+  "NAVEGADOR • v0.29.2 BETA": "BROWSER • v0.29.2 BETA",
+  "🧪 Beta v0.29.2": "🧪 Beta v0.29.2",
+  "Jogue com o celular deitado": "Play with your phone sideways",
+  "O mapa e os controles ficam maiores.": "The map and controls will be larger.",
   "+alcance.": "+range.",
   "+dano e +alcance.": "+damage and +range.",
   "% renda": "% income",
@@ -1344,6 +1364,7 @@ const GLOBAL_TOWER_PRICE_MULTIPLIER = 1.10;
 const GLOBAL_UPGRADE_PRICE_MULTIPLIER = 1.10;
 const MATCH_START_MONEY = 350;
 const CELESTIAL_SPIN_COST = 150;
+const MISTER_QUIT_SECONDS=30;
 const CELESTIAL_FREE_SPIN_MS = 24*60*60*1000;
 const CREATOR_PIX_PAYLOAD = '00020126580014BR.GOV.BCB.PIX013651006471-ff57-4ea9-a7f2-60465c8ccd615204000053039865802BR5925Luan Henrique Carvalho Pe6009SAO PAULO62140510FvcLnGIFLM6304F652';
 
@@ -1578,7 +1599,8 @@ const types = {
   alchemist:{name:$t('Gato Alquimista'),icon:'🧪',role:$t('Combos / dano contínuo'),special:$t('Gatinho secreto. Alterna Veneno → Fraqueza → Explosão no mesmo alvo. No terceiro estágio detona uma área e reinicia o ciclo.'),cost:345,unlockLevel:1,secret:true,range:154,rate:1.02,damage:3.35,splash:58,color:'#8be07b',fur:'#806aa2',accent:'#b7ff75',shot:'alchemist',alchemyPoison:.65,alchemyMark:.14,alchemyExplosion:1.45},
   chronomancer:{name:$t('Gato Cronomante'),icon:'⏳',role:$t('Controle temporal'),special:$t('Gatinho secreto. Marca o inimigo no tempo e, após alguns segundos, o devolve à posição em que estava. Chefões sofrem um retorno reduzido.'),cost:515,unlockLevel:1,secret:true,range:176,rate:1.18,damage:5.10,slow:1.3,color:'#7fd8ff',fur:'#5d638c',accent:'#b7ecff',shot:'chronomancer',temporalDelay:3.2,slowFactor:.72},
   demonking:{name:$t('Gatinho Rei Demônio'),icon:'👑',role:$t('Área / Medo / Invocação'),special:$t('Secreto do modo Impossível. Dispara Fogo Sombrio em área; sua aura causa Medo periodicamente, recua inimigos e aumenta o dano que recebem. Inimigos que morrem amedrontados renascem como Balões Sombrios aliados.'),cost:650,unlockLevel:1,secret:true,limit:1,range:168,rate:1.05,damage:6.20,splash:78,color:'#a64dff',fur:'#211b2b',accent:'#d45cff',shot:'demonking',burn:{damage:1.15,interval:1,ticks:4},fearInterval:11,fearRadius:158,fearBack:52,fearVuln:.15,fearDuration:5,shadowCap:8,shadowDamageMult:1},
-  celestial:{name:$t('Gato Celestial'),icon:'🛸',role:$t('Drones / suporte ofensivo'),special:$t('Gatinho Exclusivo da Roleta Celestial. Ele não ataca diretamente: comanda drones que perseguem os balões. A cada 2 upgrades em um caminho ganha +1 drone. Caminhos: Ataque Orbital, Bombardeio e Purificação.'),cost:420,unlockLevel:1,exclusive:true,range:158,rate:1.05,damage:2.5,splash:0,color:'#8fdcff',fur:'#eef5ff',accent:'#9ee7ff',shot:'celestial',droneSpeed:520,droneCount:1}
+  celestial:{name:$t('Gato Celestial'),icon:'🛸',role:$t('Drones / suporte ofensivo'),special:$t('Gatinho Exclusivo da Roleta Celestial. Ele não ataca diretamente: comanda drones que perseguem os balões. A cada 2 upgrades em um caminho ganha +1 drone. Caminhos: Ataque Orbital, Bombardeio e Purificação.'),cost:420,unlockLevel:1,exclusive:true,range:158,rate:1.05,damage:2.5,splash:0,color:'#8fdcff',fur:'#eef5ff',accent:'#9ee7ff',shot:'celestial',droneSpeed:520,droneCount:1},
+  mister:{name:$t('Gatinho Mister'),icon:'🎮',role:$t('Gamer / dano simbólico'),special:$t('Gatinho secreto. Custa 999, dá 1 de dano com alcance minúsculo e, depois de 30 segundos em campo, larga a defesa para jogar Minecraft.'),cost:999,fixedCost:true,unlockLevel:1,secret:true,limit:1,range:5,rate:1,damage:1,color:'#59c94b',fur:'#b08a63',accent:'#59c94b',shot:'dart'},
 };
 
 const HEROES = {
@@ -1650,6 +1672,7 @@ function towerPriceMultiplier(mapId){
 function towerPrice(typeId,mapId){
   const base=types[typeId];
   if(!base)return 0;
+  if(base.fixedCost)return base.cost;
   return Math.max(1,Math.round(base.cost*towerPriceMultiplier(mapId)*GLOBAL_TOWER_PRICE_MULTIPLIER));
 }
 function towerPriceDeltaLabel(mapId){
@@ -2016,7 +2039,7 @@ const DEFAULT_PROFILE = {
   version:18,
   coins:250,
   selectedHero:'king',
-  secretUnlocks:{boomerang:false,alchemist:false,chronomancer:false,demonking:false},
+  secretUnlocks:{boomerang:false,alchemist:false,chronomancer:false,demonking:false,mister:false},
   exclusiveUnlocks:{celestial:false},
   celestialWheel:{nextFreeAt:0,pendingXp:0,spins:0,misses:0},
   level:1,
@@ -2025,7 +2048,7 @@ const DEFAULT_PROFILE = {
     dart:{level:1,xp:0,maxRewardClaimed:false}, frost:{level:1,xp:0,maxRewardClaimed:false}, burst:{level:1,xp:0,maxRewardClaimed:false},
     laser:{level:1,xp:0,maxRewardClaimed:false}, ninja:{level:1,xp:0,maxRewardClaimed:false}, wizard:{level:1,xp:0,maxRewardClaimed:false},
     electric:{level:1,xp:0,maxRewardClaimed:false}, vine:{level:1,xp:0,maxRewardClaimed:false}, salmon:{level:1,xp:0,maxRewardClaimed:false}, sniper:{level:1,xp:0,maxRewardClaimed:false},
-    boomerang:{level:1,xp:0,maxRewardClaimed:false}, alchemist:{level:1,xp:0,maxRewardClaimed:false}, chronomancer:{level:1,xp:0,maxRewardClaimed:false}, demonking:{level:1,xp:0,maxRewardClaimed:false}, celestial:{level:1,xp:0,maxRewardClaimed:false}
+    boomerang:{level:1,xp:0,maxRewardClaimed:false}, alchemist:{level:1,xp:0,maxRewardClaimed:false}, chronomancer:{level:1,xp:0,maxRewardClaimed:false}, demonking:{level:1,xp:0,maxRewardClaimed:false}, mister:{level:1,xp:0,maxRewardClaimed:false}, celestial:{level:1,xp:0,maxRewardClaimed:false}
   },
   maps:Object.fromEntries(Object.keys(maps).map(id=>[id,{cleared:{easy:false,normal:false,hard:false},wins:0}])),
   inventory:{frenzy:1,focus:0,blizzard:0,cash:0,heal:0},
@@ -2146,6 +2169,7 @@ let heroCollectionSelection=profile.selectedHero||'king';
 const MASTERY_MAX_LEVEL=50;
 const MASTERY_MAX_COINS=500;
 const MASTERY_ABILITIES={
+  mister:{name:$t('Só mais uma partida'),icon:'🎮',cooldown:60,description:$t('Mister promete que vai ajudar: volta a dar 1 de dano por 10 segundos antes de voltar pro Minecraft.')},
   dart:{name:$t('Chuva de Dardos'),icon:'🌧️',cooldown:40,description:$t('Todos os inimigos no mapa recebem 50% do dano atual deste Dardo.')},
   sniper:{name:$t('Tiro de Execução'),icon:'💥',cooldown:30,description:$t('Dispara no inimigo de maior vida e causa 10× o dano atual do Sniper.')},
   frost:{name:$t('Zero Absoluto'),icon:'🧊',cooldown:45,description:$t('Congela inimigos comuns por 3s; chefões ficam extremamente lentos por 4s.')},
@@ -2415,7 +2439,7 @@ function totalStars(){ return Object.keys(maps).reduce((sum,id)=>sum+mapStars(id
 function totalWins(){ return Object.values(profile.maps).reduce((sum,m)=>sum+(m.wins||0),0); }
 function isTowerUnlocked(id){ const t=types[id];if(!t)return false;if(t.secret&&!profile.secretUnlocks?.[id])return false;if(t.exclusive&&!profile.exclusiveUnlocks?.[id])return false;return profile.level>=t.unlockLevel; }
 function discoverSecretUnlocks(){
-  if(!profile.secretUnlocks)profile.secretUnlocks={boomerang:false,alchemist:false,chronomancer:false,demonking:false};
+  if(!profile.secretUnlocks)profile.secretUnlocks={boomerang:false,alchemist:false,chronomancer:false,demonking:false,mister:false};
   const unlocked=[];
   for(const [id,categoryId] of Object.entries(SECRET_TOWER_RULES)){
     if(profile.secretUnlocks[id])continue;
@@ -2713,7 +2737,8 @@ const TOWER_TIPS={
   vine:$t('Não causa dano por padrão: imobiliza inimigos por alguns segundos. Combine com torres de dano pra aproveitar a deixa parada.'),
   salmon:$t('Não ataca — gera salmões extras a cada rodada concluída. Ajuda a bancar as outras torres mais caras.'),
   sniper:$t('Alcance cobre o mapa inteiro e sempre enxerga Camuflados sozinho. Caro, mas nunca precisa se preocupar com posicionamento.'),
-  celestial:$t('Não ataca diretamente: os drones fazem o trabalho. A cada 2 upgrades no mesmo caminho a frota ganha +1 drone.')
+  celestial:$t('Não ataca diretamente: os drones fazem o trabalho. A cada 2 upgrades no mesmo caminho a frota ganha +1 drone.'),
+  mister:$t('Não conte com ele. Alcance de 5, 1 de dano e, depois de 30 segundos, nenhum.')
 };
 
 const BALLOON_GUIDE=[
@@ -3149,6 +3174,8 @@ function initPersonalTd(){
   }
   if(canvasWrap&&'ResizeObserver' in window)new ResizeObserver(fitCanvasToViewport).observe(canvasWrap);
   window.addEventListener('resize',fitCanvasToViewport,{passive:true});
+  window.addEventListener('orientationchange',fitCanvasToViewport,{passive:true});
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',fitCanvasToViewport,{passive:true});
   window.addEventListener('catoons:fit-map',fitCanvasToViewport);
   document.addEventListener('fullscreenchange',fitCanvasToViewport);
   fitCanvasToViewport();
@@ -4223,6 +4250,7 @@ function initPersonalTd(){
     // Identificador usado apenas para estatísticas da v0.13.0 (dano/eliminações por gatinho).
     st.sourceTowerId=t.id;
     st.sourceType=t.type;
+    if(t.type==='mister'){st.damage=t.misterQuit?0:1;st.range=5;st.rate=1;st.detectsCamo=false;st.breaksArmor=false;st.misterQuit=Boolean(t.misterQuit);}
     return st;
   }
 
@@ -4742,6 +4770,7 @@ function initPersonalTd(){
     else if(t.type==='boomerang')special=$T` • 🪃 ${st.boomerangTargets} alvos + retorno ×${st.returnMultiplier.toFixed(2)}`;
     else if(t.type==='alchemist')special=$T` • 🧪 Veneno → Fraqueza → Explosão`;
     else if(t.type==='chronomancer')special=$T` • ⏳ Retorno temporal em ${st.temporalDelay.toFixed(1)}s`;
+    else if(t.type==='mister')special=st.misterQuit?$t(' • 🎮 jogando Minecraft'):$T` • ⏱️ desiste em ${Math.max(0,Math.ceil(MISTER_QUIT_SECONDS-(t.misterTime||0)))}s`;
     else if(t.type==='demonking')special=$T` • 😨 Medo ${st.fearRadius}px / ${st.fearInterval.toFixed(1)}s • 🌑 sombras ${st.shadowCap}`;
     const speedBonus=effectActive('frenzy')&&!st.rootHold&&!st.farm?$t(' • ⚡ 2× velocidade ATIVO'):'';
     const damageBonus=effectActive('focus')&&!st.rootHold&&!st.farm?$t(' • 🔥 2× dano ATIVO'):'';
@@ -4754,6 +4783,7 @@ function initPersonalTd(){
       ?$T`${st.role} • não ataca • ${cadence}${special}${supportText}${observerText} • limite ${TOWER_LIMIT_PER_TYPE} por tipo • ${max?$t('nível máximo'):$T`próximo upgrade 🐟 ${cost}`}`
       :`${st.role} • ${st.rootHold?$t('Controle'):$T`Dano ${st.damage.toFixed(2)}`} • ${st.globalRange?$t('Range GLOBAL'):`Range ${st.range}`} • ${cadence}${special}${supportText}${observerText}${speedBonus}${damageBonus} • ${max?$t('nível máximo'):$T`próximo upgrade 🐟 ${cost}`}`;
     btn.textContent=max?$t('Nível máximo'):`Upgrade 🐟 ${cost}`;btn.disabled=max;
+    if(t.type==='mister'){name.textContent=st.name;stats.textContent=$T`${st.role} • Dano ${st.damage.toFixed(2)} • Range ${st.range}${special}`;btn.textContent=$t('🎮 Sem upgrades');btn.disabled=true;}
   }
 
   function renderHotbar(){
@@ -4923,6 +4953,7 @@ function initPersonalTd(){
     state.money=MATCH_START_MONEY;
     state.lives=Math.max(1,map.lives+diff.extraLives);
     state.wave=0;state.lastClearedWave=0;state.lastFarmPaidWave=0;state.selected=null;state.selectedTower=null;state.selectedHero=false;state.repositionTower=null;state.hero=null;state.nextTowerId=1;state.nextEnemyId=1;
+    state.unitPlacedThisMatch=false;
     state.paused=false;state.menuOpen=false;state.defeatShown=false;state.waveActive=false;state.completed=false;state.rewardGranted=false;state.masteryXpGranted=false;state.masterySession=Object.fromEntries(Object.keys(types).map(id=>[id,{used:false,damage:0,pops:0,income:0,actions:0}]));
     state.enemies=[];state.towers=[];state.shots=[];state.spawn=[];state.shadowBloons=[];state.pulses=[];state.lightning=[];state.airstrikes=[];state.bombs=[];state.floatTexts=[];state.particles=[];state.impactFx=[];state.muzzleFx=[];state.screenShake=0;state.particleTimer=0;state.last=0;
     state.pendingClearCash=0;state.pendingWaveXp=0;state.paidMilestones=new Set();
@@ -5185,7 +5216,7 @@ function initPersonalTd(){
     const pathTower=typeId==='dart'||typeId==='sniper';
     const tower={id:state.nextTowerId++,x,y,type:typeId,cool:0,level:1,angle:0,paths:pathTower?[0,0,0]:undefined,dartMainPath:null,dartLastPath:null,sniperMainPath:null,sniperLastPath:null,planeTimer:0,planeLastWave:state.wave,
       spent:price,damageDealt:0,pops:0,incomeGenerated:0,masteryAbilityCd:0,masteryBuffTimer:0,fearCooldown:typeId==='demonking'?1.4:0};
-    state.towers.push(tower);state.masterySession[typeId].used=true;
+    state.towers.push(tower);state.masterySession[typeId].used=true;state.unitPlacedThisMatch=true;
     const count=towerCount(typeId);
     state.selectedTower=null;state.selectedHero=false;cancelPlacement(true);
     setMsg($T`✓ ${type.name} posicionado. ${count}/${type.limit||TOWER_LIMIT_PER_TYPE} deste tipo. Para colocar outro, selecione o gatinho novamente na barra.`);
@@ -5201,6 +5232,7 @@ function initPersonalTd(){
     if(obstacleAt(x,y,27)){setMsg($t('🌳 Esse obstáculo ocupa o espaço do herói. Escolha outro ponto.'));return false;}
     if(state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<52)){setMsg($t('Muito perto de outro gatinho. Escolha outro ponto.'));return false;}
     state.money-=price;
+    state.unitPlacedThisMatch=true;
     state.hero={type:id,x,y,level:1,xp:0,cool:0,skillCd:0,ultimateCd:0,commandTimer:0,ultimateTimer:0,farmBoostWaves:0,damageDealt:0,pops:0,spent:price,priority:id==='warrior'?'strong':'first'};
     cancelPlacement(true);sfx('place');
     setMsg($T`🦸 ${h.name} entrou em campo! Ele sobe do nível 1 ao 10 nesta partida. Habilidade no Nv.5 e Ultimate no Nv.10.`);
@@ -5382,6 +5414,7 @@ function initPersonalTd(){
   function upgradeTower(){
     const t=selectedTower();
     if(!t){setMsg($t('Clique primeiro em um gatinho já posicionado.'));return;}
+    if(t.type==='mister'){setMsg($t('Mister não aceita upgrades. Ele está ocupado demais jogando.'));return;}
     if(t.type==='dart'||t.type==='sniper'||t.type==='frost'||t.type==='vine'||t.type==='burst'||t.type==='ninja'||t.type==='laser'||t.type==='wizard'||t.type==='electric'||t.type==='celestial'){setMsg($T`${types[t.type].name} usa a árvore de 3 caminhos na aba de upgrades da direita.`);updateUpgradePanel();return;}
     if(t.level>=MAX_LEVEL){setMsg($T`${types[t.type].name} já está no nível máximo.`);return;}
     const cost=upgradeCost(t);
@@ -5404,9 +5437,11 @@ function initPersonalTd(){
   function activateMasteryAbility(){
     const t=selectedTower();if(!t||masteryState(t.type).level<50)return;
     if((t.masteryAbilityCd||0)>0){setMsg($T`⭐ ${MASTERY_ABILITIES[t.type].name} recarrega em ${Math.ceil(t.masteryAbilityCd)}s.`);return;}
-    const st=towerStats(t),ab=MASTERY_ABILITIES[t.type],alive=state.enemies.filter(e=>!e.dead);if(!alive.length&&t.type!=='salmon'){setMsg($t('Não há inimigos no mapa para usar essa habilidade.'));return;}
+    const st=towerStats(t),ab=MASTERY_ABILITIES[t.type],alive=state.enemies.filter(e=>!e.dead);if(!alive.length&&t.type!=='salmon'&&t.type!=='mister'){setMsg($t('Não há inimigos no mapa para usar essa habilidade.'));return;}
     const strongest=()=>alive.slice().sort((a,b)=>(b.hp||0)-(a.hp||0))[0];
-    if(t.type==='dart'){
+    if(t.type==='mister'){
+      t.misterQuit=false;t.misterTime=MISTER_QUIT_SECONDS-10;spawnFloatText(t.x,t.y-34,$t('🎮 Só mais uma...'),'#7ee36b');
+    }else if(t.type==='dart'){
       alive.forEach(e=>damageEnemy(e,st.damage*.5,{...st,detectsCamo:true,breaksArmor:true}));state.pulses.push({x:W/2,y:H/2,range:Math.max(W,H),life:.45,maxLife:.45,color:'#f3bf67'});
     }else if(t.type==='sniper'){
       const e=strongest();damageEnemy(e,st.damage*10,{...st,detectsCamo:true,breaksArmor:true});const p=pointAt(e.d,e.path);spawnFloatText(p.x,p.y-30,$t('💥 EXECUÇÃO ×10'),'#ffd36b');
@@ -6084,6 +6119,13 @@ function initPersonalTd(){
     state.muzzleFx.forEach(f=>f.life-=dt);state.muzzleFx=state.muzzleFx.filter(f=>f.life>0);
     state.towers.forEach(t=>{
       t.masteryAbilityCd=Math.max(0,(t.masteryAbilityCd||0)-dt);t.masteryBuffTimer=Math.max(0,(t.masteryBuffTimer||0)-dt);
+      if(t.type==='mister'){
+        if(!t.misterQuit){
+          t.misterTime=(t.misterTime||0)+dt;
+          if(t.misterTime>=MISTER_QUIT_SECONDS){t.misterQuit=true;spawnFloatText(t.x,t.y-34,$t('🎮 Saiu pra jogar'),'#7ee36b');setMsg($t('Mister largou a defesa: agora ele só quer saber de Minecraft.'));if(state.selectedTower===t.id)updateUpgradePanel();}
+        }
+        if(t.misterQuit)return;
+      }
       const st=towerStats(t);
       if(st.farm)return;
       if((t.stunTimer||0)>0)return;
@@ -6376,6 +6418,7 @@ function initPersonalTd(){
     }
     if(state.lives<=0&&!state.defeatShown){
       state.defeatShown=true;playMusicTheme(state.map);setMsg(isInfinite()?$T`∞ Fim do Infinito. Você concluiu ${state.lastClearedWave} rodadas.`:$t('Fim de jogo. Reinicie o mapa e tente outra estratégia.'));showResult(false);
+      if(!state.unitPlacedThisMatch&&!profile.secretUnlocks?.mister){if(!profile.secretUnlocks)profile.secretUnlocks={};profile.secretUnlocks.mister=true;saveProfile();renderUnlocks();setTimeout(()=>queueSecretReveals(['mister']),600);}
     }
     updateStats();
   }
@@ -6679,6 +6722,15 @@ function drawTower(t){
       ctx.strokeStyle='#f5e7a6';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-4,r+8,now*.8,now*.8+Math.PI*1.6);ctx.stroke();
       const count=Math.min(6,st.droneCount||1);for(let i=0;i<count;i++){const a=now*.9+i*Math.PI*2/count,rr=r+19+(i%2)*4,dx=Math.cos(a)*rr,dy=Math.sin(a)*rr*.55-4;ctx.save();ctx.translate(dx,dy);ctx.rotate(a+Math.PI/2);ctx.fillStyle='#172838';ctx.strokeStyle='#8fdcff';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(0,-5);ctx.lineTo(7,5);ctx.lineTo(0,3);ctx.lineTo(-7,5);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
       ctx.fillStyle='#8fdcff';ctx.font='900 12px Segoe UI Symbol';ctx.textAlign='center';ctx.fillText('✦',0,-r-16);
+    }else if(t.type==='mister'){
+      // Moletom verde + headset gamer. Quando desiste, a tela do "PC" acende na frente dele.
+      ctx.fillStyle='#3f9e3a';ctx.strokeStyle='#235e22';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(-r*.7,7,r*1.4,r*.88,5);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#2f7d2c';for(let i=0;i<3;i++)ctx.fillRect(-r*.5+i*r*.36,11+(i%2)*4,4,4);
+      ctx.strokeStyle='#202430';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,-5,r*.98,Math.PI*1.08,Math.PI*1.92);ctx.stroke();
+      ctx.fillStyle='#202430';ctx.beginPath();ctx.roundRect(-r-3,-9,6,11,3);ctx.fill();ctx.beginPath();ctx.roundRect(r-3,-9,6,11,3);ctx.fill();
+      ctx.fillStyle='#59c94b';ctx.fillRect(-r-1,-6,2,5);ctx.fillRect(r-1,-6,2,5);
+      ctx.strokeStyle='#202430';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(-r,1);ctx.quadraticCurveTo(-r*.7,8,-r*.3,7);ctx.stroke();
+      if(st.misterQuit){ctx.fillStyle='#14202b';ctx.strokeStyle='#59c94b';ctx.lineWidth=1.2;ctx.beginPath();ctx.roundRect(r*.55,-4,13,10,2);ctx.fill();ctx.stroke();ctx.fillStyle='#7ee36b';ctx.globalAlpha=.55+.45*Math.sin(now*6);ctx.fillRect(r*.55+2,-2,9,6);ctx.globalAlpha=1;}
     }
 
     ctx.restore();
@@ -6705,6 +6757,19 @@ function drawTower(t){
     ctx.fillStyle='#f6f4ff';ctx.font='800 9px Segoe UI,Arial';ctx.textAlign='center';
     ctx.fillText(t.type==='dart'?`${dartTier>=DART_MAX_TIER?'★':''}T${dartTier}`:t.type==='sniper'?`${sniperTier>=SNIPER_MAX_TIER?'★':''}T${sniperTier}`:t.type==='frost'?`${frostTier>=FROST_MAX_TIER?'★':''}T${frostTier}`:t.type==='vine'?`${vineTier>=VINE_MAX_TIER?'★':''}T${vineTier}`:t.type==='burst'?`${burstTier>=BURST_MAX_TIER?'★':''}T${burstTier}`:t.type==='ninja'?`${ninjaTier>=NINJA_MAX_TIER?'★':''}T${ninjaTier}`:t.type==='laser'?`${laserTier>=LASER_MAX_TIER?'★':''}T${laserTier}`:t.type==='wizard'?`${wizardTier>=WIZARD_MAX_TIER?'★':''}T${wizardTier}`:t.type==='electric'?`${electricTier>=ELECTRIC_MAX_TIER?'★':''}T${electricTier}`:t.type==='celestial'?`${celestialTier>=CELESTIAL_MAX_TIER?'★':''}T${celestialTier}`:`${lv>=MAX_LEVEL?'★':''}L${lv}`,t.x,t.y+r+15);
   }
+
+function drawMisterBubble(t){
+  const text=$t('Amo jogar minecraft por 14h seguidas');
+  ctx.save();ctx.font='800 11px Segoe UI,Arial';
+  const w=Math.ceil(ctx.measureText(text).width)+16,h=22,x=Math.max(6,Math.min(W-w-6,t.x-w/2)),y=Math.max(6,t.y-62);
+  ctx.fillStyle='#fffdf5';ctx.strokeStyle='#2b2f3a';ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.fill();ctx.stroke();
+  const tx=Math.max(x+10,Math.min(x+w-10,t.x));
+  ctx.beginPath();ctx.moveTo(tx-6,y+h-1);ctx.lineTo(tx,y+h+8);ctx.lineTo(tx+6,y+h-1);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(tx-6,y+h);ctx.lineTo(tx,y+h+8);ctx.lineTo(tx+6,y+h);ctx.stroke();
+  ctx.fillStyle='#1d2330';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,x+w/2,y+h/2+.5);
+  ctx.restore();
+}
 
 function drawTree(x,y,s=1,night=false){
   ctx.save();ctx.translate(x,y);ctx.scale(s,s);
@@ -7101,6 +7166,7 @@ function draw(){
 
   ctx.save();ctx.textAlign='left';ctx.font='800 11px Segoe UI,Arial';ctx.fillStyle='#071019bb';ctx.fillRect(12,12,136,30);ctx.fillStyle='#dceef6';ctx.fillText($T`⏩ Velocidade ${state.gameSpeed}×`,22,31);ctx.restore();
 
+  state.towers.forEach(t=>{if(t.type==='mister'&&t.misterQuit)drawMisterBubble(t);});
   if(state.completed){
     const stars=mapStars(state.map),diff=currentDifficulty();
     ctx.fillStyle='#05050bd4';ctx.fillRect(0,0,W,H);

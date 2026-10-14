@@ -1,4 +1,4 @@
-CATOONS TD v0.29.0 — INGLÊS + TROCA DE IDIOMA
+CATOONS TD v0.29.2 — INTERFACE RESPONSIVA PARA CELULAR
 
 Esta edição não contém executáveis, launchers, arquivos .bat ou instaladores.
 Ela possui somente HTML, CSS, JavaScript e este arquivo de instruções.
@@ -7,6 +7,17 @@ COMO ABRIR
 1. Extraia o ZIP para uma pasta.
 2. Abra o arquivo index.html com Google Chrome ou Microsoft Edge.
    Ou jogue direto no navegador: https://luanhcp.github.io/CatoonsTD/
+
+NOVO v0.29.2 — CELULAR
+- A partida agora reorganiza HUD, mapa, gatinhos e controles para telas estreitas.
+- Botões de toque maiores e barra de gatinhos com rolagem horizontal.
+- Poderes ficam compactos e o painel de upgrades usa uma folha sobre o mapa.
+- Funciona em retrato; para enxergar o mapa maior, use o celular deitado.
+
+NOVO v0.29.1 — GATINHO MISTER
+- Novo gatinho secreto: Mister 🎮. Custa 999, dá 1 de dano com alcance 5 e, depois de 30 segundos, vai jogar Minecraft.
+- Como desbloquear? Segredo. 🐾
+- A janela de "Segredo descoberto" agora aparece por cima da tela de resultado.
 
 NOVO v0.29.0 — IDIOMAS
 - O jogo inteiro agora existe em português e em inglês.

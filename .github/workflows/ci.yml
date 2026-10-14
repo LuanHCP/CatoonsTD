@@ -21,8 +21,8 @@ jobs:
       - name: Check JavaScript syntax
         run: node --check src/game.js
 
-      - name: Verify web entrypoint
-        run: test -f index.html && test -f src/style.css
+      - name: Validate release structure and HTML5 assets
+        run: node scripts/validate-release.mjs
 
   build-launcher:
     runs-on: ubuntu-latest

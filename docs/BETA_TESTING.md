@@ -1,6 +1,6 @@
 # Checklist de Beta / Playtest
 
-## Objetivo — v0.29.0
+## Objetivo — v0.29.2
 
 Validar se os sistemas atuais funcionam juntos antes de adicionar novas mecânicas grandes.
 
@@ -42,6 +42,10 @@ Validar se os sistemas atuais funcionam juntos antes de adicionar novas mecânic
 - [ ] Confirmar skin dourada e recompensa máxima.
 - [ ] Verificar que secretos não aparecem antes do desbloqueio.
 - [ ] Confirmar reconhecimento retroativo para saves que já cumprem requisitos.
+- [ ] Perder uma fase sem colocar gatinho/herói e confirmar o desbloqueio do Gatinho Mister.
+- [ ] Confirmar que o Gatinho Mister custa 🐟 999 em todos os tiers, tem limite de 1 e não aceita upgrades.
+- [ ] Confirmar que o Gatinho Mister para de atacar após 30 segundos e volta temporariamente com a habilidade de Maestria.
+- [ ] Confirmar que a revelação do secreto aparece acima da tela de resultado.
 
 ## 6. Inimigos especiais
 
@@ -94,6 +98,11 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 - [ ] Confirmar que Play abre a fase e reposiciona a tela corretamente.
 - [ ] Testar todos os botões do menu, pausa, velocidade, upgrades e configurações.
 - [ ] Confirmar que preços e recompensas da partida usam salmões (🐟), não `$` ou “ouro”.
+- [ ] Em celular 390×844 (retrato), confirmar que HUD, mapa, gatinhos e botão de rodada ficam acessíveis sem zoom manual.
+- [ ] Em celular 844×390 (paisagem), confirmar que o mapa ganha área e os controles continuam acessíveis.
+- [ ] Girar o aparelho durante uma partida e confirmar que o mapa se recalibra sem perder a partida.
+- [ ] Arrastar horizontalmente a barra de gatinhos/poderes e confirmar que o gesto não posiciona unidades por acidente.
+- [ ] Abrir upgrades no celular e confirmar rolagem, fechamento, compra, venda e reposicionamento.
 
 ## 11. Conteúdo v0.28.x
 
@@ -104,7 +113,7 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 - [ ] Confirmar que o Pix abre, copia o código e não concede recompensa de gameplay.
 - [ ] Abrir o formulário de feedback pelas Configurações.
 
-## 12. Idiomas (v0.29.0)
+## 12. Idiomas (v0.29.2)
 
 - [ ] Abrir com save limpo num navegador em inglês e confirmar que o jogo inicia em inglês.
 - [ ] Trocar o idioma pelo botão 🌐 do lobby e pelo seletor em Configurações.
@@ -120,7 +129,7 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 ## Modelo para reportar bug
 
 ```text
-Versão: v0.29.0
+Versão: v0.29.2
 Idioma:
 Mapa:
 Tier:
