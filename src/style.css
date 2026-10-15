@@ -610,6 +610,29 @@ body.in-game .game-panel{width:min(1540px,100%)}
 @media(max-width:1050px){.cats-mastery-layout{grid-template-columns:1fr}.cat-mastery-detail{position:relative;top:auto}.mastery-collection{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.mastery-collection{grid-template-columns:1fr}}
 
+/* v0.29.3 — ficha de caminhos e valores acessível pela coleção de gatinhos. */
+body.cat-build-open{overflow:hidden}
+.cat-build-modal{z-index:110;padding:14px}
+.cat-build-card{position:relative;width:min(1180px,96vw);max-height:94dvh;padding:22px;text-align:left}
+.cat-build-close{position:sticky;z-index:5;top:0;float:right;width:42px;height:42px;padding:0;border-radius:50%;background:#0b1720e8;border-color:#527083;color:#eefaff;font-size:16px}
+.cat-build-hero{display:flex;align-items:center;gap:14px;padding-right:48px}
+.cat-build-icon{width:64px;height:64px;flex:0 0 64px;display:grid;place-items:center;border:1px solid var(--cat-color);border-radius:18px;background:color-mix(in srgb,var(--cat-color) 13%,#081018);box-shadow:inset 0 0 24px color-mix(in srgb,var(--cat-color) 18%,transparent);font-size:34px}
+.cat-build-hero h2{margin:3px 0!important;font-size:27px!important}.cat-build-hero p{font-size:12px}
+.cat-build-special{margin:14px 0 0!important;padding:11px 13px;border:1px solid #2e4655;border-radius:12px;background:#09141d;color:#cfe0e7!important;font-size:12px}
+.cat-build-base{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.cat-build-base span{padding:6px 9px;border:1px solid #314b5a;border-radius:999px;background:#0b1821;color:#d7ebf3;font-size:10px;font-weight:800}
+.cat-build-prices{margin-top:11px;padding:10px 12px;border:1px solid #5b4c29;border-radius:12px;background:#211b0d;color:#ecd98f;font-size:11px}
+.cat-build-prices>div{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}.cat-build-prices span{padding:5px 7px;border-radius:8px;background:#0b1218;color:#cbdbe1}
+.cat-build-rule{margin:12px 0 9px;padding:9px 11px;border-left:3px solid #70caea;background:#0b1923;color:#bfe4f1;font-size:11px;font-weight:800}
+.cat-build-paths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.cat-build-paths.one{grid-template-columns:1fr}
+.cat-build-path{min-width:0;border:1px solid #304653;border-radius:14px;background:linear-gradient(180deg,#111c25,#091118);box-shadow:inset 4px 0 0 var(--path-color);overflow:hidden}
+.cat-build-path>header{display:flex;gap:9px;align-items:center;padding:11px 12px;border-bottom:1px solid #263a46;background:color-mix(in srgb,var(--path-color) 8%,transparent)}
+.cat-build-path>header>span{font-size:25px}.cat-build-path header small{display:block;color:#8ba3ad;font-size:8px;font-weight:900;letter-spacing:.11em}.cat-build-path h3{margin:1px 0 0;font-size:14px}
+.cat-build-path ol{list-style:none;margin:0;padding:6px}.cat-build-path li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:7px;align-items:start;padding:8px 6px;border-bottom:1px solid #1f303a}.cat-build-path li:last-child{border-bottom:0}
+.cat-build-tier{display:grid;place-items:center;min-height:26px;border:1px solid var(--path-color);border-radius:8px;color:var(--path-color);font-size:9px;font-weight:900}.cat-build-path li div{min-width:0}.cat-build-path li b{display:block;color:#edf7fb;font-size:10.5px}.cat-build-path li small{display:block;margin-top:3px;color:#9eb2bc;font-size:9px;line-height:1.35}.cat-build-path li strong{white-space:nowrap;color:#f3d475;font-size:9px}
+.cat-build-no-upgrades{padding:22px;text-align:center}.cat-build-no-upgrades b{font-size:20px;color:#8ee37b}.cat-build-no-upgrades p{margin-top:8px!important}
+@media(max-width:900px){.cat-build-paths{grid-template-columns:1fr}.cat-build-card{padding:16px}.cat-build-path li small{font-size:10px}}
+@media(max-width:520px){.cat-build-modal{padding:5px}.cat-build-card{width:100%;max-height:calc(100dvh - 10px);padding:12px;border-radius:15px}.cat-build-hero{gap:9px}.cat-build-icon{width:48px;height:48px;flex-basis:48px;font-size:26px}.cat-build-hero h2{font-size:20px!important}.cat-build-prices>div{display:grid;grid-template-columns:1fr 1fr}.cat-build-path li{grid-template-columns:28px minmax(0,1fr)}.cat-build-path li strong{grid-column:2}.cat-build-close{width:38px;height:38px}}
+
 /* v0.15.0 — Heróis Gatinhos */
 .heroes-card{border-color:#7b6231!important;background:linear-gradient(145deg,#231b0d,#111821)!important}
 .hero-loadout-strip{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:14px 0;padding:13px 15px;border:1px solid #5d4b28;border-radius:15px;background:linear-gradient(135deg,#231b0f,#111922)}

@@ -6,7 +6,7 @@
 
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-**Status:** Beta público · **Build:** v0.29.2
+**Status:** Beta público · **Build:** v0.29.3
 **Plataformas:** Navegador moderno em computador e celular · Windows x64 via launcher local
 **Idiomas:** Português (Brasil) e English — detectado pelo navegador, com troca manual no jogo
 
@@ -47,6 +47,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 - **Venda por 50% do investimento**, reposicionamento e estatísticas por torre.
 - **Português e inglês**, com troca de idioma no lobby/Configurações.
 - **Interface responsiva para celular**, priorizando o modo deitado e mantendo suporte ao modo retrato.
+- **Fichas de upgrades na coleção**, com todos os caminhos, tiers, preços e efeitos antes de entrar numa partida.
 - **Tutorial guiado**, configurações, exportação/importação de save e painel de playtest por `F8`.
 - **Launcher Windows em Go**, sem embutir ou extrair o jogo: ele apenas abre a build local em modo app no Edge/Chrome.
 

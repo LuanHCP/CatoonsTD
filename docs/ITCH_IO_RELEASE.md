@@ -2,7 +2,7 @@
 
 ## Arquivo para upload
 
-Use `CatoonsTD_v0.29.2_ITCH_HTML5.zip`, gerado por `scripts/package_itch.ps1`. O ZIP contém `index.html` na raiz e somente os arquivos necessários para a versão web.
+Use `CatoonsTD_v0.29.3_ITCH_HTML5.zip`, gerado por `scripts/package_itch.ps1`. O ZIP contém `index.html` na raiz e somente os arquivos necessários para a versão web.
 
 ## Configuração recomendada
 

@@ -11,7 +11,7 @@
   <main class="game-shell">
     <header class="hero">
       <div>
-        <span class="eyebrow">NAVEGADOR • v0.29.2 BETA</span>
+        <span class="eyebrow">NAVEGADOR • v0.29.3 BETA</span>
         <h1>Catoons TD</h1>
         <p>Escolha um lobby, evolua sua conta e monte sua defesa felina.</p>
       </div>
@@ -394,6 +394,13 @@
     </section>
   </main>
 
+  <div id="cat-build-modal" class="game-modal cat-build-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="cat-build-title">
+    <div class="game-modal-card cat-build-card" tabindex="-1">
+      <button type="button" id="cat-build-close" class="cat-build-close" aria-label="Fechar detalhes do gatinho">✕</button>
+      <div id="cat-build-content"></div>
+    </div>
+  </div>
+
   <div id="pause-menu" class="game-modal" aria-hidden="true">
     <div class="game-modal-card pause-card">
       <span class="eyebrow" id="menu-kicker">PARTIDA PAUSADA</span>
@@ -435,9 +442,9 @@
           <input type="file" id="menu-import-save-input" accept="application/json,.json" hidden>
         </div>
         <section class="beta-notice" aria-label="Informações do beta">
-          <b>🧪 Beta v0.29.2</b>
+          <b>🧪 Beta v0.29.3</b>
           <p>O progresso fica salvo somente neste navegador. Exporte seu save regularmente para não perder a evolução ao limpar os dados do navegador ou trocar de computador.</p>
-          <a class="ghost beta-feedback-button" href="https://github.com/LuanHCP/CatoonsTD/issues/new?template=bug_report.md&amp;title=%5BBETA%20v0.29.2%5D%20" target="_blank" rel="noopener noreferrer">🐞 Enviar feedback ou relatar bug</a>
+          <a class="ghost beta-feedback-button" href="https://github.com/LuanHCP/CatoonsTD/issues/new?template=bug_report.md&amp;title=%5BBETA%20v0.29.3%5D%20" target="_blank" rel="noopener noreferrer">🐞 Enviar feedback ou relatar bug</a>
         </section>
         <small id="menu-save-io-status" class="modal-hint" hidden></small>
       </div>
@@ -454,7 +461,7 @@
       <details class="enemy-guide credits-details">
         <summary>🎬 Créditos</summary>
         <div class="credits-body">
-          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.29.2</span></p>
+          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.29.3</span></p>
           <p>Criado por <b>Luan</b>.</p>
           <p>Trilha sonora, efeitos sonoros e toda a arte das torres, heróis e mapas são originais, feitos direto no jogo.</p>
           <p class="credits-thanks">Obrigado por jogar! 🐾</p>

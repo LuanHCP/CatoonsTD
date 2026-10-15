@@ -11,6 +11,36 @@ const I18N_LANG=(()=>{
   return /^pt/i.test(nav)?'pt':'en';
 })();
 const I18N_EN={
+  "NAVEGADOR • v0.29.3 BETA": "BROWSER • v0.29.3 BETA",
+  "🧪 Beta v0.29.3": "🧪 Beta v0.29.3",
+  "FICHA DE UPGRADES": "UPGRADE SHEET",
+  "CAMINHO": "PATH",
+  "EVOLUÇÃO": "PROGRESSION",
+  "Caminho linear": "Linear progression",
+  "Base": "Base",
+  "Upgrade para nível": "Upgrade to level",
+  "Abrir caminhos e upgrades de": "Open paths and upgrades for",
+  "Fechar detalhes do gatinho": "Close kitten details",
+  "Preço de colocação por categoria de mapa": "Placement price by map category",
+  "Escolha até 2 caminhos: um pode chegar ao T5 e o caminho secundário fica limitado ao T3.": "Choose up to 2 paths: one can reach T5 and the secondary path is limited to T3.",
+  "📏 Alcance global": "📏 Global range",
+  "🛡️ Quebra blindagem": "🛡️ Breaks armor",
+  "🥷 Detecta camuflados": "🥷 Detects Camo",
+  "alcance global": "global range",
+  "detecta Camo": "detects Camo",
+  "quebra blindagem": "breaks armor",
+  "recarga": "cooldown",
+  "cadência": "rate",
+  "💥 Dano:": "💥 Damage:",
+  "📏 Alcance:": "📏 Range:",
+  "⚡ Cadência:": "⚡ Fire rate:",
+  "💣 Área:": "💣 Area:",
+  "⚡ Cadeia:": "⚡ Chain:",
+  "🎣 Renda: 🐟": "🎣 Income: 🐟",
+  "🌱 Iniciantes:": "🌱 Beginner:",
+  "🧭 Medianos:": "🧭 Medium:",
+  "🔥 Difíceis:": "🔥 Hard:",
+  "💀 Impossíveis:": "💀 Impossible:",
   "• 🎮 jogando Minecraft": "• 🎮 playing Minecraft",
   "• ⏱️ desiste em": "• ⏱️ quits in",
   "🎮 Sem upgrades": "🎮 No upgrades",
@@ -1231,8 +1261,6 @@ const I18N_EN={
   "Troque o idioma no lobby (a página recarrega).": "Change the language from the lobby (the page reloads).",
   "NAVEGADOR • v0.29.0 BETA": "BROWSER • v0.29.0 BETA",
   "NAVEGADOR • v0.29.1 BETA": "BROWSER • v0.29.1 BETA",
-  "NAVEGADOR • v0.29.2 BETA": "BROWSER • v0.29.2 BETA",
-  "🧪 Beta v0.29.2": "🧪 Beta v0.29.2",
   "Jogue com o celular deitado": "Play with your phone sideways",
   "O mapa e os controles ficam maiores.": "The map and controls will be larger.",
   "+alcance.": "+range.",
@@ -2020,6 +2048,13 @@ const CELESTIAL_PATHS = [
   ]}
 ];
 
+// A coleção usa as mesmas definições da partida para que nomes, preços e efeitos
+// nunca fiquem diferentes entre a ficha do gatinho e a árvore comprável no mapa.
+const COLLECTION_TOWER_PATHS={
+  dart:DART_PATHS,sniper:SNIPER_PATHS,frost:FROST_PATHS,vine:VINE_PATHS,burst:BURST_PATHS,
+  ninja:NINJA_PATHS,laser:LASER_PATHS,wizard:WIZARD_PATHS,electric:ELECTRIC_PATHS,celestial:CELESTIAL_PATHS
+};
+
 const powers = {
   frenzy:{name:$t('Patinhas Frenéticas'),icon:'⚡',cost:70,duration:10,description:$t('Todas as torres atacam 2× mais rápido por 10 segundos.'),effect:'attackSpeed'},
   focus:{name:$t('Instinto Predador'),icon:'🔥',cost:85,duration:10,description:$t('Todas as torres causam 2× de dano por 10 segundos.'),effect:'damage'},
@@ -2658,18 +2693,101 @@ function renderCatMasteryDetail(id){
     <div class="mastery-reward">${max?$t('✨ Skin dourada equipada automaticamente • recompensa de nível 50 recebida'):$t('🎁 Nível 50: skin dourada + habilidade exclusiva + 🪙 ')+MASTERY_MAX_COINS+$t(' moedas')}</div>`;
   drawCollectionCat(id);
 }
+
+let catBuildLastTrigger=null;
+
+function collectionBaseStats(id){
+  const t=types[id],items=[];
+  if(t.farm)items.push($T`🎣 Renda: 🐟 ${t.farmIncome}/rodada`);
+  else if(t.damage>0)items.push($T`💥 Dano: ${Number(t.damage).toFixed(2)}`);
+  if(t.globalRange)items.push($t('📏 Alcance global'));
+  else if(t.range>0)items.push($T`📏 Alcance: ${t.range}`);
+  if(t.rate>0&&!t.farm)items.push($T`⚡ Cadência: ${(1/t.rate).toFixed(2)}/s`);
+  if(t.splash)items.push($T`💣 Área: ${t.splash}`);
+  if(t.chainTargets)items.push($T`⚡ Cadeia: ${t.chainTargets} alvos`);
+  if(t.breaksArmor)items.push($t('🛡️ Quebra blindagem'));
+  if(t.detectsCamo)items.push($t('🥷 Detecta camuflados'));
+  return items;
+}
+
+function collectionLinearStats(id,level){
+  const base=types[id],step=Math.max(0,level-1),items=[];
+  const damage=Number((base.damage*Math.pow(1.70,step)).toFixed(2));
+  const range=base.globalRange?base.range:Math.round(base.range*(1+step*.16));
+  const normalRate=base.rate?Math.max(base.rate*.48,base.rate*Math.pow(.82,step)):0;
+  const rate=base.rootHold?Math.max(base.minRate||4,base.rate-step*((base.rate-(base.minRate||4))/3)):normalRate;
+  const farmIncome=base.farmIncome?Math.round(base.farmIncome*Math.pow(1.37,step)):0;
+  if(base.farm)items.push($T`🐟 ${farmIncome}/rodada`);
+  else if(base.damage>0)items.push($T`Dano ${damage}`);
+  if(base.globalRange)items.push($t('alcance global'));
+  else if(range>0)items.push($T`alcance ${range}`);
+  if(rate>0&&!base.farm)items.push($T`${base.rootHold?$t('recarga'):$t('cadência')} ${base.rootHold?rate.toFixed(1)+'s':(1/rate).toFixed(2)+'/s'}`);
+  if(base.splash)items.push($T`área ${base.splash+step*12}`);
+  if(id==='boomerang')items.push($T`${(base.boomerangTargets||3)+step} alvos`, $T`retorno ×${((base.returnMultiplier||.58)+step*.09).toFixed(2)}`);
+  if(id==='alchemist')items.push($T`veneno ${((base.alchemyPoison||.65)+step*.28).toFixed(2)}`, $T`fraqueza +${Math.round(((base.alchemyMark||.14)+step*.035)*100)}%`, $T`explosão ×${((base.alchemyExplosion||1.45)+step*.18).toFixed(2)}`);
+  if(id==='chronomancer')items.push($T`retorno em ${Math.max(2.2,(base.temporalDelay||3.2)-step*.22).toFixed(2)}s`, $T`velocidade inimiga ${Math.round(Math.max(.48,(base.slowFactor||.72)-step*.06)*100)}%`);
+  if(id==='demonking')items.push($T`Medo a cada ${Math.max(7.5,(base.fearInterval||11)-step*1.05).toFixed(1)}s`, $T`raio ${Math.round((base.fearRadius||158)+step*14)}`, $T`${(base.shadowCap||8)+step} sombras`);
+  if((id==='boomerang'&&step>=2)||(id==='chronomancer'&&step>=2)||(id==='demonking'&&step>=3))items.push($t('detecta Camo'));
+  if((id==='boomerang'&&step>=3)||(id==='alchemist'&&step>=3)||(id==='chronomancer'&&step>=2)||(id==='demonking'&&step>=2))items.push($t('quebra blindagem'));
+  return items;
+}
+
+function collectionUpgradePrice(id,currentLevel){
+  return Math.max(1,Math.round(types[id].cost*(.82+currentLevel*.56)*GLOBAL_UPGRADE_PRICE_MULTIPLIER));
+}
+
+function renderCollectionPath(path){
+  const tiers=path.tiers.map((tier,index)=>`<li><span class="cat-build-tier">T${index+1}</span><div><b>${tier.name}</b><small>${tier.description}</small></div><strong>🐟 ${Math.max(1,Math.round(tier.cost*GLOBAL_UPGRADE_PRICE_MULTIPLIER))}</strong></li>`).join('');
+  return `<article class="cat-build-path" style="--path-color:${path.color}"><header><span>${path.icon}</span><div><small>${$t('CAMINHO')}</small><h3>${path.name}</h3></div></header><ol>${tiers}</ol></article>`;
+}
+
+function renderCollectionLinear(id){
+  const t=types[id];
+  if(id==='mister')return `<section class="cat-build-no-upgrades"><b>${$t('🎮 Sem upgrades')}</b><p>${t.special}</p></section>`;
+  const levels=Array.from({length:4},(_,index)=>{
+    const level=index+1,price=level===1?'':`<strong>🐟 ${collectionUpgradePrice(id,level-1)}</strong>`;
+    return `<li><span class="cat-build-tier">N${level}</span><div><b>${level===1?$t('Base'):$T`Upgrade para nível ${level}`}</b><small>${collectionLinearStats(id,level).join(' • ')}</small></div>${price}</li>`;
+  }).join('');
+  return `<article class="cat-build-path linear" style="--path-color:${t.color}"><header><span>📈</span><div><small>${$t('EVOLUÇÃO')}</small><h3>${$t('Caminho linear')}</h3></div></header><ol>${levels}</ol></article>`;
+}
+
+function openCatBuildModal(id,trigger){
+  const modal=$('#cat-build-modal'),root=$('#cat-build-content'),t=types[id];if(!modal||!root||!t)return;
+  const paths=COLLECTION_TOWER_PATHS[id]||null,prices=MAP_CATEGORIES.map(category=>`<span>${category.icon} ${category.name}: <b>🐟 ${towerPrice(id,category.maps[0])}</b></span>`).join('');
+  const body=paths
+    ?`<div class="cat-build-rule">${$t('Escolha até 2 caminhos: um pode chegar ao T5 e o caminho secundário fica limitado ao T3.')}</div><div class="cat-build-paths">${paths.map(renderCollectionPath).join('')}</div>`
+    :`<div class="cat-build-paths one">${renderCollectionLinear(id)}</div>`;
+  root.innerHTML=`<header class="cat-build-hero" style="--cat-color:${t.color}"><div class="cat-build-icon">${t.icon}</div><div><span class="eyebrow">${$t('FICHA DE UPGRADES')}</span><h2 id="cat-build-title">${t.name}</h2><p>${t.role}</p></div></header>
+    <p class="cat-build-special">${t.special}</p>
+    <div class="cat-build-base">${collectionBaseStats(id).map(item=>`<span>${item}</span>`).join('')}</div>
+    <section class="cat-build-prices"><b>${$t('Preço de colocação por categoria de mapa')}</b><div>${prices}</div></section>${body}`;
+  catBuildLastTrigger=trigger||document.activeElement;
+  modal.classList.add('visible');modal.setAttribute('aria-hidden','false');document.body.classList.add('cat-build-open');
+  requestAnimationFrame(()=>$('#cat-build-close')?.focus());
+}
+
+function closeCatBuildModal(){
+  const modal=$('#cat-build-modal');if(!modal||!modal.classList.contains('visible'))return false;
+  modal.classList.remove('visible');modal.setAttribute('aria-hidden','true');document.body.classList.remove('cat-build-open');
+  if(catBuildLastTrigger?.isConnected)catBuildLastTrigger.focus();catBuildLastTrigger=null;return true;
+}
+
 function renderCatCollection(){
   if($('#cats-level')) $('#cats-level').textContent=profile.level;
   const root=$('#cat-collection');if(!root)return;
   if(!types[catCollectionSelection]||((types[catCollectionSelection].secret||types[catCollectionSelection].exclusive)&&!isTowerUnlocked(catCollectionSelection)))catCollectionSelection='dart';
   const visibleTypes=Object.entries(types).filter(([id,t])=>!(t.secret||t.exclusive)||isTowerUnlocked(id));
   root.innerHTML=visibleTypes.map(([id,t])=>{const unlocked=isTowerUnlocked(id),m=masteryState(id),pct=masteryProgressPct(id),max=m.level>=50,need=max?0:requiredMasteryXp(m.level);
-    return `<article class="cat-card mastery-card ${unlocked?'':'locked'} ${max?'mastered':''} ${catCollectionSelection===id?'selected':''}" data-mastery-cat="${id}" style="--cat-glow:${max?'#f2cf62':t.color}33">
+    return `<article class="cat-card mastery-card ${unlocked?'':'locked'} ${max?'mastered':''} ${catCollectionSelection===id?'selected':''}" data-mastery-cat="${id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${$T`Abrir caminhos e upgrades de ${t.name}`}" style="--cat-glow:${max?'#f2cf62':t.color}33">
       <div class="cat-head"><div class="cat-avatar">${unlocked?t.icon:'🔒'}</div><div><h3>${t.name}</h3><small>${t.role} • base 🐟 ${Math.round(t.cost*GLOBAL_TOWER_PRICE_MULTIPLIER)}</small></div></div>
       <p class="cat-role">${max?$t('<span class="mastery-gold-label">⭐ Maestria Máxima • Skin Dourada</span>'):$T`Maestria ${m.level}/50`} • ${masteryBonusSummary(id).text}</p>
       <div class="mastery-mini-track"><i style="width:${pct}%"></i></div><div class="mastery-mini-text"><span>${max?'MAX':`${m.xp}/${need} XP`}</span><span>${Math.round(pct)}%</span></div>
       <div class="cat-unlock">${unlocked?$t('✓ Liberado para jogar'):$T`🔒 Libera no nível ${t.unlockLevel} • você está no ${profile.level}`}</div></article>`;}).join('');
-  $$('[data-mastery-cat]').forEach(card=>card.onclick=()=>{catCollectionSelection=card.dataset.masteryCat;renderCatCollection();});
+  $$('[data-mastery-cat]').forEach(card=>{
+    const open=()=>{catCollectionSelection=card.dataset.masteryCat;$$('[data-mastery-cat]').forEach(item=>item.classList.toggle('selected',item===card));renderCatMasteryDetail(catCollectionSelection);openCatBuildModal(catCollectionSelection,card);};
+    card.onclick=open;
+    card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
+  });
   renderCatMasteryDetail(catCollectionSelection);
 }
 
@@ -7266,6 +7384,7 @@ if($('#result-next'))$('#result-next').onclick=e=>{
   sfx('ui');hideGameModal('#result-screen');runMapLoading(mapId,diffId,()=>{loadSelection(mapId,diffId,'campaign');setScreen('game');},'campaign');
 };
 window.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&closeCatBuildModal()){e.preventDefault();return;}
   if(e.key==='F8'&&document.body.dataset.screen==='game'){e.preventDefault();togglePlaytestDebug();return;}
   if(e.key!=='Escape'||document.body.dataset.screen!=='game'||state.completed||state.lives<=0)return;
   if(state.repositionTower){cancelReposition();return;}
@@ -7273,6 +7392,8 @@ window.addEventListener('keydown',e=>{
   if(state.selectedTower){closeUpgradePanel(false);return;}
   if(state.menuOpen)closePauseMenu(true);else openPauseMenu();
 });
+if($('#cat-build-close'))$('#cat-build-close').onclick=closeCatBuildModal;
+if($('#cat-build-modal'))$('#cat-build-modal').onclick=e=>{if(e.target.id==='cat-build-modal')closeCatBuildModal();};
 if($('#secret-unlock-close'))$('#secret-unlock-close').onclick=closeSecretReveal;
 if($('#td-upgrade'))$('#td-upgrade').onclick=upgradeTower;
 if($('#td-reposition'))$('#td-reposition').onclick=e=>{e.stopPropagation();beginReposition();};

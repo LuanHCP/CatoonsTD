@@ -1,6 +1,6 @@
 # Checklist de Beta / Playtest
 
-## Objetivo — v0.29.2
+## Objetivo — v0.29.3
 
 Validar se os sistemas atuais funcionam juntos antes de adicionar novas mecânicas grandes.
 
@@ -103,6 +103,8 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 - [ ] Girar o aparelho durante uma partida e confirmar que o mapa se recalibra sem perder a partida.
 - [ ] Arrastar horizontalmente a barra de gatinhos/poderes e confirmar que o gesto não posiciona unidades por acidente.
 - [ ] Abrir upgrades no celular e confirmar rolagem, fechamento, compra, venda e reposicionamento.
+- [ ] Na coleção, abrir a ficha de um gatinho com 3 caminhos e confirmar nomes, T1–T5, efeitos e preços.
+- [ ] Abrir a ficha do Pescador e confirmar a progressão linear; fechar pelo botão, fundo e tecla Esc.
 
 ## 11. Conteúdo v0.28.x
 
@@ -113,7 +115,7 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 - [ ] Confirmar que o Pix abre, copia o código e não concede recompensa de gameplay.
 - [ ] Abrir o formulário de feedback pelas Configurações.
 
-## 12. Idiomas (v0.29.2)
+## 12. Idiomas (v0.29.3)
 
 - [ ] Abrir com save limpo num navegador em inglês e confirmar que o jogo inicia em inglês.
 - [ ] Trocar o idioma pelo botão 🌐 do lobby e pelo seletor em Configurações.
@@ -129,7 +131,7 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 ## Modelo para reportar bug
 
 ```text
-Versão: v0.29.2
+Versão: v0.29.3
 Idioma:
 Mapa:
 Tier:

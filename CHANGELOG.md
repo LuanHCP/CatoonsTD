@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.29.3 — fichas de upgrades na coleção
+
+- Clicar ou usar Enter/Espaço em um gatinho da coleção agora abre uma sobreposição com a ficha completa da unidade.
+- Gatinhos com árvore própria exibem os três caminhos, tiers T1–T5, preços em salmões e o efeito de cada melhoria.
+- Unidades com evolução linear mostram os atributos e o custo de cada nível; o Gatinho Mister informa claramente que não aceita upgrades.
+- A ficha também apresenta atributos-base e preços de colocação para mapas Iniciantes, Médios, Difíceis e Impossíveis.
+- Interface adaptada para celular, com rolagem interna, fechamento por botão, fundo ou Esc e retorno do foco ao cartão selecionado.
+
 ## v0.29.2 — interface responsiva para celular
 
 - HUD da partida reorganizada para telas estreitas, com estatísticas e menu em uma única faixa compacta.

@@ -1,4 +1,4 @@
-CATOONS TD v0.29.2 — INTERFACE RESPONSIVA PARA CELULAR
+CATOONS TD v0.29.3 — FICHAS DE UPGRADES NA COLEÇÃO
 
 Esta edição não contém executáveis, launchers, arquivos .bat ou instaladores.
 Ela possui somente HTML, CSS, JavaScript e este arquivo de instruções.
@@ -7,6 +7,11 @@ COMO ABRIR
 1. Extraia o ZIP para uma pasta.
 2. Abra o arquivo index.html com Google Chrome ou Microsoft Edge.
    Ou jogue direto no navegador: https://luanhcp.github.io/CatoonsTD/
+
+NOVO v0.29.3 — FICHAS DOS GATINHOS
+- Clique em qualquer gatinho da coleção para ver caminhos, tiers, preços e efeitos.
+- Gatinhos de evolução linear mostram os atributos e o valor de cada nível.
+- A ficha funciona com mouse, teclado e toque, inclusive em telas de celular.
 
 NOVO v0.29.2 — CELULAR
 - A partida agora reorganiza HUD, mapa, gatinhos e controles para telas estreitas.

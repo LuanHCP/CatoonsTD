@@ -8,7 +8,7 @@
 
 > **Web/desktop Tower Defense built with HTML, CSS and JavaScript, using AI as an engineering copilot.**
 
-**Status:** Public Beta · **Build:** v0.29.2
+**Status:** Public Beta · **Build:** v0.29.3
 **Platforms:** Modern desktop and mobile browsers · Windows x64 through a lightweight Go launcher
 **Languages:** English and Brazilian Portuguese (auto-detected, switchable in-game)
 
@@ -40,6 +40,7 @@ Catoons TD is a personal software engineering project focused on **progression, 
 - optional creator support through Pix, with no gameplay rewards;
 - full English and Portuguese localization with an in-game language switch;
 - guided tutorial, touch-friendly mobile HUD (landscape preferred) and a developer playtest panel (`F8`);
+- collection upgrade sheets with every path, tier, price and effect available before starting a match;
 - Go-based Windows launcher that opens the local web build in Edge/Chrome app mode.
 
 ## AI-assisted engineering
