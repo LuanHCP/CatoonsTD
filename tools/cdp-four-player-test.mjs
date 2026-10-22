@@ -15,14 +15,21 @@ for(let i=0;i<testPlayers;i++)targets.push(await (await fetch(`${endpoint}/json/
 const peers=targets.map(target=>new CdpClient(target.webSocketDebuggerUrl));
 await Promise.all(peers.map(peer=>peer.open()));await Promise.all(peers.map(peer=>peer.call('Runtime.enable')));await delay(700);
 const [host,...guests]=peers;
+const roomId=await host.evaluate('CatoonsLan.createRoom()');
+if(!/^\d{8}$/.test(roomId))throw new Error('ID numérico inválido: '+roomId);
 for(let index=0;index<guests.length;index++){
-  const offer=await host.evaluate(index===0?'CatoonsLan.createRoom()':'CatoonsLan.createInvite()');
-  const answer=await guests[index].evaluate(`CatoonsLan.joinRoom(${JSON.stringify(offer)})`);
-  await host.evaluate(`CatoonsLan.acceptAnswer(${JSON.stringify(answer)})`);
+  await guests[index].evaluate(`CatoonsLan.joinRoom(${JSON.stringify(roomId)})`);
   for(let attempt=0;attempt<30;attempt++){if(await host.evaluate(`CatoonsLan.playerCount===${index+2}`))break;await delay(120);}
 }
 const room=await host.evaluate(`({connected:CatoonsLan.connected,count:CatoonsLan.playerCount,max:CatoonsLan.maxPlayers,players:CatoonsLan.players,canInvite:CatoonsLan.canInvite})`);
 if(!room.connected||room.count!==testPlayers||room.max!==4||(testPlayers===4&&room.canInvite))throw new Error(`Sala incompleta: ${JSON.stringify(room)}`);
+if(testPlayers===4){
+  const extraTarget=await(await fetch(`${endpoint}/json/new?${encodeURIComponent(gameUrl)}`,{method:'PUT'})).json();
+  const extra=new CdpClient(extraTarget.webSocketDebuggerUrl);await extra.open();await delay(600);
+  const rejection=await extra.evaluate(`CatoonsLan.joinRoom(${JSON.stringify(roomId)}).then(()=>'',e=>e.message)`);
+  await extra.call('Page.close');extra.close();
+  if(!rejection.includes('Sala cheia'))throw new Error('Quinto jogador não foi recusado: '+rejection);
+}
 const teamScaleText=testMode==='boss-event'?await host.evaluate(`document.querySelector('#event-team-scale')?.textContent||''`):'';
 const expectedScale={2:'×1,00',3:'×1,34',4:'×1,68'}[testPlayers],expectedStartMoney=testMode==='boss-event'?({2:500,3:425,4:350}[testPlayers]):350;
 if(testMode==='boss-event'&&(!teamScaleText.includes(expectedScale)||!teamScaleText.includes(`🐟 ${expectedStartMoney}`)))throw new Error(`Escala/bônus inicial para ${testPlayers} jogadores não foi aplicado no lobby: ${teamScaleText}`);
@@ -56,6 +63,18 @@ if(testMode==='boss-event')bossAnnouncement=await host.evaluate(`(()=>{for(let i
 if(testMode==='boss-event'&&!bossAnnouncement.includes('Almirante Espinha'))throw new Error(`O boss da rodada 20 não apareceu: ${bossAnnouncement}`);
 if(testMode==='boss-event')bossState=await host.evaluate(`personalTd.eventBossState()`);
 if(testMode==='boss-event'&&(!bossState||bossState.round!==20||bossState.phase!==1||!bossState.shieldHp||!String(bossState.requirement).includes('Antiblindagem')))throw new Error(`Estado inicial do boss inválido: ${JSON.stringify(bossState)}`);
-const result={room,mode:testMode,teamScaleText,matchStarted:true,totalPlaced:await host.evaluate(`personalTd.towerCount('dart')`),wallets,waveTargets,bossAnnouncement,bossState};
+const result={room,roomId,mode:testMode,teamScaleText,matchStarted:true,totalPlaced:await host.evaluate(`personalTd.towerCount('dart')`),wallets,waveTargets,bossAnnouncement,bossState};
+await host.evaluate(`document.querySelector('#menu-lobby').click();true`);
+await delay(500);
+const returned=await Promise.all(peers.map(peer=>peer.evaluate(`document.body.dataset.screen`)));
+if(!returned.every(screen=>screen===(testMode==='boss-event'?'event':'play')))throw new Error('Retorno ao lobby não sincronizou: '+returned);
+await guests[0].evaluate('CatoonsLan.disconnect();true');await delay(500);
+if(await host.evaluate('CatoonsLan.playerCount')!==testPlayers-1)throw new Error('A vaga não foi liberada.');
+await guests[0].evaluate(`CatoonsLan.joinRoom(${JSON.stringify(roomId)})`);
+await delay(500);
+if(await host.evaluate('CatoonsLan.playerCount')!==testPlayers)throw new Error('Não foi possível voltar com o mesmo ID.');
+await host.evaluate('CatoonsLan.disconnect();true');await delay(500);
+if(!(await Promise.all(peers.map(peer=>peer.evaluate('CatoonsLan.role')))).every(role=>role==='solo'))throw new Error('Fechar sala não desconectou toda a equipe.');
+result.lifecycle='retorno sincronizado, saída, reentrada e fechamento OK';
 console.log(JSON.stringify(result,null,2));
 await Promise.all(peers.map(peer=>peer.call('Page.close')));peers.forEach(peer=>peer.close());

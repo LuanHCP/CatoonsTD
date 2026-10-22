@@ -44,6 +44,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 - **Economia da partida em salmões** e progressão persistente com moedas, XP, estrelas, poderes consumíveis e saves locais.
 - **Apoie o criador** com QR Code e código Pix, sem conceder vantagens dentro do jogo.
 - **Campanha, modo Infinito e cooperativo experimental para 2–4 jogadores por LAN/VPN**, com carteiras individuais e o dobro de inimigos.
+- **Salas por ID numérico**, entrada automática e quatro vagas visíveis, em um lobby com seleção clara de modos. [Como conectar](docs/MULTIPLAYER_LAN.md).
 - **Evento diário Maré Blindada**, separado da campanha, com o Almirante Espinha nas rodadas 20, 40 e 60, vida escalável por equipe, quatro escudos especializados e barra de boss própria.
 - **Venda por 50% do investimento**, reposicionamento e estatísticas por torre.
 - **Português e inglês**, com troca de idioma no lobby/Configurações.
@@ -83,7 +84,7 @@ flowchart LR
     B --> UI
 ```
 
-A build atual é **client-side e offline-first**. Não há backend obrigatório: o estado persistente do jogador é armazenado em `localStorage`, com suporte a exportação/importação manual do save.
+A build é **client-side**, com save em `localStorage` e exportação/importação manual. O modo solo funciona offline; as salas cooperativas usam o PeerServer público para conectar pelo ID, e WebRTC para transmitir a partida diretamente entre os jogadores na LAN/VPN.
 
 Mais detalhes: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 

@@ -73,9 +73,9 @@ sequenceDiagram
 
 ## Decisões de projeto
 
-### Serverless / offline-first
+### Solo offline e salas cooperativas por ID
 
-Para o estágio atual, manter o jogo sem backend reduz complexidade de implantação e permite que a build seja hospedada no GitHub Pages. O custo é que o save fica associado ao navegador/perfil local, por isso existe exportação/importação manual.
+O modo solo e o save funcionam localmente. A build continua hospedável no GitHub Pages. Para o cooperativo, `src/multiplayer.js` usa PeerJS 1.5.5 com o PeerServer público para sinalização: o anfitrião registra um ID aleatório de oito dígitos e os convidados se conectam pelo mesmo ID. O anfitrião aceita até três convidados, mantém a simulação e distribui snapshots via WebRTC. Não há TURN configurado; os participantes precisam de comunicação direta por LAN/VPN. O save fica associado ao navegador/perfil local, com exportação/importação manual.
 
 ### Estado centralizado da partida
 

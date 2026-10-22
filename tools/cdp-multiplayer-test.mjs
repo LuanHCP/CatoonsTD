@@ -46,9 +46,8 @@ await Promise.all([host.call('Runtime.enable'), guest.call('Runtime.enable')]);
 await new Promise(resolve => setTimeout(resolve, 800));
 
 await host.evaluate(`window.__lanTest=[];CatoonsLan.onMessage(message=>window.__lanTest.push(message));true`);
-const offer = await host.evaluate(`CatoonsLan.disconnect();CatoonsLan.createRoom()`);
-const answer = await guest.evaluate(`CatoonsLan.disconnect();CatoonsLan.joinRoom(${JSON.stringify(offer)})`);
-await host.evaluate(`CatoonsLan.acceptAnswer(${JSON.stringify(answer)})`);
+const roomId = await host.evaluate(`CatoonsLan.createRoom()`);
+await guest.evaluate(`CatoonsLan.joinRoom(${JSON.stringify(roomId)})`);
 
 let connected = false;
 for (let attempt = 0; attempt < 20; attempt++) {

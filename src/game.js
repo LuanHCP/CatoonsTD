@@ -2696,86 +2696,57 @@ function renderMapLobby(){
     ?(infinite?$t('A dificuldade define sua economia inicial, vidas e velocidade de escalada.'):$t('Cada mapa pode ser jogado em Fácil, Normal ou Difícil; a categoria do mapa é independente da dificuldade escolhida.'))
     :$t('Escolha uma categoria com mapas disponíveis para selecionar a dificuldade.');
   const playEnter=$('#play-enter');
-  if(playEnter){playEnter.textContent=infinite?$t('Jogar Infinito'):$t('Entrar no mapa');playEnter.disabled=!categoryHasMaps;}
+  if(playEnter){const guest=window.CatoonsLan?.isGuest;playEnter.textContent=guest?$t('Aguarde o anfitrião iniciar'):infinite?$t('Iniciar Infinito →'):$t('Iniciar Campanha →');playEnter.disabled=!categoryHasMaps||guest;}
   if($('#selected-map-badge')) $('#selected-map-badge').textContent=categoryHasMaps
     ?`${maps[lobbySelection.map].name} • ${category.name} • ${infinite?$t('∞ Infinito'):$t('🏁 Campanha')} • ${difficulties[lobbySelection.difficulty].name}`
     :$T`${category.icon} Mapas ${category.name} • em desenvolvimento`;
   renderPlayHeroSummary();
 }
 
-function initLanLobby(){
-  const lan=window.CatoonsLan;
-  if(!lan)return;
-  const statusEl=$('#lan-status'),countEl=$('#lan-player-count'),hostPanel=$('#lan-host-panel'),guestPanel=$('#lan-guest-panel'),help=$('#lan-help'),newInvite=$('#lan-new-invite'),acceptBtn=$('#lan-accept-answer');
-  const setBusy=(button,busy,label)=>{if(!button)return;button.disabled=busy;if(label)button.textContent=label;};
-  const copyFrom=async selector=>{
-    const field=$(selector);if(!field||!field.value)return;
-    try{await navigator.clipboard.writeText(field.value);if(help)help.textContent=$t('✓ Código copiado. Envie-o ao outro jogador.');}
-    catch(_){field.focus();field.select();document.execCommand('copy');if(help)help.textContent=$t('✓ Código selecionado para copiar.');}
-  };
-  const showError=error=>{if(help)help.textContent=`⚠ ${error?.message||error}`;};
-  lan.onStatus(info=>{
-    document.body.classList.toggle('lan-connected',Boolean(info.connected));
-    if(countEl)countEl.textContent=`${info.playerCount||1}/${info.maxPlayers||4} jogadores`;
-    if(newInvite)newInvite.hidden=!(info.role==='host'&&info.connected&&(info.playerCount||1)<(info.maxPlayers||4)&&lan.canInvite);
-    if(acceptBtn&&info.status==='connected'){acceptBtn.disabled=false;acceptBtn.textContent=$t('Conectar jogador');$('#lan-answer-input').value='';}
-    if(!statusEl)return;
-    const labels={
-      offline:$t('Somente solo'),creating:$t('Criando sala...'),'waiting-answer':$t('Aguardando resposta'),joining:$t('Entrando...'),
-      'waiting-host':$t('Aguardando anfitrião'),connecting:$t('Conectando...'),connected:info.role==='host'?$t('Conectado • anfitrião'):$T`Conectado • jogador ${String(info.localPlayerId||'').replace('p','')}`,
-      disconnected:$t('Jogador desconectado'),error:$t('Falha na conexão')
-    };
-    statusEl.textContent=labels[info.status]||info.status;
-    statusEl.className=`lan-status ${info.connected?'connected':info.status==='error'?'error':info.status==='offline'?'offline':'waiting'}`;
-    if(info.connected&&help)help.textContent=info.role==='host'
-      ?$T`✓ ${info.playerCount}/4 jogadores na sala. Você pode convidar mais pessoas ou iniciar a fase.`
-      :$t('✓ Conectado. Aguarde o anfitrião escolher e iniciar a fase.');
+function renderRoomPanels(info){
+  const lan=window.CatoonsLan;if(!lan)return;
+  const busy=['creating','joining'].includes(info.status),inRoom=info.role!=='solo',isHost=info.role==='host',members=lan.players;
+  const labels={offline:'Jogue solo ou reúna sua equipe',creating:'Gerando ID da sala…',joining:'Localizando e conectando…',waiting:'Sala aberta • aguardando equipe',connected:isHost?'Equipe conectada • você é o anfitrião':'Conectado • aguarde o anfitrião',error:'Não foi possível conectar',closed:'Sala encerrada','signal-lost':'Serviço de salas desconectado'};
+  document.body.classList.toggle('lan-connected',Boolean(info.connected));
+  $$('[data-room-panel]').forEach(panel=>{
+    panel.querySelector('[data-room-status]').textContent=info.status==='offline'&&panel.closest('#screen-event')?'Reúna 2 a 4 jogadores para o evento':labels[info.status]||info.status;
+    panel.querySelector('[data-room-status]').className='room-status '+(info.connected?'online':info.status==='error'?'error':'');
+    panel.querySelector('[data-room-actions]').hidden=inRoom;
+    panel.querySelector('[data-room-active]').hidden=!inRoom;
+    panel.querySelector('[data-room-create]').disabled=busy;
+    panel.querySelector('[data-room-connect]').disabled=busy;
+    panel.querySelector('[data-room-id]').textContent=info.roomId||'···· ····';
+    panel.querySelector('[data-room-copy]').disabled=!info.roomId||busy;
+    panel.querySelector('[data-room-close]').textContent=busy?'Cancelar conexão':isHost?'Fechar sala':'Sair da sala';
+    panel.querySelector('[data-room-count]').textContent=(info.playerCount||1)+'/4 jogadores';
+    panel.querySelector('[data-room-help]').textContent=info.detail||(inRoom?(isHost?'Compartilhe o mesmo ID com até 3 amigos. Você escolhe quando iniciar.':'Você já está na equipe. A partida abre automaticamente quando o anfitrião iniciar.'):'Crie a sala e compartilhe o ID, ou digite o ID de um amigo. Internet para conectar; mesma rede ou VPN para jogar.');
+    const slots=panel.querySelectorAll('[data-room-slot]');
+    slots.forEach((slot,index)=>{const id=['host','p2','p3','p4'][index],present=inRoom&&members.includes(id);slot.classList.toggle('occupied',present);slot.querySelector('b').textContent=present?(id===info.localPlayerId?'Você':index===0?'Anfitrião':'Jogador '+(index+1)):'Vaga livre';slot.querySelector('small').textContent=present?(index===0?'Líder da equipe':'Conectado'):'Aguardando';});
   });
-  $('#lan-solo').onclick=()=>{lan.disconnect();hostPanel.hidden=true;guestPanel.hidden=true;if(help)help.textContent=$t('Modo solo ativado.');};
-  $('#lan-create').onclick=async e=>{
-    const button=e.currentTarget;hostPanel.hidden=false;guestPanel.hidden=true;setBusy(button,true,$t('Criando...'));
-    try{$('#lan-offer-output').value=await lan.createRoom();if(help)help.textContent=$t('Envie o código da sala ao próximo jogador e aguarde a resposta.');}
-    catch(error){showError(error);}finally{setBusy(button,false,$t('🏠 Criar sala'));}
-  };
-  $('#lan-join').onclick=()=>{lan.disconnect();hostPanel.hidden=true;guestPanel.hidden=false;if(help)help.textContent=$t('Cole o código da sala para gerar sua resposta.');};
-  $('#lan-generate-answer').onclick=async e=>{
-    const button=e.currentTarget;setBusy(button,true,$t('Gerando...'));
-    try{$('#lan-answer-output').value=await lan.joinRoom($('#lan-offer-input').value);if(help)help.textContent=$t('Envie a resposta ao anfitrião. A conexão termina quando ele colar o código.');}
-    catch(error){showError(error);}finally{setBusy(button,false,$t('Gerar resposta'));}
-  };
-  $('#lan-accept-answer').onclick=async e=>{
-    const button=e.currentTarget;setBusy(button,true,$t('Conectando...'));
-    try{await lan.acceptAnswer($('#lan-answer-input').value);}
-    catch(error){showError(error);setBusy(button,false,$t('Conectar jogador'));}
-  };
-  if(newInvite)newInvite.onclick=async e=>{
-    const button=e.currentTarget;setBusy(button,true,$t('Gerando convite...'));
-    try{$('#lan-offer-output').value=await lan.createInvite();if(help)help.textContent=$t('Envie o novo código ao próximo jogador. Cada convite funciona para apenas uma pessoa.');}
-    catch(error){showError(error);}finally{setBusy(button,false,$t('➕ Convidar outro jogador'));}
-  };
-  $('#lan-copy-offer').onclick=()=>copyFrom('#lan-offer-output');
-  $('#lan-copy-answer').onclick=()=>copyFrom('#lan-answer-output');
+  renderEventLobby();renderMapLobby();
+}
+
+function initLanLobby(){
+  const lan=window.CatoonsLan;if(!lan)return;
+  $$('[data-room-panel]').forEach(panel=>{
+    const help=panel.querySelector('[data-room-help]'),input=panel.querySelector('[data-room-input]');
+    const run=async fn=>{try{await fn();}catch(error){help.textContent=error.message||String(error);}};
+    panel.querySelector('[data-room-create]').onclick=()=>run(()=>lan.createRoom());
+    panel.querySelector('[data-room-connect]').onclick=()=>run(()=>lan.joinRoom(input.value));
+    input.addEventListener('input',()=>{input.value=input.value.replace(/\D/g,'').slice(0,8);});
+    input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!panel.querySelector('[data-room-connect]').disabled)panel.querySelector('[data-room-connect]').click();});
+    panel.querySelector('[data-room-close]').onclick=()=>lan.disconnect();
+    panel.querySelector('[data-room-copy]').onclick=async()=>{
+      if(!lan.roomId)return;
+      try{await navigator.clipboard.writeText(lan.roomId);help.textContent='ID copiado. Envie para seus amigos.';}
+      catch(_){input.value=lan.roomId;panel.querySelector('[data-room-actions]').hidden=false;input.focus();input.select();help.textContent='Selecione e copie o ID: '+lan.roomId;}
+    };
+  });
+  lan.onStatus(renderRoomPanels);
 }
 
 function initEventLobby(){
-  const lan=window.CatoonsLan;if(!lan)return;
-  const hostPanel=$('#event-host-panel'),guestPanel=$('#event-guest-panel'),help=$('#event-lan-help'),statusEl=$('#event-lan-status'),start=$('#event-start'),newInvite=$('#event-new-invite');
-  const showError=error=>{if(help)help.textContent=`⚠ ${error?.message||error}`;};
-  const copyField=async selector=>{const field=$(selector);if(!field?.value)return;try{await navigator.clipboard.writeText(field.value);if(help)help.textContent=$t('✓ Código copiado.');}catch(_){field.focus();field.select();document.execCommand('copy');}};
-  lan.onStatus(info=>{
-    if(statusEl){statusEl.textContent=info.connected?$T`${info.playerCount}/${info.maxPlayers} • ${info.role==='host'?'anfitrião':`jogador ${String(info.localPlayerId).replace('p','')}`}`:$t('1/4 • somente solo');statusEl.className=`lan-status ${info.connected?'connected':'offline'}`;}
-    if(start){start.disabled=!(info.connected&&info.role==='host');start.textContent=info.role==='guest'?$t('⏳ Aguarde o anfitrião'):$t('⚔️ Iniciar evento diário');}
-    if(newInvite)newInvite.hidden=!(info.role==='host'&&info.connected&&info.playerCount<info.maxPlayers&&lan.canInvite);
-    const scale=$('#event-team-scale'),players=Math.max(2,info.playerCount||2);if(scale)scale.textContent=$T`👥 ${players} jogadores • vida ×${eventTeamScale(players).toFixed(2).replace('.',',')} • 🐟 ${eventStartMoney(players)} para cada`;
-  });
-  $('#event-lan-solo').onclick=()=>{lan.disconnect();hostPanel.hidden=true;guestPanel.hidden=true;if(help)help.textContent=$t('Sala desconectada.');};
-  $('#event-lan-create').onclick=async()=>{hostPanel.hidden=false;guestPanel.hidden=true;try{$('#event-offer-output').value=await lan.createRoom();if(help)help.textContent=$t('Envie o convite ao próximo jogador e cole a resposta abaixo.');}catch(error){showError(error);}};
-  $('#event-lan-join').onclick=()=>{lan.disconnect();hostPanel.hidden=true;guestPanel.hidden=false;if(help)help.textContent=$t('Cole o convite do anfitrião.');};
-  $('#event-generate-answer').onclick=async()=>{try{$('#event-answer-output').value=await lan.joinRoom($('#event-offer-input').value);if(help)help.textContent=$t('Envie sua resposta ao anfitrião.');}catch(error){showError(error);}};
-  $('#event-accept-answer').onclick=async()=>{try{await lan.acceptAnswer($('#event-answer-input').value);$('#event-answer-input').value='';}catch(error){showError(error);}};
-  if(newInvite)newInvite.onclick=async()=>{try{$('#event-offer-output').value=await lan.createInvite();if(help)help.textContent=$t('Novo convite gerado para o próximo jogador.');}catch(error){showError(error);}};
-  $('#event-copy-offer').onclick=()=>copyField('#event-offer-output');$('#event-copy-answer').onclick=()=>copyField('#event-answer-output');
-  if(start)start.onclick=()=>personalTd?.startEvent?.();
+  const start=$('#event-start');if(start)start.onclick=()=>personalTd?.startEvent?.();
 }
 
 function eventPlayerCount(playerCount){return Math.max(2,Math.min(4,Number(playerCount)||2));}
@@ -2783,9 +2754,8 @@ function eventTeamScale(playerCount){return 1+(eventPlayerCount(playerCount)-2)*
 function eventStartMoney(playerCount){return({2:500,3:425,4:350})[eventPlayerCount(playerCount)];}
 
 function renderEventLobby(){
-  const lan=window.CatoonsLan,status=$('#event-lan-status'),start=$('#event-start'),players=Math.max(2,lan?.playerCount||2),scale=$('#event-team-scale');
-  if(status)status.textContent=lan?.connected?$T`${lan.playerCount}/${lan.maxPlayers} • ${lan.isHost?'anfitrião':`jogador ${String(lan.localPlayerId).replace('p','')}`}`:$t('1/4 • somente solo');
-  if(start)start.disabled=!(lan?.connected&&lan.isHost);
+  const lan=window.CatoonsLan,start=$('#event-start'),players=Math.max(2,lan?.playerCount||2),scale=$('#event-team-scale');
+  if(start){start.disabled=!(lan?.connected&&lan.isHost);start.textContent=lan?.isGuest?'Aguarde o anfitrião':lan?.connected?'Iniciar evento →':lan?.isHost?'Aguardando mais um jogador':'Crie ou entre em uma sala';}
   if(scale)scale.textContent=$T`👥 ${players} jogadores • vida ×${eventTeamScale(players).toFixed(2).replace('.',',')} • 🐟 ${eventStartMoney(players)} para cada`;
 }
 function drawCollectionCat(id){
@@ -3175,6 +3145,7 @@ function renderProfileUi(){
 function initNavigation(){
   $$('[data-screen]').forEach(btn=>btn.onclick=()=>{sfx('ui');setScreen(btn.dataset.screen);});
   $$('[data-go-screen]').forEach(btn=>btn.onclick=()=>{sfx('ui');setScreen(btn.dataset.goScreen);});
+  $$('[data-select-mode]').forEach(btn=>btn.onclick=()=>{sfx('ui');lobbySelection.mode=btn.dataset.selectMode;setScreen('play');});
   window.addEventListener('popstate',e=>{
     const id=(e.state&&e.state.screen)||(location.hash||'#hub').slice(1);
     if(['hub','play','event','cats','heroes','powers','game','tutorial'].includes(id))setScreen(id,false);
@@ -3435,6 +3406,7 @@ function initPersonalTd(){
 
   const lan=window.CatoonsLan;
   let lanSnapshotAt=0;
+  let guestMatchLoading=false,queuedGuestSnapshot=null;
   const lanGuest=()=>Boolean(lan?.connected&&lan.isGuest);
   const lanHost=()=>Boolean(lan?.connected&&lan.isHost);
   let walletActorId='host';
@@ -3468,7 +3440,8 @@ function initPersonalTd(){
   }
   function applyLanSnapshot(next){
     if(!lanGuest()||!next)return;
-    const mapChanged=state.map!==next.map;
+    if(guestMatchLoading){queuedGuestSnapshot=next;return;}
+    const mapChanged=state.map!==next.map||state.mode!==next.mode;
     const localSelection={selected:state.selected,selectedTower:state.selectedTower,selectedHero:state.selectedHero,repositionTower:state.repositionTower};
     Object.assign(state,next);
     state.paidMilestones=new Set(next.paidMilestones||[]);
@@ -3505,14 +3478,22 @@ function initPersonalTd(){
     }
   }
   if(lan){
-    lan.onStatus(info=>{if(info.connected)lan.send('ready',{role:info.role});});
+    let announcedReady=false;
+    lan.onStatus(info=>{
+      if(info.connected&&!announcedReady){announcedReady=true;lan.send('ready',{role:info.role});}
+      if(!info.connected)announcedReady=false;
+      if(['closed','error'].includes(info.status)&&document.body.dataset.screen==='game'&&!info.connected){state.paused=true;hideGameModal('#pause-menu');setScreen(isBossEvent()?'event':'play');}
+    });
     lan.onMessage(message=>{
       if(message.type==='ready'&&lanHost())lan.send('lobby',{...lobbySelection});
       else if(message.type==='lobby'&&lanGuest()){
         const next=message.payload||{};lobbySelection.map=next.map||lobbySelection.map;lobbySelection.difficulty=next.difficulty||lobbySelection.difficulty;lobbySelection.mode=next.mode||lobbySelection.mode;renderMapLobby();
       }else if(message.type==='start'&&lanGuest()){
         const next=message.payload||{};
-        runMapLoading(next.map,next.difficulty,()=>{loadSelection(next.map,next.difficulty,next.mode);setScreen('game');setMsg($t('🐾 Cooperativo conectado. Cada jogador tem seus próprios salmões; vidas, mapa e ondas são compartilhados.'));},next.mode);
+        guestMatchLoading=true;queuedGuestSnapshot=null;
+        runMapLoading(next.map,next.difficulty,()=>{if(!lanGuest()){guestMatchLoading=false;queuedGuestSnapshot=null;return;}loadSelection(next.map,next.difficulty,next.mode);setScreen('game');guestMatchLoading=false;if(queuedGuestSnapshot){const snapshot=queuedGuestSnapshot;queuedGuestSnapshot=null;applyLanSnapshot(snapshot);}setMsg($t('🐾 Cooperativo conectado. Cada jogador tem seus próprios salmões; vidas, mapa e ondas são compartilhados.'));},next.mode);
+      }else if(message.type==='return-lobby'&&lanGuest()){
+        state.paused=true;closePauseMenu(false);hideGameModal('#result-screen');setScreen(message.payload?.screen==='event'?'event':'play');
       }else if(message.type==='action')handleLanAction(message.payload,message.from);
       else if(message.type==='snapshot')applyLanSnapshot(message.payload);
     });
@@ -5379,7 +5360,7 @@ function initPersonalTd(){
     state.map=mapId in maps?mapId:'grove';
     state.difficulty=diffId in difficulties?diffId:'easy';
     state.mode=modeId==='infinite'?'infinite':modeId==='boss-event'?'boss-event':'campaign';
-    lobbySelection={map:state.map,difficulty:state.difficulty,mode:state.mode,category:'beginner'};
+    if(state.mode!=='boss-event')lobbySelection={map:state.map,difficulty:state.difficulty,mode:state.mode,category:'beginner'};
     reset();
   }
 
@@ -7749,7 +7730,13 @@ if($('#td-pause'))$('#td-pause').onclick=()=>{
 };
 if($('#menu-resume'))$('#menu-resume').onclick=()=>{sfx('ui');closePauseMenu(true);setMsg($T`Jogo rodando em ${state.gameSpeed}×.`);};
 if($('#menu-restart'))$('#menu-restart').onclick=()=>{sfx('ui');closePauseMenu(false);runMapLoading(state.map,state.difficulty,reset,state.mode);};
-if($('#menu-lobby'))$('#menu-lobby').onclick=()=>{sfx('ui');closePauseMenu(false);state.paused=true;setScreen('hub');};
+function returnToMatchLobby(){
+  const screen=isBossEvent()?'event':'play';
+  if(lanHost()){lan.send('return-lobby',{screen});lan.setAccepting(true);}
+  else if(lanGuest())lan.disconnect();
+  closePauseMenu(false);hideGameModal('#result-screen');state.paused=true;setScreen(screen);
+}
+if($('#menu-lobby'))$('#menu-lobby').onclick=()=>{sfx('ui');returnToMatchLobby();};
 if($('#menu-close'))$('#menu-close').onclick=()=>{sfx('ui');hideGameModal('#pause-menu');};
 if($('#hub-settings-btn'))$('#hub-settings-btn').onclick=()=>{sfx('ui');openSettingsModal();};
 if($('#menu-support-creator'))$('#menu-support-creator').onclick=()=>{sfx('ui');showGameModal('#support-creator-modal');};
@@ -7781,7 +7768,7 @@ if($('#menu-music'))$('#menu-music').oninput=e=>{
   else if(!musicState)startMusic();else updateMusicVolume();
 };
 if($('#result-retry'))$('#result-retry').onclick=()=>{sfx('ui');hideGameModal('#result-screen');runMapLoading(state.map,state.difficulty,reset,state.mode);};
-if($('#result-lobby'))$('#result-lobby').onclick=()=>{sfx('ui');hideGameModal('#result-screen');setScreen('hub');};
+if($('#result-lobby'))$('#result-lobby').onclick=()=>{sfx('ui');returnToMatchLobby();};
 if($('#result-next'))$('#result-next').onclick=e=>{
   const mapId=e.currentTarget.dataset.nextMap,diffId=e.currentTarget.dataset.nextDifficulty;
   if(!mapId||!diffId)return;
@@ -7848,6 +7835,7 @@ $$('.td-tower-picker [data-td-tower]').forEach(btn=>btn.onclick=()=>{
 });
 
 if($('#play-enter'))$('#play-enter').onclick=()=>{
+  if(lan?.isGuest)return;
   const enterBtn=$('#play-enter');
   if(enterBtn&&enterBtn.dataset.loading==='1')return;
   if(enterBtn){enterBtn.dataset.loading='1';enterBtn.disabled=true;enterBtn.textContent=$t('🐾 Preparando mapa...');}
@@ -7856,7 +7844,7 @@ if($('#play-enter'))$('#play-enter').onclick=()=>{
   runMapLoading(mapId,diffId,()=>{
     loadSelection(mapId,diffId,modeId);
     setScreen('game');
-    if(lanHost()){lan.send('start',{map:mapId,difficulty:diffId,mode:modeId});broadcastLanSnapshot(true);}
+    if(lanHost()){lan.setAccepting(false);lan.send('start',{map:mapId,difficulty:diffId,mode:modeId});broadcastLanSnapshot(true);}
     const area=$('#game-area');
     if(area)area.scrollTop=0;
     const gameScreen=$('#screen-game');
@@ -7870,7 +7858,7 @@ if($('#play-enter'))$('#play-enter').onclick=()=>{
 function startEvent(){
   if(!lan?.connected||!lan.isHost){renderEventLobby();return;}
   const mapId='grove',diffId='normal',modeId='boss-event';
-  runMapLoading(mapId,diffId,()=>{loadSelection(mapId,diffId,modeId);setScreen('game');lan.send('start',{map:mapId,difficulty:diffId,mode:modeId});broadcastLanSnapshot(true);},modeId);
+  runMapLoading(mapId,diffId,()=>{loadSelection(mapId,diffId,modeId);setScreen('game');lan.setAccepting(false);lan.send('start',{map:mapId,difficulty:diffId,mode:modeId});broadcastLanSnapshot(true);},modeId);
 }
 
 personalTd={reset,startWave,startEvent,upgradeTower,upgradeDartPath,upgradeSniperPath,renderHotbar,loadSelection,towerCount:(id)=>state.towers.filter(t=>t.type===id).length,placementType:()=>state.selected,mapId:()=>state.map,towerPrice:(id)=>towerPrice(id,state.map),eventBossState:()=>{const e=[...state.enemies,...state.spawn].find(enemy=>enemy.eventBoss&&!enemy.dead);return e?{name:e.name,round:e.round,encounter:e.encounter,phase:e.bossPhase,hp:e.hp,maxHp:e.maxHp,shieldHp:e.bossShieldHp,shieldMax:e.bossShieldMax,requirement:bossShieldRequirement(e.bossPhase||1).label}:null;}};

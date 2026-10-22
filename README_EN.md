@@ -66,7 +66,7 @@ flowchart LR
     Browser --> UI
 ```
 
-The current build is client-side and offline-first. No backend is required to run the game.
+The current build is client-side with local saves and offline solo play. Experimental LAN/VPN co-op rooms use an eight-digit ID: the public PeerJS PeerServer handles signaling, while match state travels directly between players over WebRTC. Creating and finding rooms requires an internet connection.
 
 ## Tech stack
 

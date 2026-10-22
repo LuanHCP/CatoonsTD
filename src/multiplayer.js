@@ -1,168 +1,105 @@
 'use strict';
 
-// Multiplayer cooperativo experimental para LAN/VPN.
-// Topologia em estrela: o anfitrião mantém até três conexões WebRTC diretas.
+// PeerServer presents the peers; match state travels directly over WebRTC.
 (() => {
-  const MAX_PLAYERS = 4;
-  const listeners = {message: new Set(), status: new Set()};
-  const hostPeers = new Map();
-  let guestPeer = null;
-  let role = 'solo';
-  let status = 'offline';
-  let localPlayerId = 'solo';
-  let pendingPlayerId = null;
-  let remotePlayerCount = 1;
-  let remotePlayers = ['host'];
-
-  const emit = (kind, value) => listeners[kind].forEach(fn => {
-    try { fn(value); } catch (error) { console.error('[Catoons LAN]', error); }
-  });
-  const openHostPeers = () => [...hostPeers.values()].filter(item => item.channel?.readyState === 'open');
-  const playerCount = () => role === 'host' ? 1 + openHostPeers().length : role === 'guest' ? remotePlayerCount : 1;
-  const connected = () => role === 'host' ? openHostPeers().length > 0 : guestPeer?.channel?.readyState === 'open';
-  const setStatus = (next, detail = '') => {
-    status = next;
-    emit('status', {status, detail, role, connected: connected(), playerCount: playerCount(), maxPlayers: MAX_PLAYERS, localPlayerId});
-  };
-  const encode = value => btoa(unescape(encodeURIComponent(JSON.stringify(value))));
-  const decode = code => JSON.parse(decodeURIComponent(escape(atob(String(code || '').trim()))));
-  const waitForIce = pc => new Promise(resolve => {
-    if (pc.iceGatheringState === 'complete') return resolve();
-    const done = () => {
-      if (pc.iceGatheringState !== 'complete') return;
-      pc.removeEventListener('icegatheringstatechange', done);
-      resolve();
-    };
-    pc.addEventListener('icegatheringstatechange', done);
-    setTimeout(resolve, 5000);
-  });
-  const packet = (type, payload = {}) => JSON.stringify({type, payload, sentAt: Date.now()});
-
-  function broadcastRoster() {
-    if (role !== 'host') return;
-    const payload = {playerCount: playerCount(), maxPlayers: MAX_PLAYERS, players: ['host', ...openHostPeers().map(item => item.playerId)]};
-    for (const item of openHostPeers()) item.channel.send(packet('roster', payload));
-    setStatus(connected() ? 'connected' : status);
+  const MAX_PLAYERS=4,PROTOCOL=3,PREFIX='catoons-v3-',TIMEOUT=22000;
+  const listeners={message:new Set(),status:new Set()},peers=new Map();
+  let broker=null,guest=null,role='solo',status='offline',detail='',roomId='',localPlayerId='solo',roster=['host'],accepting=true,generation=0,cancelPending=null;
+  const emit=(kind,value)=>listeners[kind].forEach(fn=>{try{fn(value);}catch(error){console.error('[Catoons sala]',error);}});
+  const openPeers=()=>[...peers.values()].filter(item=>item.conn.open);
+  const connected=()=>role==='host'?openPeers().length>0:Boolean(guest?.open&&localPlayerId!=='guest');
+  const players=()=>role==='host'?['host',...openPeers().map(item=>item.id)]:roster.slice();
+  const info=()=>({status,detail,role,connected:connected(),playerCount:role==='solo'?1:players().length,maxPlayers:MAX_PLAYERS,localPlayerId,roomId,accepting});
+  function setStatus(next,message=''){status=next;detail=message;emit('status',info());}
+  function transmit(conn,type,payload={}){if(!conn?.open)return false;try{conn.send({type,payload,sentAt:Date.now()});return true;}catch(_){return false;}}
+  function send(type,payload={}){if(role==='host'){let sent=false;for(const item of openPeers())sent=transmit(item.conn,type,payload)||sent;return sent;}return transmit(guest,type,payload);}
+  function broadcastRoster(){send('roster',{players:players(),accepting});setStatus(connected()?'connected':'waiting');}
+  function closeAll(notify=true){
+    generation++;
+    if(cancelPending){const cancel=cancelPending;cancelPending=null;cancel(new Error('Conexão cancelada.'));}
+    const old=broker;broker=null;const channels=[...peers.values()].map(item=>item.conn);if(guest)channels.push(guest);
+    peers.clear();guest=null;role='solo';roomId='';localPlayerId='solo';roster=['host'];accepting=true;
+    for(const conn of channels){try{conn.close();}catch(_){}}
+    try{old?.destroy();}catch(_){}
+    if(notify)setStatus('offline');
   }
-
-  function closeAll(notify = true) {
-    for (const item of hostPeers.values()) {
-      try { item.channel?.close(); } catch (_) {}
-      try { item.pc?.close(); } catch (_) {}
-    }
-    hostPeers.clear();
-    try { guestPeer?.channel?.close(); } catch (_) {}
-    try { guestPeer?.pc?.close(); } catch (_) {}
-    guestPeer = null;
-    role = 'solo';localPlayerId = 'solo';pendingPlayerId = null;remotePlayerCount = 1;remotePlayers = ['host'];
-    if (notify) setStatus('offline');
+  const errorText=error=>error?.type==='peer-unavailable'?'Sala não encontrada. Confira o ID e se o anfitrião está com a sala aberta.':error?.type==='unavailable-id'?'Este ID já está em uso. Tente criar a sala novamente.':'Não foi possível conectar ao serviço de salas. Verifique sua internet e tente novamente.';
+  function incoming(message,from){
+    if(!message||typeof message.type!=='string')return;
+    if(role==='host'&&['welcome','roster','start','snapshot','lobby','return-lobby','room-closed','rejected'].includes(message.type))return;
+    if(role==='guest'&&message.type==='roster'){roster=message.payload.players||roster;accepting=message.payload.accepting!==false;setStatus('connected');}
+    if(role==='guest'&&message.type==='room-closed'){closeAll(false);setStatus('closed','O anfitrião fechou a sala.');return;}
+    emit('message',{...message,from});
   }
-
-  function parseMessage(event, from) {
-    try {
-      const message = JSON.parse(event.data);
-      if (message.type === 'welcome' && role === 'guest') {
-        localPlayerId = message.payload.playerId || localPlayerId;
-        remotePlayerCount = message.payload.playerCount || remotePlayerCount;
-        remotePlayers = message.payload.players || ['host', localPlayerId];
-        setStatus('connected');
-      } else if (message.type === 'roster' && role === 'guest') {
-        remotePlayerCount = message.payload.playerCount || remotePlayerCount;
-        remotePlayers = message.payload.players || remotePlayers;
-        setStatus('connected');
+  function acceptConnection(conn,token){
+    if(token!==generation){conn.close();return;}
+    const id=['p2','p3','p4'].find(slot=>!peers.has(slot));
+    const reason=conn.metadata?.protocol!==PROTOCOL?'Versões diferentes. Atualize o jogo nos dois computadores.':!accepting?'A partida já começou. Aguarde o anfitrião voltar ao lobby.':!id?'Sala cheia. O limite é de quatro jogadores.':null;
+    if(reason){conn.on('open',()=>{transmit(conn,'rejected',{reason});setTimeout(()=>conn.close(),300);});return;}
+    const item={id,conn};peers.set(id,item);
+    const expiry=setTimeout(()=>{if(!conn.open&&token===generation){peers.delete(id);conn.close();broadcastRoster();}},TIMEOUT);
+    conn.on('open',()=>{clearTimeout(expiry);if(token!==generation)return;transmit(conn,'welcome',{playerId:id,players:players(),roomId,accepting});broadcastRoster();});
+    conn.on('data',message=>{if(token===generation)incoming(message,id);});
+    conn.on('close',()=>{clearTimeout(expiry);if(token!==generation)return;peers.delete(id);broadcastRoster();});
+    conn.on('error',()=>{clearTimeout(expiry);if(token!==generation)return;peers.delete(id);conn.close();broadcastRoster();});
+  }
+  function openBroker(id,token){
+    return new Promise((resolve,reject)=>{
+      let settled=false;
+      const timer=setTimeout(()=>finish(new Error('O serviço de salas demorou para responder. Tente novamente.')),TIMEOUT);
+      function finish(error){if(settled)return;settled=true;clearTimeout(timer);if(cancelPending===cancel)cancelPending=null;error?reject(error):resolve(broker);}
+      const cancel=error=>finish(error);cancelPending=cancel;
+      try{broker=id?new window.Peer(id,{debug:0,config:{iceServers:[]}}):new window.Peer({debug:0,config:{iceServers:[]}});}catch(error){finish(error);return;}
+      broker.on('open',()=>{if(token===generation)finish();});
+      broker.on('connection',conn=>{if(role==='host')acceptConnection(conn,token);else conn.close();});
+      broker.on('error',error=>{if(token!==generation)return;const message=errorText(error);if(!settled){finish(Object.assign(new Error(message),{type:error.type}));return;}if(cancelPending){cancelPending(new Error(message));return;}setStatus('error',message);});
+      broker.on('disconnected',()=>{if(token!==generation)return;setStatus('signal-lost','Serviço de salas desconectado. A partida em andamento continua; recrie a sala para receber novos jogadores.');});
+    });
+  }
+  function checkSupport(){if(!window.Peer||!window.RTCPeerConnection)throw new Error('Use Edge ou Chrome atualizado e recarregue a página para conectar.');}
+  async function createRoom(){
+    checkSupport();closeAll(false);const token=generation;role='host';localPlayerId='host';setStatus('creating');
+    try{
+      for(let attempt=0;attempt<4;attempt++){
+        const random=new Uint32Array(1);crypto.getRandomValues(random);roomId=String(10000000+random[0]%90000000);
+        try{await openBroker(PREFIX+roomId,token);break;}catch(error){if(error.type!=='unavailable-id'||attempt===3)throw error;const old=broker;broker=null;old?.destroy();}
       }
-      emit('message', {...message, from});
-    } catch (_) { setStatus('error', 'Mensagem inválida recebida.'); }
+      if(token!==generation)throw new Error('Conexão cancelada.');setStatus('waiting');return roomId;
+    }catch(error){if(token===generation){closeAll(false);setStatus('error',error.message);}throw error;}
   }
-
-  function bindHostChannel(item, channel) {
-    item.channel = channel;
-    channel.onopen = () => {
-      channel.send(packet('welcome', {playerId: item.playerId, playerCount: playerCount(), maxPlayers: MAX_PLAYERS, players: ['host', ...openHostPeers().map(peer => peer.playerId)]}));
-      pendingPlayerId = null;setStatus('connected');broadcastRoster();
-    };
-    channel.onclose = () => { setStatus(openHostPeers().length ? 'connected' : 'disconnected');broadcastRoster(); };
-    channel.onerror = () => setStatus('error', `Falha na conexão de ${item.playerId}.`);
-    channel.onmessage = event => parseMessage(event, item.playerId);
+  async function joinRoom(value){
+    checkSupport();const id=String(value||'').trim().replace(/[\s-]/g,'');if(!/^\d{8}$/.test(id))throw new Error('Digite os 8 números do ID da sala.');
+    closeAll(false);const token=generation;roomId=id;role='guest';localPlayerId='guest';setStatus('joining');
+    try{
+      const peer=await openBroker(null,token);if(token!==generation)throw new Error('Conexão cancelada.');
+      return await new Promise((resolve,reject)=>{
+        let settled=false;const timer=setTimeout(()=>finish(new Error('A sala não respondeu. Confira o ID e a conexão LAN/VPN.')),TIMEOUT);
+        const cancel=error=>finish(error);cancelPending=cancel;
+        function finish(error){if(settled)return;settled=true;clearTimeout(timer);if(cancelPending===cancel)cancelPending=null;error?reject(error):resolve(roomId);}
+        guest=peer.connect(PREFIX+id,{reliable:true,serialization:'json',metadata:{protocol:PROTOCOL}});
+        guest.on('data',message=>{
+          if(token!==generation)return;
+          if(message?.type==='rejected'){finish(new Error(message.payload.reason));return;}
+          if(message?.type==='welcome'){
+            localPlayerId=message.payload.playerId;roster=message.payload.players;accepting=message.payload.accepting!==false;setStatus('connected');finish();return;
+          }
+          incoming(message,'host');
+        });
+        guest.on('close',()=>{if(token!==generation)return;finish(new Error('A conexão com o anfitrião foi encerrada.'));closeAll(false);setStatus('closed','A sala foi encerrada ou a conexão com o anfitrião caiu.');});
+        guest.on('error',()=>finish(new Error('Não foi possível ligar ao anfitrião. Verifique a rede ou VPN.')));
+      });
+    }catch(error){if(token===generation){closeAll(false);setStatus('error',error.message);}throw error;}
   }
-
-  function bindGuestChannel(item, channel) {
-    item.channel = channel;
-    channel.onopen = () => setStatus('connected');
-    channel.onclose = () => setStatus('disconnected');
-    channel.onerror = () => setStatus('error', 'Falha no canal da partida.');
-    channel.onmessage = event => parseMessage(event, 'host');
-  }
-
-  function nextPlayerId() {
-    for (let slot = 2; slot <= MAX_PLAYERS; slot++) {
-      const id = `p${slot}`;if (!hostPeers.has(id)) return id;
-    }
-    return null;
-  }
-
-  async function createInvite() {
-    if (!window.RTCPeerConnection) throw new Error('Este navegador não oferece suporte a WebRTC.');
-    if (role !== 'host') {closeAll(false);role = 'host';localPlayerId = 'host';}
-    if (pendingPlayerId) throw new Error('Conclua o convite atual antes de gerar outro.');
-    const playerId = nextPlayerId();
-    if (!playerId) throw new Error('A sala já atingiu o limite de 4 jogadores.');
-    const pc = new RTCPeerConnection({iceServers: []});
-    const item = {playerId, pc, channel: null};hostPeers.set(playerId, item);pendingPlayerId = playerId;
-    pc.onconnectionstatechange = () => {if (pc.connectionState === 'failed') setStatus('error', `Não foi possível conectar ${playerId}.`);};
-    bindHostChannel(item, pc.createDataChannel('catoons-coop', {ordered: true}));
-    setStatus('creating');await pc.setLocalDescription(await pc.createOffer());await waitForIce(pc);setStatus('waiting-answer');
-    return encode({version: 2, playerId, description: pc.localDescription});
-  }
-
-  async function createRoom() {
-    closeAll(false);role = 'host';localPlayerId = 'host';setStatus('creating');return createInvite();
-  }
-
-  async function joinRoom(offerCode) {
-    if (!window.RTCPeerConnection) throw new Error('Este navegador não oferece suporte a WebRTC.');
-    const envelope = decode(offerCode),offer = envelope.description || envelope;
-    if (offer.type !== 'offer') throw new Error('O código da sala não é uma oferta válida.');
-    closeAll(false);role = 'guest';localPlayerId = envelope.playerId || 'guest';remotePlayerCount = 2;
-    const pc = new RTCPeerConnection({iceServers: []});
-    const item = {playerId: localPlayerId, pc, channel: null};guestPeer = item;
-    pc.onconnectionstatechange = () => {if (pc.connectionState === 'failed') setStatus('error', 'Não foi possível ligar ao anfitrião.');};
-    pc.ondatachannel = event => bindGuestChannel(item, event.channel);
-    setStatus('joining');await pc.setRemoteDescription(offer);await pc.setLocalDescription(await pc.createAnswer());await waitForIce(pc);setStatus('waiting-host');
-    return encode({version: 2, playerId: localPlayerId, description: pc.localDescription});
-  }
-
-  async function acceptAnswer(answerCode) {
-    if (role !== 'host') throw new Error('Crie uma sala antes de aceitar a resposta.');
-    const envelope = decode(answerCode),answer = envelope.description || envelope;
-    const playerId = envelope.playerId || pendingPlayerId,item = hostPeers.get(playerId);
-    if (!item || !pendingPlayerId || playerId !== pendingPlayerId) throw new Error('Esta resposta não pertence ao convite atual.');
-    if (answer.type !== 'answer') throw new Error('O código recebido não é uma resposta válida.');
-    await item.pc.setRemoteDescription(answer);setStatus('connecting');
-  }
-
-  function send(type, payload = {}) {
-    if (role === 'host') {
-      let sent = false;for (const item of openHostPeers()) {item.channel.send(packet(type, payload));sent = true;}return sent;
-    }
-    if (guestPeer?.channel?.readyState !== 'open') return false;
-    guestPeer.channel.send(packet(type, payload));return true;
-  }
-
-  function sendTo(playerId, type, payload = {}) {
-    if (role !== 'host') return false;
-    const channel = hostPeers.get(playerId)?.channel;if (channel?.readyState !== 'open') return false;
-    channel.send(packet(type, payload));return true;
-  }
-
-  window.CatoonsLan = {
-    createRoom,createInvite,joinRoom,acceptAnswer,disconnect: () => closeAll(true),send,sendTo,
-    onMessage(fn) {listeners.message.add(fn);return () => listeners.message.delete(fn);},
-    onStatus(fn) {listeners.status.add(fn);fn({status,role,connected:connected(),playerCount:playerCount(),maxPlayers:MAX_PLAYERS,localPlayerId});return () => listeners.status.delete(fn);},
-    get role() {return role;},get status() {return status;},get connected() {return connected();},
-    get isHost() {return role === 'host';},get isGuest() {return role === 'guest';},
-    get playerCount() {return playerCount();},get maxPlayers() {return MAX_PLAYERS;},get localPlayerId() {return localPlayerId;},
-    get players() {return role === 'host' ? ['host', ...openHostPeers().map(item => item.playerId)] : [...remotePlayers];},
-    get canInvite() {return role === 'host'&&!pendingPlayerId&&hostPeers.size<MAX_PLAYERS-1;}
+  function disconnect(){send(role==='host'?'room-closed':'leaving');closeAll(true);}
+  window.CatoonsLan={
+    createRoom,joinRoom,disconnect,send,sendTo:(id,type,payload)=>transmit(peers.get(id)?.conn,type,payload),
+    setAccepting(value){if(role!=='host')return;accepting=Boolean(value);broadcastRoster();},
+    onMessage(fn){listeners.message.add(fn);return()=>listeners.message.delete(fn);},
+    onStatus(fn){listeners.status.add(fn);fn(info());return()=>listeners.status.delete(fn);},
+    get role(){return role;},get status(){return status;},get connected(){return connected();},get roomId(){return roomId;},
+    get isHost(){return role==='host';},get isGuest(){return role==='guest';},get playerCount(){return role==='solo'?1:players().length;},
+    get maxPlayers(){return MAX_PLAYERS;},get localPlayerId(){return localPlayerId;},get players(){return players();},
+    get canInvite(){return role==='host'&&accepting&&peers.size<MAX_PLAYERS-1;}
   };
+  window.addEventListener('pagehide',()=>closeAll(false));
 })();

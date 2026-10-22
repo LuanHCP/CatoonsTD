@@ -1,6 +1,8 @@
 # Catoons TD — Multiplayer cooperativo (LAN/VPN)
 
-Este é um recurso experimental da versão beta. Ele não usa servidor externo: os jogadores se conectam diretamente por LAN ou VPN.
+Este é um recurso experimental da versão beta. As salas usam um ID numérico de 8 dígitos: o anfitrião cria, compartilha o ID e os amigos digitam para conectar automaticamente.
+
+Criar e encontrar salas exige internet, pois o serviço público PeerServer do PeerJS apresenta os jogadores. O estado da partida é transmitido diretamente entre os computadores por WebRTC, na mesma rede ou VPN. A biblioteca PeerJS 1.5.5 está incluída no jogo, com licença MIT em `src/vendor/PEERJS_LICENSE`.
 
 ## O que já funciona
 
@@ -29,12 +31,12 @@ Este é um recurso experimental da versão beta. Ele não usa servidor externo: 
 1. Extraia o mesmo ZIP nos dois computadores.
 2. Abra `index.html` no Edge ou Chrome nos dois computadores.
 3. Nos dois jogos, abra a aba **Evento** para jogar o boss diário, ou entre em **Play** para a campanha cooperativa.
-4. No primeiro computador, clique em **Criar sala** e envie o código exibido ao próximo jogador.
-5. No computador convidado, clique em **Entrar em sala**, cole o código e clique em **Gerar resposta**.
-6. Envie a resposta gerada de volta ao anfitrião.
-7. O anfitrião cola a resposta e clica em **Conectar jogador**.
-8. Para adicionar o terceiro e o quarto participantes, o anfitrião clica em **Convidar outro jogador** e repete os passos 5 a 7 com um novo código para cada pessoa.
-9. Quando todos estiverem conectados, o anfitrião inicia o evento ou escolhe mapa/dificuldade da campanha. Os convidados entram automaticamente.
+4. No primeiro computador, clique em **Criar sala** e em **Copiar ID**.
+5. Envie o mesmo ID de 8 números para todos os amigos.
+6. Cada convidado digita o ID no campo **Já tem um ID?** e clica em **Conectar**.
+7. As quatro vagas mostram quem já está conectado. O anfitrião inicia a partida quando a equipe estiver pronta; os convidados entram automaticamente.
+8. Para sair, um convidado usa **Sair da sala**. O anfitrião usa **Fechar sala** para encerrar a sala inteira. As vagas liberadas podem ser preenchidas com o mesmo ID enquanto estiverem no lobby.
+9. Ao voltar da partida pelo menu, o anfitrião traz todos de volta ao lobby e mantém a sala aberta. Entradas durante uma partida em andamento são bloqueadas.
 
 ## Observações desta primeira versão
 
@@ -42,5 +44,6 @@ Este é um recurso experimental da versão beta. Ele não usa servidor externo: 
 - Os dois devem usar exatamente o mesmo pacote do jogo.
 - Se a conexão cair, volte ao lobby e crie uma sala novamente; a reconexão automática ainda não foi adicionada.
 - Nesta primeira versão, a recompensa/progressão permanente da vitória é registrada apenas no computador anfitrião.
-- Não publique os códigos da sala: eles contêm informações técnicas temporárias da conexão local.
+- Compartilhe o ID apenas com quem você quer convidar. Ele dá acesso à sala enquanto ela estiver aberta.
+- Se o serviço público de salas estiver indisponível, o jogo informa o erro; o modo solo continua disponível.
 

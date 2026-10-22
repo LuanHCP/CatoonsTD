@@ -44,8 +44,8 @@ const result = await evaluate(`(() => {
     lanApi: Boolean(window.CatoonsLan),
     lanRole: window.CatoonsLan?.role,
     visible: Boolean(rect && rect.width > 0 && rect.height > 0),
-    controls: ['lan-solo','lan-create','lan-join','lan-status'].every(id => Boolean(document.getElementById(id))),
-    copy: section?.innerText.includes('Cooperativo no mesmo mapa'),
+    controls: ['create','connect','status','copy','close'].every(action => Boolean(section?.querySelector('[data-room-'+action+']'))),
+    copy: section?.innerText.includes('Sua sala'),
     scriptCount: [...document.scripts].map(script => script.src).filter(Boolean).length
   };
 })()`);
