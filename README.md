@@ -45,7 +45,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 - **Apoie o criador** com QR Code e código Pix, sem conceder vantagens dentro do jogo.
 - **Campanha, modo Infinito e cooperativo experimental para 2–4 jogadores por LAN/VPN**, com carteiras individuais e o dobro de inimigos.
 - **Salas por ID numérico**, entrada automática e quatro vagas visíveis, em um lobby com seleção clara de modos. [Como conectar](docs/MULTIPLAYER_LAN.md).
-- **Evento diário Maré Blindada**, separado da campanha, com o Almirante Espinha nas rodadas 20, 40 e 60, vida escalável por equipe, quatro escudos especializados e barra de boss própria.
+- **Evento diário Maré Blindada**, solo ou com até 4 jogadores, separado da campanha. O Almirante Espinha aparece nas rodadas 20, 40 e 60, com vida e economia ajustadas à equipe, quatro escudos especializados e barra de boss própria. Solo funciona offline.
 - **Venda por 50% do investimento**, reposicionamento e estatísticas por torre.
 - **Português e inglês**, com troca de idioma no lobby/Configurações.
 - **Interface responsiva para celular**, priorizando o modo deitado e mantendo suporte ao modo retrato.

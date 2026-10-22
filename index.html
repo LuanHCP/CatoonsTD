@@ -65,7 +65,7 @@
       <section class="mission-grid" aria-label="Escolha um modo de jogo">
         <button type="button" class="mission-card campaign-mission" data-select-mode="campaign"><span class="mission-number">01 / EXPLORAR</span><span class="mission-art mission-route" aria-hidden="true">↗</span><b>Campanha</b><p>Escolha um mapa, monte a defesa e conquiste estrelas.</p><span class="mission-meta">SOLO OU EQUIPE <i>Jogar →</i></span></button>
         <button type="button" class="mission-card infinite-mission" data-select-mode="infinite"><span class="mission-number">02 / SOBREVIVER</span><span class="mission-art" aria-hidden="true">∞</span><b>Infinito</b><p>Ondas sem fim. Até onde sua defesa consegue chegar?</p><span class="mission-meta">SOLO OU EQUIPE <i>Jogar →</i></span></button>
-        <button type="button" class="mission-card boss-mission" data-go-screen="event"><span class="mission-number">03 / ENFRENTAR</span><span class="mission-art" aria-hidden="true">◈</span><b>Boss diário</b><p>Una sua equipe contra o Almirante nas rodadas 20, 40 e 60.</p><span class="mission-meta">COOPERATIVO · 2–4 <i>Entrar →</i></span></button>
+        <button type="button" class="mission-card boss-mission" data-go-screen="event"><span class="mission-number">03 / ENFRENTAR</span><span class="mission-art" aria-hidden="true">◈</span><b>Boss diário</b><p>Enfrente o Almirante nas rodadas 20, 40 e 60, sozinho ou em equipe.</p><span class="mission-meta">SOLO OU EQUIPE · 1–4 <i>Entrar →</i></span></button>
       </section>
       <section class="lobby-grid collection-shortcuts">
         <button class="lobby-card cats-card" type="button" data-go-screen="cats"><span class="lobby-icon">🐱</span><span><b>Gatinhos</b><small>Conheça e evolua sua coleção</small></span></button>
@@ -162,14 +162,14 @@
             <div class="event-boss-body"><span>🦈</span><i></i></div><div class="event-boss-cabin"></div>
           </div>
           <div class="event-copy">
-            <span class="eyebrow">OPERAÇÃO COOPERATIVA • BOSS DIÁRIO</span>
+            <span class="eyebrow">SOLO OU COOPERATIVO • BOSS DIÁRIO</span>
             <h2>Maré Blindada</h2>
             <p>O chefe ativo do dia invade a arena nas rodadas 20, 40 e 60. Cada retorno tem mais vida e quatro etapas protegidas por escudos diferentes.</p>
             <div class="event-boss-name"><span>🦈</span><div><small>CHEFE ATIVO HOJE</small><b>Almirante Espinha</b></div></div>
             <div class="event-phase-preview">
               <span>1️⃣ 💥 Antiblindagem</span><span>2️⃣ 👁️ Detecta Camo</span><span>3️⃣ 🔥 Fogo/Laser</span><span>4️⃣ 🐾 Todos</span>
             </div>
-            <p id="event-team-scale" class="event-team-scale">👥 2 jogadores • vida ×1,00 • 🐟 500 para cada</p>
+            <p id="event-team-scale" class="event-team-scale">🐾 Solo • vida ×0,66 • 🐟 650 iniciais</p>
           </div>
         </div>
         <div class="event-team-layout">
@@ -187,7 +187,7 @@
           <div class="room-roster"><div data-room-slot class="room-slot"><span>01</span><div><b>Vaga livre</b><small>Aguardando</small></div><i></i></div><div data-room-slot class="room-slot"><span>02</span><div><b>Vaga livre</b><small>Aguardando</small></div><i></i></div><div data-room-slot class="room-slot"><span>03</span><div><b>Vaga livre</b><small>Aguardando</small></div><i></i></div><div data-room-slot class="room-slot"><span>04</span><div><b>Vaga livre</b><small>Aguardando</small></div><i></i></div></div>
           <p data-room-help class="lan-help">Crie uma sala e compartilhe o ID. Seus amigos digitam e conectam.</p>
         </section>
-          <div class="event-launch-panel"><span class="eyebrow">PRONTOS PARA A INVASÃO?</span><h3>Reúna 2 a 4 jogadores</h3><p>Cada um controla seus gatos e seus salmões. A equipe compartilha vidas e rodadas.</p><button type="button" id="event-start" class="primary big-action" disabled>Crie ou entre em uma sala</button><small>O anfitrião inicia quando a equipe estiver pronta.</small></div>
+          <div class="event-launch-panel"><span class="eyebrow">PRONTO PARA A INVASÃO?</span><h3>Sozinho ou com amigos</h3><p>Jogue solo agora, ou conecte até 3 amigos pelo ID. A vida do boss e os salmões iniciais se ajustam à equipe.</p><button type="button" id="event-start" class="primary big-action">Jogar solo →</button><small>Solo não precisa de sala nem internet. Em equipe, o anfitrião inicia.</small></div>
         </div>
         <article class="event-coming-soon"><span>🌑</span><div><small>PRÓXIMO CHEFE DA ROTAÇÃO</small><b>Em breve</b><p>O segundo boss será lançado na próxima atualização do evento.</p></div></article>
       </section>

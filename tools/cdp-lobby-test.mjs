@@ -28,9 +28,23 @@ if(!await evaluate(`document.querySelector('#screen-event [data-room-help]').tex
 await evaluate(`document.querySelector('#screen-event [data-room-create]').click();true`);
 for(let attempt=0;attempt<120;attempt++){if(await evaluate(`CatoonsLan.status==='waiting'||CatoonsLan.status==='error'`))break;await wait(200);}
 const created=await evaluate(`({id:CatoonsLan.roomId,visible:!document.querySelector('#screen-event [data-room-active]').hidden,startDisabled:document.querySelector('#event-start').disabled,status:CatoonsLan.status})`);
-if(!/^\d{8}$/.test(created.id)||!created.visible||!created.startDisabled||created.status!=='waiting')throw new Error('Criar sala pela interface falhou: '+JSON.stringify(created));
+if(!/^\d{8}$/.test(created.id)||!created.visible||created.startDisabled||created.status!=='waiting')throw new Error('Criar sala pela interface falhou: '+JSON.stringify(created));
 await evaluate(`document.querySelector('#screen-event [data-room-close]').click();true`);await wait(150);
 if(!await evaluate(`CatoonsLan.role==='solo'&&document.querySelector('#screen-event [data-room-active]').hidden&&!document.querySelector('#screen-event [data-room-actions]').hidden`))throw new Error('Fechar sala pela interface falhou.');
+await call('Network.enable');
+await call('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:-1,uploadThroughput:-1});
+if(!await evaluate(`!document.querySelector('#event-start').disabled&&document.querySelector('#event-start').textContent.includes('solo')`))throw new Error('Evento solo não está disponível sem sala.');
+await evaluate(`document.querySelector('#event-start').click();true`);
+for(let attempt=0;attempt<30;attempt++){if(await evaluate(`document.body.dataset.screen==='game'`))break;await wait(100);}
+const solo=await evaluate(`({screen:document.body.dataset.screen,money:Number(document.querySelector('#td-money').textContent),role:CatoonsLan.role,rounds:document.querySelector('#td-wave-max').textContent,modeLabel:document.querySelector('#game-difficulty-text').textContent})`);
+if(solo.screen!=='game'||solo.money!==650||solo.role!=='solo'||solo.rounds!=='60'||!solo.modeLabel.includes('Solo'))throw new Error('Evento solo offline falhou: '+JSON.stringify(solo));
+const soloWave=await evaluate(`personalTd.startWave();Number(document.querySelector('#td-count').textContent)`);
+if(soloWave!==13)throw new Error('O solo não deveria receber balões dobrados: '+soloWave);
+const soloBoss=await evaluate(`(()=>{for(let i=1;i<20;i++)personalTd.startWave();return personalTd.eventBossState();})()`);
+if(soloBoss?.round!==20||soloBoss.maxHp<=0||soloBoss.maxHp>=1334.8||soloBoss.shieldHp<=0)throw new Error('Escala do boss solo incorreta: '+JSON.stringify(soloBoss));
+await evaluate(`document.querySelector('#menu-lobby').click();true`);
+if(!await evaluate(`document.body.dataset.screen==='event'&&!document.querySelector('#event-start').disabled`))throw new Error('Retorno do solo não liberou nova partida.');
+await call('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
 if(errors.length)throw new Error('Erros no navegador: '+errors);
-console.log(JSON.stringify({layouts:result,modeShortcut:true,invalidId:true,createAndCloseButtons:true,browserErrors:errors},null,2));
+console.log(JSON.stringify({layouts:result,modeShortcut:true,invalidId:true,createAndCloseButtons:true,soloOffline:solo,soloWave,soloBoss,browserErrors:errors},null,2));
 await call('Page.close');socket.close();

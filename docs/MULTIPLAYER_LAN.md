@@ -14,9 +14,9 @@ Criar e encontrar salas exige internet, pois o serviço público PeerServer do P
 - Cada participante pode posicionar, melhorar, reposicionar e vender seus próprios gatinhos.
 - Todos podem pedir o início da rodada e mudar a velocidade.
 - O anfitrião mantém a simulação oficial e envia o estado da partida aos demais jogadores.
-- **Evento diário de boss** separado das fases, exclusivo do cooperativo, com 60 rodadas.
-- O **Almirante Espinha** invade nas rodadas 20, 40 e 60, ficando mais resistente a cada aparição. A vida também escala com a equipe: 2 jogadores ×1,00; 3 jogadores ×1,34; 4 jogadores ×1,68.
-- Para compensar equipes menores, cada jogador começa o evento com 🐟 500 em dupla, 🐟 425 em trio ou 🐟 350 com quatro jogadores.
+- **Evento diário de boss** separado das fases, disponível solo ou em equipe de até 4 jogadores, com 60 rodadas. O botão **Jogar solo** inicia diretamente, sem criar sala e sem internet.
+- O **Almirante Espinha** invade nas rodadas 20, 40 e 60, ficando mais resistente a cada aparição. A vida também escala com a equipe: solo ×0,66; 2 jogadores ×1,00; 3 jogadores ×1,34; 4 jogadores ×1,68.
+- Para compensar equipes menores, cada jogador começa o evento com 🐟 650 solo, 🐟 500 em dupla, 🐟 425 em trio ou 🐟 350 com quatro jogadores. Solo recebe a quantidade normal de balões; em equipe vêm 2× mais.
 - A vida do Almirante é dividida em quatro etapas. No começo e ao perder cada etapa, ele recria um escudo e fica extremamente lento até a proteção ser rompida:
   1. escudo antiblindagem — só recebe dano de quem quebra blindados;
   2. escudo camuflado — só recebe dano de quem detecta camuflados;

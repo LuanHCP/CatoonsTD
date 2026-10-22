@@ -2709,7 +2709,7 @@ function renderRoomPanels(info){
   const labels={offline:'Jogue solo ou reúna sua equipe',creating:'Gerando ID da sala…',joining:'Localizando e conectando…',waiting:'Sala aberta • aguardando equipe',connected:isHost?'Equipe conectada • você é o anfitrião':'Conectado • aguarde o anfitrião',error:'Não foi possível conectar',closed:'Sala encerrada','signal-lost':'Serviço de salas desconectado'};
   document.body.classList.toggle('lan-connected',Boolean(info.connected));
   $$('[data-room-panel]').forEach(panel=>{
-    panel.querySelector('[data-room-status]').textContent=info.status==='offline'&&panel.closest('#screen-event')?'Reúna 2 a 4 jogadores para o evento':labels[info.status]||info.status;
+    panel.querySelector('[data-room-status]').textContent=info.status==='offline'&&panel.closest('#screen-event')?'Jogue solo ou conecte até 3 amigos':labels[info.status]||info.status;
     panel.querySelector('[data-room-status]').className='room-status '+(info.connected?'online':info.status==='error'?'error':'');
     panel.querySelector('[data-room-actions]').hidden=inRoom;
     panel.querySelector('[data-room-active]').hidden=!inRoom;
@@ -2749,14 +2749,14 @@ function initEventLobby(){
   const start=$('#event-start');if(start)start.onclick=()=>personalTd?.startEvent?.();
 }
 
-function eventPlayerCount(playerCount){return Math.max(2,Math.min(4,Number(playerCount)||2));}
+function eventPlayerCount(playerCount){return Math.max(1,Math.min(4,Number(playerCount)||1));}
 function eventTeamScale(playerCount){return 1+(eventPlayerCount(playerCount)-2)*.34;}
-function eventStartMoney(playerCount){return({2:500,3:425,4:350})[eventPlayerCount(playerCount)];}
+function eventStartMoney(playerCount){return({1:650,2:500,3:425,4:350})[eventPlayerCount(playerCount)];}
 
 function renderEventLobby(){
-  const lan=window.CatoonsLan,start=$('#event-start'),players=Math.max(2,lan?.playerCount||2),scale=$('#event-team-scale');
-  if(start){start.disabled=!(lan?.connected&&lan.isHost);start.textContent=lan?.isGuest?'Aguarde o anfitrião':lan?.connected?'Iniciar evento →':lan?.isHost?'Aguardando mais um jogador':'Crie ou entre em uma sala';}
-  if(scale)scale.textContent=$T`👥 ${players} jogadores • vida ×${eventTeamScale(players).toFixed(2).replace('.',',')} • 🐟 ${eventStartMoney(players)} para cada`;
+  const lan=window.CatoonsLan,start=$('#event-start'),players=eventPlayerCount(lan?.connected?lan.playerCount:1),scale=$('#event-team-scale');
+  if(start){start.disabled=Boolean(lan?.isGuest||['creating','joining'].includes(lan?.status)||start.dataset.loading==='1');start.textContent=start.dataset.loading==='1'?'Preparando arena…':lan?.isGuest?'Aguarde o anfitrião':players>1?'Iniciar evento em equipe →':'Jogar solo →';}
+  if(scale)scale.textContent=players===1?$T`🐾 Solo • vida ×${eventTeamScale(1).toFixed(2).replace('.',',')} • 🐟 ${eventStartMoney(1)} iniciais`:$T`👥 ${players} jogadores • vida ×${eventTeamScale(players).toFixed(2).replace('.',',')} • 🐟 ${eventStartMoney(players)} para cada`;
 }
 function drawCollectionCat(id){
   const canvas=$('#cat-preview-canvas');if(!canvas)return;
@@ -3789,10 +3789,10 @@ function initPersonalTd(){
     const resultCard=$('#result-screen .result-card');
     if(resultCard){resultCard.classList.toggle('victory',victory);resultCard.classList.toggle('defeat',!victory);}
     if($('#result-icon'))$('#result-icon').textContent=victory?'🏆':(endless?'∞':'💔');
-    if($('#result-kicker'))$('#result-kicker').textContent=victory?(raid?$t('CAÇADA EM EQUIPE CONCLUÍDA'):$t('FASE CONCLUÍDA')):(endless?$t('MODO INFINITO ENCERRADO'):$t('DEFESA ROMPIDA'));
+    if($('#result-kicker'))$('#result-kicker').textContent=victory?(raid?$t('EVENTO CONCLUÍDO'):$t('FASE CONCLUÍDA')):(endless?$t('MODO INFINITO ENCERRADO'):$t('DEFESA ROMPIDA'));
     if($('#result-title'))$('#result-title').textContent=victory?$t('Vitória!'):(endless?$t('Fim do Infinito'):$t('Derrota'));
     if($('#result-text'))$('#result-text').textContent=victory
-      ?(raid?$t('O time venceu as três invasões do Almirante Espinha!'):$T`${currentMap().name} • ${currentDifficulty().name} concluído.`)
+      ?(raid?$t('Você venceu as três invasões do Almirante Espinha!'):$T`${currentMap().name} • ${currentDifficulty().name} concluído.`)
       :(endless?$T`Você chegou até a rodada ${Math.max(state.wave,state.lastClearedWave)}. Seu recorde fica salvo para a próxima tentativa.`:$t('Os inimigos atravessaram sua defesa. Reorganize as torres e tente novamente.'));
     if($('#result-summary'))$('#result-summary').innerHTML=victory
       ?(raid?$T`<span>⚔️ 3/3 invasões vencidas</span><span>🪙 +${(details.coins||0)+masteryCoinTotal}</span><span>XP conta +${details.xp||0}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`:$T`<span>⭐ ${mapStars(state.map)}/3 no mapa</span><span>🪙 +${(details.coins||0)+masteryCoinTotal}</span><span>XP conta +${details.xp||0}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`)
@@ -5296,7 +5296,7 @@ function initPersonalTd(){
     if($('#game-map-title'))$('#game-map-title').textContent=map.name;
     if($('#game-difficulty-text'))$('#game-difficulty-text').textContent=endless
       ?$T`∞ Modo Infinito • ${diff.name} • melhor: rodada ${infiniteBestFor(state.map,state.difficulty)}`
-      :isBossEvent()?$t('👑 Evento diário • Maré Blindada • equipe LAN/VPN'):$T`🏁 Campanha • ${diff.name} • ${profile.maps[state.map].cleared[state.difficulty]?$t('⭐ já concluída'):$t('☆ estrela ainda não conquistada')}`;
+      :isBossEvent()?(lan?.connected?$t('👑 Evento diário • Maré Blindada • equipe LAN/VPN'):$t('👑 Evento diário • Maré Blindada • Solo')):$T`🏁 Campanha • ${diff.name} • ${profile.maps[state.map].cleared[state.difficulty]?$t('⭐ já concluída'):$t('☆ estrela ainda não conquistada')}`;
     const start=$('#td-start');
     if(start){
       // Mantém os mesmos elementos durante o clique. Recriar o conteúdo a cada frame fazia
@@ -5481,7 +5481,7 @@ function initPersonalTd(){
 
   function makeDailyBoss(round){
     const map=currentMap(),diff=currentDifficulty(),strongest=strongestRegularDurability(round),encounter=Math.max(1,Math.min(3,Math.round(round/20)));
-    const players=Math.max(2,lan?.playerCount||2),teamScale=eventTeamScale(players),bossScale=[0,120,185,275][encounter];
+    const players=eventPlayerCount(lan?.connected?lan.playerCount:1),teamScale=eventTeamScale(players),bossScale=[0,120,185,275][encounter];
     const hp=Number((strongest*bossScale*teamScale).toFixed(1)),shieldMax=Number((hp*(.12+encounter*.025)).toFixed(1));
     const speed=(50+round*2.2)*map.speedMultiplier*diff.speed*.22,reward=Math.round((220+encounter*180)*map.rewardMultiplier*diff.waveReward);
     return{at:0,round,kind:'boss',eventBoss:true,raidBoss:'spine',encounter,armored:false,camo:false,name:$t('Almirante Espinha'),
@@ -6475,7 +6475,7 @@ function initPersonalTd(){
     const diff=currentDifficulty(),coinReward=Math.round(180*diff.coinMultiplier),xpReward=Math.round(260*diff.xpMultiplier);
     profile.coins+=coinReward;const levels=grantXp(xpReward);saveProfile();
     const levelText=levels.length?$T` • 🎖️ Subiu para o nível ${profile.level}!`:'';
-    setMsg($T`👑 Evento diário concluído! O time venceu as três invasões do Almirante Espinha. +🪙 ${coinReward} • +${xpReward} XP${levelText}`);
+    setMsg($T`👑 Evento diário concluído! Você venceu as três invasões do Almirante Espinha. +🪙 ${coinReward} • +${xpReward} XP${levelText}`);
     updateStats();showResult(true,{coins:coinReward,xp:xpReward,bossHunt:true});
   }
 
@@ -7856,9 +7856,11 @@ if($('#play-enter'))$('#play-enter').onclick=()=>{
 };
 
 function startEvent(){
-  if(!lan?.connected||!lan.isHost){renderEventLobby();return;}
+  const button=$('#event-start');if(lan?.isGuest||['creating','joining'].includes(lan?.status)||button?.dataset.loading==='1')return;
+  if(lan?.isHost&&!lan.connected)lan.disconnect();
+  if(button)button.dataset.loading='1';renderEventLobby();
   const mapId='grove',diffId='normal',modeId='boss-event';
-  runMapLoading(mapId,diffId,()=>{loadSelection(mapId,diffId,modeId);setScreen('game');lan.setAccepting(false);lan.send('start',{map:mapId,difficulty:diffId,mode:modeId});broadcastLanSnapshot(true);},modeId);
+  runMapLoading(mapId,diffId,()=>{loadSelection(mapId,diffId,modeId);setScreen('game');if(lanHost()){lan.setAccepting(false);lan.send('start',{map:mapId,difficulty:diffId,mode:modeId});broadcastLanSnapshot(true);}if(button)delete button.dataset.loading;},modeId);
 }
 
 personalTd={reset,startWave,startEvent,upgradeTower,upgradeDartPath,upgradeSniperPath,renderHotbar,loadSelection,towerCount:(id)=>state.towers.filter(t=>t.type===id).length,placementType:()=>state.selected,mapId:()=>state.map,towerPrice:(id)=>towerPrice(id,state.map),eventBossState:()=>{const e=[...state.enemies,...state.spawn].find(enemy=>enemy.eventBoss&&!enemy.dead);return e?{name:e.name,round:e.round,encounter:e.encounter,phase:e.bossPhase,hp:e.hp,maxHp:e.maxHp,shieldHp:e.bossShieldHp,shieldMax:e.bossShieldMax,requirement:bossShieldRequirement(e.bossPhase||1).label}:null;}};
