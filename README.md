@@ -34,7 +34,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 
 - **14 mapas** organizados em 4 tiers: 6 Iniciantes, 4 Médios, 2 Difíceis e 2 Impossíveis. Em **Festa na Igreja**, duas rotas formam uma cruz e os bancos funcionam como posições elevadas.
 - **3 dificuldades por mapa**: Fácil, Normal e Difícil.
-- **16 gatinhos**, incluindo personagens secretos, o **Gatinho Rei Demônio** do tier Impossível, o exclusivo **Gato Celestial** e o inútil (de propósito) **Gatinho Mister**.
+- **17 gatinhos**, incluindo personagens secretos, o **Gatinho Rei Demônio**, o exclusivo **Gato Celestial**, a unidade de suporte **Caixinha de Areia** e o inútil (de propósito) **Gatinho Mister**.
 - **Roleta Celestial** com um giro gratuito a cada 24 horas, recompensas de moedas/XP e garantia do Gato Celestial no 50º giro sem sucesso.
 - **Árvores de upgrade** com caminhos e crosspath limitado em unidades específicas, incluindo o Rei Demônio com Senhor do Medo, Chamas do Abismo e Legião Sombria.
 - **Maestria até o nível 50**, com bônus permanentes, skin dourada e habilidade exclusiva no nível máximo.
@@ -43,7 +43,8 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 - **5 inimigos especiais** com habilidades próprias: Curandeiro, Atrapalhão, Bobo da Corte, Anjo e Demônio.
 - **Economia da partida em salmões** e progressão persistente com moedas, XP, estrelas, poderes consumíveis e saves locais.
 - **Apoie o criador** com QR Code e código Pix, sem conceder vantagens dentro do jogo.
-- **Campanha e modo Infinito**.
+- **Campanha, modo Infinito e cooperativo experimental para 2–4 jogadores por LAN/VPN**, com carteiras individuais e o dobro de inimigos.
+- **Evento diário Maré Blindada**, separado da campanha, com o Almirante Espinha nas rodadas 20, 40 e 60, vida escalável por equipe, quatro escudos especializados e barra de boss própria.
 - **Venda por 50% do investimento**, reposicionamento e estatísticas por torre.
 - **Português e inglês**, com troca de idioma no lobby/Configurações.
 - **Interface responsiva para celular**, priorizando o modo deitado e mantendo suporte ao modo retrato.
@@ -106,6 +107,7 @@ CatoonsTD/
 ├─ index.html
 ├─ src/
 │  ├─ game.js
+│  ├─ multiplayer.js
 │  └─ style.css
 ├─ desktop/
 │  └─ launcher.go
@@ -114,6 +116,7 @@ CatoonsTD/
 │  ├─ AI_ASSISTED_DEVELOPMENT.md
 │  ├─ BETA_TESTING.md
 │  ├─ DEPLOY_GITHUB.md
+│  ├─ MULTIPLAYER_LAN.md
 │  └─ PORTFOLIO_TEXTS.md
 ├─ screenshots/
 ├─ .github/

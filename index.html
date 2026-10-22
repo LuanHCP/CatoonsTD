@@ -31,6 +31,7 @@
     <nav class="main-tabs" aria-label="Lobbies">
       <button type="button" class="active" data-screen="hub">🏠 Lobby</button>
       <button type="button" data-screen="play">▶ Play</button>
+      <button type="button" data-screen="event">👑 Evento</button>
       <button type="button" data-screen="cats">🐱 Gatinhos</button>
       <button type="button" data-screen="heroes">🦸 Heróis</button>
       <button type="button" data-screen="powers">⚡ Poderes</button>
@@ -76,6 +77,10 @@
         <button class="lobby-card heroes-card" type="button" data-go-screen="heroes">
           <span class="lobby-icon">🦸</span>
           <span><b>Heróis</b><small>Escolha 1 Herói Gatinho para liderar cada partida</small></span>
+        </button>
+        <button class="lobby-card event-card" type="button" data-go-screen="event">
+          <span class="lobby-icon">👑</span>
+          <span><b>Boss diário</b><small>Evento cooperativo separado • marcos 20/40/60</small></span>
         </button>
       </section>
 
@@ -126,6 +131,44 @@
           <button type="button" class="ghost" data-go-screen="heroes">🦸 Trocar herói</button>
         </div>
 
+        <section class="multiplayer-strip" aria-label="Multiplayer cooperativo por LAN ou VPN">
+          <div class="multiplayer-head">
+            <div>
+              <span class="eyebrow">MULTIPLAYER EXPERIMENTAL • LAN/VPN</span>
+              <h3>🐾 Cooperativo no mesmo mapa • até 4 jogadores</h3>
+              <p>Cada jogador tem seus próprios salmões. O campo, as vidas e as rodadas são compartilhados; no cooperativo vêm 2× mais balões.</p>
+            </div>
+            <div class="lan-room-summary"><span id="lan-player-count">1/4 jogadores</span><span id="lan-status" class="lan-status offline">Somente solo</span></div>
+          </div>
+          <div class="multiplayer-actions">
+            <button type="button" id="lan-solo" class="ghost">🎮 Jogar solo</button>
+            <button type="button" id="lan-create">🏠 Criar sala</button>
+            <button type="button" id="lan-join">🔗 Entrar em sala</button>
+          </div>
+          <div id="lan-host-panel" class="lan-exchange" hidden>
+            <label>1. Envie este código ao próximo jogador
+              <textarea id="lan-offer-output" readonly spellcheck="false"></textarea>
+            </label>
+            <button type="button" id="lan-copy-offer" class="ghost">📋 Copiar código da sala</button>
+            <label>2. Cole aqui o código de resposta recebido
+              <textarea id="lan-answer-input" spellcheck="false" placeholder="Cole a resposta do segundo jogador"></textarea>
+            </label>
+            <button type="button" id="lan-accept-answer" class="primary">Conectar jogador</button>
+            <button type="button" id="lan-new-invite" class="ghost" hidden>➕ Convidar outro jogador</button>
+          </div>
+          <div id="lan-guest-panel" class="lan-exchange" hidden>
+            <label>1. Cole o código enviado pelo anfitrião
+              <textarea id="lan-offer-input" spellcheck="false" placeholder="Cole o código da sala"></textarea>
+            </label>
+            <button type="button" id="lan-generate-answer" class="primary">Gerar resposta</button>
+            <label>2. Envie este código de volta ao anfitrião
+              <textarea id="lan-answer-output" readonly spellcheck="false"></textarea>
+            </label>
+            <button type="button" id="lan-copy-answer" class="ghost">📋 Copiar resposta</button>
+          </div>
+          <p id="lan-help" class="lan-help">Não usa servidor externo. Os dois computadores precisam estar na mesma rede ou VPN.</p>
+        </section>
+
         <div class="difficulty-strip">
           <div>
             <span class="eyebrow">DIFICULDADE</span>
@@ -136,6 +179,49 @@
         </div>
       </section>
 
+    </section>
+
+    <section id="screen-event" class="screen">
+      <section class="panel event-lobby-panel">
+        <div class="event-hero">
+          <div class="event-boss-art" aria-hidden="true">
+            <div class="event-boss-glow"></div><div class="event-boss-fin fin-left"></div><div class="event-boss-fin fin-right"></div>
+            <div class="event-boss-body"><span>🦈</span><i></i></div><div class="event-boss-cabin"></div>
+          </div>
+          <div class="event-copy">
+            <span class="eyebrow">EVENTO DIÁRIO • COOPERATIVO LAN/VPN</span>
+            <h2>Maré Blindada</h2>
+            <p>O chefe ativo do dia invade a arena nas rodadas 20, 40 e 60. Cada retorno tem mais vida e quatro etapas protegidas por escudos diferentes.</p>
+            <div class="event-boss-name"><span>🦈</span><div><small>CHEFE ATIVO HOJE</small><b>Almirante Espinha</b></div></div>
+            <div class="event-phase-preview">
+              <span>1️⃣ 💥 Antiblindagem</span><span>2️⃣ 👁️ Detecta Camo</span><span>3️⃣ 🔥 Fogo/Laser</span><span>4️⃣ 🐾 Todos</span>
+            </div>
+            <p id="event-team-scale" class="event-team-scale">👥 2 jogadores • vida ×1,00 • 🐟 500 para cada</p>
+          </div>
+        </div>
+        <div class="event-roster-head"><div><span class="eyebrow">EQUIPE DO EVENTO</span><h3>Monte a sala</h3></div><span id="event-lan-status" class="lan-status offline">1/4 • somente solo</span></div>
+        <div class="multiplayer-actions event-actions">
+          <button type="button" id="event-lan-solo" class="ghost">🎮 Desconectar</button>
+          <button type="button" id="event-lan-create">🏠 Criar sala</button>
+          <button type="button" id="event-lan-join">🔗 Entrar em sala</button>
+        </div>
+        <div id="event-host-panel" class="lan-exchange" hidden>
+          <label>Código para o próximo jogador<textarea id="event-offer-output" readonly spellcheck="false"></textarea></label>
+          <button type="button" id="event-copy-offer" class="ghost">📋 Copiar convite</button>
+          <label>Resposta recebida<textarea id="event-answer-input" spellcheck="false" placeholder="Cole a resposta do jogador"></textarea></label>
+          <button type="button" id="event-accept-answer" class="primary">Conectar jogador</button>
+          <button type="button" id="event-new-invite" class="ghost" hidden>➕ Convidar outro jogador</button>
+        </div>
+        <div id="event-guest-panel" class="lan-exchange" hidden>
+          <label>Convite do anfitrião<textarea id="event-offer-input" spellcheck="false"></textarea></label>
+          <button type="button" id="event-generate-answer" class="primary">Gerar resposta</button>
+          <label>Sua resposta<textarea id="event-answer-output" readonly spellcheck="false"></textarea></label>
+          <button type="button" id="event-copy-answer" class="ghost">📋 Copiar resposta</button>
+        </div>
+        <p id="event-lan-help" class="lan-help">Crie uma sala e conecte de 1 a 3 aliados. O anfitrião inicia o evento.</p>
+        <button type="button" id="event-start" class="primary big-action" disabled>⚔️ Iniciar evento diário</button>
+        <article class="event-coming-soon"><span>🌑</span><div><small>PRÓXIMO CHEFE DA ROTAÇÃO</small><b>Em breve</b><p>O segundo boss será lançado na próxima atualização do evento.</p></div></article>
+      </section>
     </section>
 
     <section id="screen-game" class="screen game-screen">
@@ -178,6 +264,11 @@
 
             <div class="canvas-wrap">
               <canvas id="personal-td-canvas" width="1100" height="620" aria-label="Catoons TD"></canvas>
+              <div id="event-boss-hud" class="event-boss-hud" hidden>
+                <div class="event-boss-hud-title"><span id="event-boss-icon">🦈</span><div><small id="event-boss-encounter">CHEFE DIÁRIO</small><b id="event-boss-title">Almirante Espinha</b></div><strong id="event-boss-phase">ETAPA 1/4</strong></div>
+                <div class="event-boss-health"><i id="event-boss-health-fill"></i><span id="event-boss-health-text">0 / 0 HP</span><em></em><em></em><em></em></div>
+                <div class="event-boss-shield"><i id="event-boss-shield-fill"></i><span id="event-boss-shield-text">💥 Escudo Antiblindagem</span></div>
+              </div>
               <aside id="playtest-debug" class="playtest-debug" hidden aria-live="polite">
                 <div class="playtest-debug-head"><b>🧪 PLAYTEST</b><span>F8 fecha</span></div>
                 <div id="playtest-debug-body" class="playtest-debug-body">Aguardando métricas...</div>
@@ -202,6 +293,7 @@
                 <button type="button" data-td-tower="vine" aria-label="Cipó, 248 salmões" title="Cipó • 248 salmões"><span class="tower-icon">🌿</span><small>🐟248</small></button>
                 <button type="button" data-td-tower="salmon" aria-label="Pescador de Salmão, 198 salmões" title="Pescador de Salmão • 198 salmões"><span class="tower-icon">🎣</span><small>🐟198</small></button>
                 <button type="button" data-td-tower="sniper" aria-label="Sniper, 352 salmões" title="Sniper • 352 salmões"><span class="tower-icon">🎯</span><small>🐟352</small></button>
+                <button type="button" data-td-tower="litter" aria-label="Caixinha de Areia, suporte único" title="Caixinha de Areia • suporte • limite 1"><span class="tower-icon">🧺</span><small>🐟405</small></button>
                 <button type="button" data-td-tower="boomerang" aria-label="Gato Bumerangue" title="Gato Bumerangue" hidden><span class="tower-icon">🪃</span><small>🐟314</small></button>
                 <button type="button" data-td-tower="alchemist" aria-label="Gato Alquimista" title="Gato Alquimista" hidden><span class="tower-icon">🧪</span><small>🐟380</small></button>
                 <button type="button" data-td-tower="chronomancer" aria-label="Gato Cronomante" title="Gato Cronomante" hidden><span class="tower-icon">⏳</span><small>🐟567</small></button>
@@ -538,6 +630,7 @@
     </div>
   </div>
 
+  <script src="src/multiplayer.js"></script>
   <script src="src/game.js"></script>
 </body>
 </html>

@@ -1574,6 +1574,15 @@ Object.values(maps).forEach(map=>{
   map.perches=(map.perches||[]).map(p=>({...p,x:p.x*MAP_SCALE_X,y:p.y*MAP_SCALE_Y,w:p.w*MAP_SCALE_X,h:p.h*MAP_SCALE_Y}));
 });
 
+// Arena exclusiva do evento diário. Não entra nas categorias, estrelas ou progresso das fases.
+const EVENT_ARENA_MAP={
+  name:$t('Arena da Maré Blindada'),rounds:60,startMoney:350,lives:30,hpMultiplier:1.18,speedMultiplier:.92,rewardMultiplier:1.08,clearCoins:0,enemyDensity:1,
+  description:$t('Uma arena costeira reservada para o chefe diário. O Almirante Espinha retorna mais forte nas rodadas 20, 40 e 60.'),
+  sky:['#071b2d','#0c3440'],ground:'#123842',road:'#60777b',shoulder:'#1b4f58',
+  obstacles:[{x:300,y:110,r:30,type:'rock'},{x:790,y:500,r:34,type:'rock'},{x:870,y:105,r:27,type:'tree'},{x:230,y:500,r:27,type:'tree'}],
+  path:[{x:-45,y:305},{x:130,y:305},{x:210,y:170},{x:410,y:150},{x:500,y:300},{x:420,y:465},{x:690,y:480},{x:790,y:330},{x:700,y:165},{x:930,y:145},{x:1145,y:300}]
+};
+
 const MAP_CATEGORIES=[
   {id:'beginner',name:$t('Iniciantes'),icon:'🌱',maps:['grove','meadow','creek','ridge','garden','toll'],description:$t('6 mapas de aprendizado com pressão crescente: rotas simples no começo e mais obstáculos/economia apertada perto do final.')},
   {id:'medium',name:$t('Medianos'),icon:'🧭',maps:['harbor','canyon','ruins','factory'],description:$t('4 mapas com mais densidade, rotas longas, bloqueios de visão e decisões de posicionamento mais exigentes.')},
@@ -1622,6 +1631,7 @@ const types = {
   electric:{name:$t('Gato Volts'), icon:'⚡', role:$t('Dano em cadeia / 3 caminhos'), special:$t('O raio salta entre até 4 alvos próximos. Possui árvore própria: Sobrecarga, Corrente Ampliada ou Tempestade Estática. Pode usar até 2 caminhos; um chega ao T5 e o secundário ao T3.'), cost:235, unlockLevel:3, range:150, rate:.82, damage:2.15, chainTargets:4, chainRadius:96, color:'#ffe66d', fur:'#c4ab72', accent:'#ffe66d', shot:'electric'},
   vine:   {name:$t('Gato Cipó'), icon:'🌿', role:$t('Controle pesado'), special:$t('Imobiliza até 3 inimigos comuns ou 1 boss por 2 segundos. Recarga começa em 6s e cai até 4s no nível máximo.'), cost:225, unlockLevel:5, range:145, rate:6, minRate:4, damage:0, rootHold:true, rootDuration:2, rootCount:3, color:'#69d17d', fur:'#98775d', accent:'#69d17d', shot:'vine'},
   salmon: {name:$t('Gato Pescador de Salmão'), icon:'🎣', role:$t('Farm / economia'), special:$t('Não ataca. A cada rodada concluída, pesca salmões para a partida. Upgrades aumentam a renda.'), cost:180, unlockLevel:2, range:0, rate:0, damage:0, farm:true, farmIncome:18, color:'#ff9b73', fur:'#c58b66', accent:'#72c6dd', shot:'salmon'},
+  litter: {name:$t('Caixinha de Areia'),icon:'🧺',role:$t('Suporte global / 3 caminhos'),special:$t('Unidade de suporte com limite global de 1. Pode universalizar ataques, ampliar velocidade/range ou aumentar salmões de estouros e fazendas.'),cost:450,unlockLevel:1,limit:1,range:0,rate:0,damage:0,supportOnly:true,color:'#d9b87a',fur:'#d9b87a',accent:'#7de2d3',shot:'litter'},
   sniper: {name:$t('Gato Sniper'), icon:'🎯', role:$t('Especialista / 3 caminhos'), special:$t('Possui árvore própria: Atirador de Elite, Caçador ou Observador. O Sniper sempre enxerga Camo para si; revelar Camo para TODA a defesa passa a ser função do caminho Observador.'), cost:320, unlockLevel:1, range:285, rate:1.72, damage:9.40, globalRange:true, color:'#8fe7a8', fur:'#a79072', accent:'#8fe7a8', shot:'sniper', detectsCamo:true},
   boomerang:{name:$t('Gato Bumerangue'),icon:'🪃',role:$t('Perfuração / retorno'),special:$t('Gatinho secreto. O bumerangue atravessa vários inimigos e volta causando um segundo impacto. Quanto mais evoluído, mais alvos alcança e mais forte fica o retorno.'),cost:285,unlockLevel:1,secret:true,range:158,rate:.78,damage:4.15,color:'#e6a95d',fur:'#b77849',accent:'#f3c168',shot:'boomerang',boomerangTargets:3,returnMultiplier:.58},
   alchemist:{name:$t('Gato Alquimista'),icon:'🧪',role:$t('Combos / dano contínuo'),special:$t('Gatinho secreto. Alterna Veneno → Fraqueza → Explosão no mesmo alvo. No terceiro estágio detona uma área e reinicia o ciclo.'),cost:345,unlockLevel:1,secret:true,range:154,rate:1.02,damage:3.35,splash:58,color:'#8be07b',fur:'#806aa2',accent:'#b7ff75',shot:'alchemist',alchemyPoison:.65,alchemyMark:.14,alchemyExplosion:1.45},
@@ -2048,11 +2058,37 @@ const CELESTIAL_PATHS = [
   ]}
 ];
 
+const LITTER_MAX_TIER=5;
+const LITTER_SECONDARY_MAX=3;
+const LITTER_PATHS=[
+  {id:'universal',icon:'🧼',name:$t('Areia Universal'),color:'#7de2d3',tiers:[
+    {name:$t('Areia Reveladora'),cost:120,description:$t('Todos os gatos passam a enxergar Camuflados.')},
+    {name:$t('Grãos Perfurantes'),cost:210,description:$t('Todos os gatos passam a quebrar Blindagem.')},
+    {name:$t('Mistura Completa'),cost:360,description:$t('Detecção Camo e antiblindagem ficam disponíveis para toda a equipe.')},
+    {name:$t('Filtro de Combate'),cost:610,description:$t('+15% de dano global; toda a equipe mantém detecção Camo e antiblindagem.')},
+    {name:$t('Areia Perfeita'),cost:980,description:$t('Todo gato pode atingir qualquer tipo de balão e qualquer escudo do boss.')}
+  ]},
+  {id:'tempo',icon:'⚡',name:$t('Conforto Tático'),color:'#ffe17a',tiers:[
+    {name:$t('Borda Confortável'),cost:110,description:$t('+8% velocidade de ataque e +8% range para todos os gatos.')},
+    {name:$t('Areia Macia'),cost:200,description:$t('Bônus globais sobem para +16%.')},
+    {name:$t('Caixa Espaçosa'),cost:350,description:$t('Bônus globais sobem para +24%.')},
+    {name:$t('Descanso Instantâneo'),cost:590,description:$t('+34% velocidade e range para toda a equipe.')},
+    {name:$t('Palácio de Areia'),cost:960,description:$t('+50% velocidade de ataque e +40% range global.')}
+  ]},
+  {id:'economy',icon:'🐟',name:$t('Areia Rentável'),color:'#ffbf7d',tiers:[
+    {name:$t('Moedas Perdidas'),cost:115,description:$t('+10% salmões por estouro e +12% renda de Pescadores.')},
+    {name:$t('Peneira de Salmão'),cost:205,description:$t('+18% por estouro e +24% de renda.')},
+    {name:$t('Caixa Econômica'),cost:355,description:$t('+28% por estouro e +40% de renda.')},
+    {name:$t('Tesouro Enterrado'),cost:600,description:$t('+40% por estouro e +60% de renda.')},
+    {name:$t('Fortuna Felina'),cost:990,description:$t('+60% por estouro e +90% de renda de Pescadores.')}
+  ]}
+];
+
 // A coleção usa as mesmas definições da partida para que nomes, preços e efeitos
 // nunca fiquem diferentes entre a ficha do gatinho e a árvore comprável no mapa.
 const COLLECTION_TOWER_PATHS={
   dart:DART_PATHS,sniper:SNIPER_PATHS,frost:FROST_PATHS,vine:VINE_PATHS,burst:BURST_PATHS,
-  ninja:NINJA_PATHS,laser:LASER_PATHS,wizard:WIZARD_PATHS,electric:ELECTRIC_PATHS,celestial:CELESTIAL_PATHS
+  ninja:NINJA_PATHS,laser:LASER_PATHS,wizard:WIZARD_PATHS,electric:ELECTRIC_PATHS,celestial:CELESTIAL_PATHS,litter:LITTER_PATHS
 };
 
 const powers = {
@@ -2082,7 +2118,7 @@ const DEFAULT_PROFILE = {
   mastery:{
     dart:{level:1,xp:0,maxRewardClaimed:false}, frost:{level:1,xp:0,maxRewardClaimed:false}, burst:{level:1,xp:0,maxRewardClaimed:false},
     laser:{level:1,xp:0,maxRewardClaimed:false}, ninja:{level:1,xp:0,maxRewardClaimed:false}, wizard:{level:1,xp:0,maxRewardClaimed:false},
-    electric:{level:1,xp:0,maxRewardClaimed:false}, vine:{level:1,xp:0,maxRewardClaimed:false}, salmon:{level:1,xp:0,maxRewardClaimed:false}, sniper:{level:1,xp:0,maxRewardClaimed:false},
+    electric:{level:1,xp:0,maxRewardClaimed:false}, vine:{level:1,xp:0,maxRewardClaimed:false}, salmon:{level:1,xp:0,maxRewardClaimed:false}, litter:{level:1,xp:0,maxRewardClaimed:false}, sniper:{level:1,xp:0,maxRewardClaimed:false},
     boomerang:{level:1,xp:0,maxRewardClaimed:false}, alchemist:{level:1,xp:0,maxRewardClaimed:false}, chronomancer:{level:1,xp:0,maxRewardClaimed:false}, demonking:{level:1,xp:0,maxRewardClaimed:false}, mister:{level:1,xp:0,maxRewardClaimed:false}, celestial:{level:1,xp:0,maxRewardClaimed:false}
   },
   maps:Object.fromEntries(Object.keys(maps).map(id=>[id,{cleared:{easy:false,normal:false,hard:false},wins:0}])),
@@ -2212,6 +2248,7 @@ const MASTERY_ABILITIES={
   electric:{name:$t('Tempestade Elétrica'),icon:'⛈️',cooldown:40,description:$t('Quatro pulsos globais de raio causam 75% do dano atual por pulso.')},
   vine:{name:$t('Floresta Prisional'),icon:'🌳',cooldown:50,description:$t('Prende todos os inimigos comuns por 4s e chefões por 2s.')},
   salmon:{name:$t('Pesca Milagrosa'),icon:'🐟',cooldown:60,description:$t('Gera instantaneamente 3× a renda atual por rodada deste Pescador.')},
+  litter:{name:$t('Limpeza Geral'),icon:'🧼',cooldown:65,description:$t('Por 10s, reforça visualmente a equipe; os bônus permanentes continuam definidos pelos caminhos escolhidos.')},
   ninja:{name:$t('Clones das Sombras'),icon:'👥',cooldown:45,description:$t('Por 10s, dois clones atacam junto: o dano total do Ninja fica aproximadamente 2× maior.')},
   wizard:{name:$t('Cataclismo Arcano'),icon:'🔮',cooldown:45,description:$t('Explode a área do inimigo mais forte e causa 300% do dano atual em grande área.')},
   laser:{name:$t('Sobrecarga'),icon:'🔴',cooldown:40,description:$t('Por 8s, dobra a cadência do Laser e faz seus disparos saltarem entre mais inimigos.')},
@@ -2538,6 +2575,7 @@ function setScreen(id,pushHistory=true){
     try{history.pushState({screen:id},'',`#${id}`);}catch(err){}
   }
   if(id==='play') renderMapLobby();
+  if(id==='event') renderEventLobby();
   if(id==='cats') renderCatCollection();
   if(id==='heroes') renderHeroCollection();
   if(id==='powers') renderPowerShop();
@@ -2663,6 +2701,92 @@ function renderMapLobby(){
     ?`${maps[lobbySelection.map].name} • ${category.name} • ${infinite?$t('∞ Infinito'):$t('🏁 Campanha')} • ${difficulties[lobbySelection.difficulty].name}`
     :$T`${category.icon} Mapas ${category.name} • em desenvolvimento`;
   renderPlayHeroSummary();
+}
+
+function initLanLobby(){
+  const lan=window.CatoonsLan;
+  if(!lan)return;
+  const statusEl=$('#lan-status'),countEl=$('#lan-player-count'),hostPanel=$('#lan-host-panel'),guestPanel=$('#lan-guest-panel'),help=$('#lan-help'),newInvite=$('#lan-new-invite'),acceptBtn=$('#lan-accept-answer');
+  const setBusy=(button,busy,label)=>{if(!button)return;button.disabled=busy;if(label)button.textContent=label;};
+  const copyFrom=async selector=>{
+    const field=$(selector);if(!field||!field.value)return;
+    try{await navigator.clipboard.writeText(field.value);if(help)help.textContent=$t('✓ Código copiado. Envie-o ao outro jogador.');}
+    catch(_){field.focus();field.select();document.execCommand('copy');if(help)help.textContent=$t('✓ Código selecionado para copiar.');}
+  };
+  const showError=error=>{if(help)help.textContent=`⚠ ${error?.message||error}`;};
+  lan.onStatus(info=>{
+    document.body.classList.toggle('lan-connected',Boolean(info.connected));
+    if(countEl)countEl.textContent=`${info.playerCount||1}/${info.maxPlayers||4} jogadores`;
+    if(newInvite)newInvite.hidden=!(info.role==='host'&&info.connected&&(info.playerCount||1)<(info.maxPlayers||4)&&lan.canInvite);
+    if(acceptBtn&&info.status==='connected'){acceptBtn.disabled=false;acceptBtn.textContent=$t('Conectar jogador');$('#lan-answer-input').value='';}
+    if(!statusEl)return;
+    const labels={
+      offline:$t('Somente solo'),creating:$t('Criando sala...'),'waiting-answer':$t('Aguardando resposta'),joining:$t('Entrando...'),
+      'waiting-host':$t('Aguardando anfitrião'),connecting:$t('Conectando...'),connected:info.role==='host'?$t('Conectado • anfitrião'):$T`Conectado • jogador ${String(info.localPlayerId||'').replace('p','')}`,
+      disconnected:$t('Jogador desconectado'),error:$t('Falha na conexão')
+    };
+    statusEl.textContent=labels[info.status]||info.status;
+    statusEl.className=`lan-status ${info.connected?'connected':info.status==='error'?'error':info.status==='offline'?'offline':'waiting'}`;
+    if(info.connected&&help)help.textContent=info.role==='host'
+      ?$T`✓ ${info.playerCount}/4 jogadores na sala. Você pode convidar mais pessoas ou iniciar a fase.`
+      :$t('✓ Conectado. Aguarde o anfitrião escolher e iniciar a fase.');
+  });
+  $('#lan-solo').onclick=()=>{lan.disconnect();hostPanel.hidden=true;guestPanel.hidden=true;if(help)help.textContent=$t('Modo solo ativado.');};
+  $('#lan-create').onclick=async e=>{
+    const button=e.currentTarget;hostPanel.hidden=false;guestPanel.hidden=true;setBusy(button,true,$t('Criando...'));
+    try{$('#lan-offer-output').value=await lan.createRoom();if(help)help.textContent=$t('Envie o código da sala ao próximo jogador e aguarde a resposta.');}
+    catch(error){showError(error);}finally{setBusy(button,false,$t('🏠 Criar sala'));}
+  };
+  $('#lan-join').onclick=()=>{lan.disconnect();hostPanel.hidden=true;guestPanel.hidden=false;if(help)help.textContent=$t('Cole o código da sala para gerar sua resposta.');};
+  $('#lan-generate-answer').onclick=async e=>{
+    const button=e.currentTarget;setBusy(button,true,$t('Gerando...'));
+    try{$('#lan-answer-output').value=await lan.joinRoom($('#lan-offer-input').value);if(help)help.textContent=$t('Envie a resposta ao anfitrião. A conexão termina quando ele colar o código.');}
+    catch(error){showError(error);}finally{setBusy(button,false,$t('Gerar resposta'));}
+  };
+  $('#lan-accept-answer').onclick=async e=>{
+    const button=e.currentTarget;setBusy(button,true,$t('Conectando...'));
+    try{await lan.acceptAnswer($('#lan-answer-input').value);}
+    catch(error){showError(error);setBusy(button,false,$t('Conectar jogador'));}
+  };
+  if(newInvite)newInvite.onclick=async e=>{
+    const button=e.currentTarget;setBusy(button,true,$t('Gerando convite...'));
+    try{$('#lan-offer-output').value=await lan.createInvite();if(help)help.textContent=$t('Envie o novo código ao próximo jogador. Cada convite funciona para apenas uma pessoa.');}
+    catch(error){showError(error);}finally{setBusy(button,false,$t('➕ Convidar outro jogador'));}
+  };
+  $('#lan-copy-offer').onclick=()=>copyFrom('#lan-offer-output');
+  $('#lan-copy-answer').onclick=()=>copyFrom('#lan-answer-output');
+}
+
+function initEventLobby(){
+  const lan=window.CatoonsLan;if(!lan)return;
+  const hostPanel=$('#event-host-panel'),guestPanel=$('#event-guest-panel'),help=$('#event-lan-help'),statusEl=$('#event-lan-status'),start=$('#event-start'),newInvite=$('#event-new-invite');
+  const showError=error=>{if(help)help.textContent=`⚠ ${error?.message||error}`;};
+  const copyField=async selector=>{const field=$(selector);if(!field?.value)return;try{await navigator.clipboard.writeText(field.value);if(help)help.textContent=$t('✓ Código copiado.');}catch(_){field.focus();field.select();document.execCommand('copy');}};
+  lan.onStatus(info=>{
+    if(statusEl){statusEl.textContent=info.connected?$T`${info.playerCount}/${info.maxPlayers} • ${info.role==='host'?'anfitrião':`jogador ${String(info.localPlayerId).replace('p','')}`}`:$t('1/4 • somente solo');statusEl.className=`lan-status ${info.connected?'connected':'offline'}`;}
+    if(start){start.disabled=!(info.connected&&info.role==='host');start.textContent=info.role==='guest'?$t('⏳ Aguarde o anfitrião'):$t('⚔️ Iniciar evento diário');}
+    if(newInvite)newInvite.hidden=!(info.role==='host'&&info.connected&&info.playerCount<info.maxPlayers&&lan.canInvite);
+    const scale=$('#event-team-scale'),players=Math.max(2,info.playerCount||2);if(scale)scale.textContent=$T`👥 ${players} jogadores • vida ×${eventTeamScale(players).toFixed(2).replace('.',',')} • 🐟 ${eventStartMoney(players)} para cada`;
+  });
+  $('#event-lan-solo').onclick=()=>{lan.disconnect();hostPanel.hidden=true;guestPanel.hidden=true;if(help)help.textContent=$t('Sala desconectada.');};
+  $('#event-lan-create').onclick=async()=>{hostPanel.hidden=false;guestPanel.hidden=true;try{$('#event-offer-output').value=await lan.createRoom();if(help)help.textContent=$t('Envie o convite ao próximo jogador e cole a resposta abaixo.');}catch(error){showError(error);}};
+  $('#event-lan-join').onclick=()=>{lan.disconnect();hostPanel.hidden=true;guestPanel.hidden=false;if(help)help.textContent=$t('Cole o convite do anfitrião.');};
+  $('#event-generate-answer').onclick=async()=>{try{$('#event-answer-output').value=await lan.joinRoom($('#event-offer-input').value);if(help)help.textContent=$t('Envie sua resposta ao anfitrião.');}catch(error){showError(error);}};
+  $('#event-accept-answer').onclick=async()=>{try{await lan.acceptAnswer($('#event-answer-input').value);$('#event-answer-input').value='';}catch(error){showError(error);}};
+  if(newInvite)newInvite.onclick=async()=>{try{$('#event-offer-output').value=await lan.createInvite();if(help)help.textContent=$t('Novo convite gerado para o próximo jogador.');}catch(error){showError(error);}};
+  $('#event-copy-offer').onclick=()=>copyField('#event-offer-output');$('#event-copy-answer').onclick=()=>copyField('#event-answer-output');
+  if(start)start.onclick=()=>personalTd?.startEvent?.();
+}
+
+function eventPlayerCount(playerCount){return Math.max(2,Math.min(4,Number(playerCount)||2));}
+function eventTeamScale(playerCount){return 1+(eventPlayerCount(playerCount)-2)*.34;}
+function eventStartMoney(playerCount){return({2:500,3:425,4:350})[eventPlayerCount(playerCount)];}
+
+function renderEventLobby(){
+  const lan=window.CatoonsLan,status=$('#event-lan-status'),start=$('#event-start'),players=Math.max(2,lan?.playerCount||2),scale=$('#event-team-scale');
+  if(status)status.textContent=lan?.connected?$T`${lan.playerCount}/${lan.maxPlayers} • ${lan.isHost?'anfitrião':`jogador ${String(lan.localPlayerId).replace('p','')}`}`:$t('1/4 • somente solo');
+  if(start)start.disabled=!(lan?.connected&&lan.isHost);
+  if(scale)scale.textContent=$T`👥 ${players} jogadores • vida ×${eventTeamScale(players).toFixed(2).replace('.',',')} • 🐟 ${eventStartMoney(players)} para cada`;
 }
 function drawCollectionCat(id){
   const canvas=$('#cat-preview-canvas');if(!canvas)return;
@@ -3053,7 +3177,7 @@ function initNavigation(){
   $$('[data-go-screen]').forEach(btn=>btn.onclick=()=>{sfx('ui');setScreen(btn.dataset.goScreen);});
   window.addEventListener('popstate',e=>{
     const id=(e.state&&e.state.screen)||(location.hash||'#hub').slice(1);
-    if(['hub','play','cats','heroes','powers','game','tutorial'].includes(id))setScreen(id,false);
+    if(['hub','play','event','cats','heroes','powers','game','tutorial'].includes(id))setScreen(id,false);
   });
 }
 
@@ -3246,7 +3370,8 @@ function runMapLoading(mapId,diffId,onReady,modeId='campaign'){
   const preview=$('#loading-preview');
   if(preview) preview.className=`loading-preview preview-${mapId in maps?mapId:'grove'}`;
   if($('#loading-map-name')) $('#loading-map-name').textContent=map.name;
-  if($('#loading-diff-name')) $('#loading-diff-name').textContent=modeId==='infinite'?$T`∞ Infinito • ${diff.name} • sem rodada final`:$T`${diff.name} • ${mapRounds(mapId,diffId)} rodadas`;
+  if($('#loading-map-name')) $('#loading-map-name').textContent=modeId==='boss-event'?$t('Arena da Maré Blindada'):map.name;
+  if($('#loading-diff-name')) $('#loading-diff-name').textContent=modeId==='infinite'?$T`∞ Infinito • ${diff.name} • sem rodada final`:modeId==='boss-event'?$t('👑 Evento diário • 60 rodadas • chefes em 20/40/60'):$T`${diff.name} • ${mapRounds(mapId,diffId)} rodadas`;
   if($('#loading-tip')) $('#loading-tip').textContent=loadingTips[Math.floor(Math.random()*loadingTips.length)];
   const fill=$('#loading-bar-fill');
   if(fill) fill.style.width='0%';
@@ -3308,6 +3433,91 @@ function initPersonalTd(){
     msg:$t('Escolha um mapa e uma dificuldade no lobby Play.')
   };
 
+  const lan=window.CatoonsLan;
+  let lanSnapshotAt=0;
+  const lanGuest=()=>Boolean(lan?.connected&&lan.isGuest);
+  const lanHost=()=>Boolean(lan?.connected&&lan.isHost);
+  let walletActorId='host';
+  const initialMatchMoney=state.money;
+  state.playerWallets={host:initialMatchMoney};
+  delete state.money;
+  const localWalletId=()=>lanGuest()?(lan.localPlayerId||'p2'):walletActorId;
+  const activeWalletIds=()=>lan?.connected&&Array.isArray(lan.players)&&lan.players.length?lan.players:['host'];
+  const walletAmount=id=>Math.max(0,Number(state.playerWallets?.[id])||0);
+  const setWallet=(id,value)=>{if(!state.playerWallets)state.playerWallets={};state.playerWallets[id]=Math.max(0,Number(value)||0);};
+  const addWallet=(id,value)=>setWallet(id,walletAmount(id)+(Number(value)||0));
+  const addAllWallets=value=>activeWalletIds().forEach(id=>addWallet(id,value));
+  Object.defineProperty(state,'money',{enumerable:true,configurable:true,get(){return walletAmount(localWalletId());},set(value){setWallet(localWalletId(),value);}});
+  const requestLanAction=(action,payload={})=>lanGuest()&&lan.send('action',{action,...payload});
+  function lanSnapshot(){
+    return{
+      map:state.map,difficulty:state.difficulty,mode:state.mode,playerWallets:{...state.playerWallets},lives:state.lives,wave:state.wave,
+      lastClearedWave:state.lastClearedWave,lastFarmPaidWave:state.lastFarmPaidWave,nextTowerId:state.nextTowerId,nextEnemyId:state.nextEnemyId,
+      paused:state.paused,defeatShown:state.defeatShown,gameSpeed:state.gameSpeed,waveActive:state.waveActive,completed:state.completed,
+      rewardGranted:state.rewardGranted,pendingClearCash:state.pendingClearCash,pendingWaveXp:state.pendingWaveXp,
+      paidMilestones:[...state.paidMilestones],effects:state.effects,hero:state.hero,
+      towers:state.towers,enemies:state.enemies,spawn:state.spawn,shadowBloons:state.shadowBloons,
+      pulses:state.pulses.slice(-24),lightning:state.lightning.slice(-24),airstrikes:state.airstrikes.slice(-12),bombs:state.bombs.slice(-20),
+      msg:state.msg
+    };
+  }
+  function broadcastLanSnapshot(force=false){
+    if(!lanHost()||document.body.dataset.screen!=='game')return;
+    const now=performance.now();if(!force&&now-lanSnapshotAt<120)return;lanSnapshotAt=now;
+    lan.send('snapshot',lanSnapshot());
+  }
+  function applyLanSnapshot(next){
+    if(!lanGuest()||!next)return;
+    const mapChanged=state.map!==next.map;
+    const localSelection={selected:state.selected,selectedTower:state.selectedTower,selectedHero:state.selectedHero,repositionTower:state.repositionTower};
+    Object.assign(state,next);
+    state.paidMilestones=new Set(next.paidMilestones||[]);
+    state.shots=[];state.floatTexts=[];state.particles=[];state.impactFx=[];state.muzzleFx=[];
+    Object.assign(state,localSelection);
+    if(mapChanged)configurePath();
+    updateStats();renderUnlocks();renderHeroHud();renderSynergies();updateUpgradePanel();
+  }
+  function selectLanTower(id){state.selectedTower=Number(id)||null;state.selectedHero=false;return selectedTower();}
+  function handleLanAction(data,actorId='host'){
+    if(!lanHost()||!data)return;
+    const previousActor=walletActorId;walletActorId=actorId;
+    try{
+      const action=data.action;
+      const ownedTower=()=>{const tower=selectLanTower(data.towerId);return tower&&(!tower.owner||tower.owner===actorId)?tower:null;};
+      if(action==='placeTower'){
+        const before=state.selected;state.selected=data.towerType;placeTower(Number(data.x),Number(data.y));state.selected=before;
+      }else if(action==='startWave')startWave();
+      else if(action==='placeHero')placeHero(Number(data.x),Number(data.y));
+      else if(action==='speed'){
+        state.gameSpeed=Math.max(1,Math.min(3,Number(data.speed)||1));updateSpeedButtons();
+      }else if(action==='sell'&&ownedTower())sellSelectedTower();
+      else if(action==='upgrade'&&ownedTower())upgradeTower();
+      else if(action==='upgradePath'&&ownedTower()){
+        const handlers={dart:upgradeDartPath,sniper:upgradeSniperPath,frost:upgradeFrostPath,vine:upgradeVinePath,burst:upgradeBurstPath,ninja:upgradeNinjaPath,laser:upgradeLaserPath,wizard:upgradeWizardPath,electric:upgradeElectricPath,celestial:upgradeCelestialPath,litter:upgradeLitterPath};
+        const tower=selectedTower();if(tower&&handlers[tower.type])handlers[tower.type](Number(data.path));
+      }else if(action==='priority'&&ownedTower()){
+        const tower=selectedTower();tower.priority=TARGET_PRIORITIES.includes(data.priority)?data.priority:'first';
+      }else if(action==='move'&&ownedTower()){
+        state.repositionTower=Number(data.towerId);state.selectedTower=null;moveRepositionedTower(Number(data.x),Number(data.y));
+      }
+    }finally{
+      walletActorId=previousActor;updateStats();broadcastLanSnapshot(true);
+    }
+  }
+  if(lan){
+    lan.onStatus(info=>{if(info.connected)lan.send('ready',{role:info.role});});
+    lan.onMessage(message=>{
+      if(message.type==='ready'&&lanHost())lan.send('lobby',{...lobbySelection});
+      else if(message.type==='lobby'&&lanGuest()){
+        const next=message.payload||{};lobbySelection.map=next.map||lobbySelection.map;lobbySelection.difficulty=next.difficulty||lobbySelection.difficulty;lobbySelection.mode=next.mode||lobbySelection.mode;renderMapLobby();
+      }else if(message.type==='start'&&lanGuest()){
+        const next=message.payload||{};
+        runMapLoading(next.map,next.difficulty,()=>{loadSelection(next.map,next.difficulty,next.mode);setScreen('game');setMsg($t('🐾 Cooperativo conectado. Cada jogador tem seus próprios salmões; vidas, mapa e ondas são compartilhados.'));},next.mode);
+      }else if(message.type==='action')handleLanAction(message.payload,message.from);
+      else if(message.type==='snapshot')applyLanSnapshot(message.payload);
+    });
+  }
+
   // A maioria dos mapas tem uma única rota (`map.path`). Mapas com duas rotas paralelas
   // (Difíceis/Impossíveis) usam `map.paths` (array de rotas) em vez de `map.path`; `path`/
   // `segs`/`total` abaixo sempre refletem a rota de índice 0, mantidos por compatibilidade
@@ -3318,9 +3528,11 @@ function initPersonalTd(){
   let path=[],segs=[],total=0;
   let pathsList=[],segsList=[],totalsList=[];
 
-  function currentMap(){return maps[state.map];}
+  function currentMap(){return isBossEvent()?EVENT_ARENA_MAP:maps[state.map];}
   function currentDifficulty(){return difficulties[state.difficulty];}
   function isInfinite(){return state.mode==='infinite';}
+  function isBossEvent(){return state.mode==='boss-event';}
+  function matchRounds(){return isBossEvent()?60:mapRounds(state.map,state.difficulty);}
   function currentHeroDef(){return HEROES[profile.selectedHero]||HEROES.king;}
   function towerTypePresent(typeId){return state.towers.some(t=>t.type===typeId);}
   function togglePlaytestDebug(force){
@@ -3350,7 +3562,7 @@ function initPersonalTd(){
     body.innerHTML=$T`
       <div class="playtest-debug-row"><span>FPS</span><b>${state.playtest.fps||'…'}${warn}</b></div>
       <div class="playtest-debug-row"><span>Velocidade</span><b>${state.gameSpeed}×</b></div>
-      <div class="playtest-debug-row"><span>Rodada</span><b>${state.wave}/${isInfinite()?'∞':mapRounds(state.map,state.difficulty)}</b></div>
+      <div class="playtest-debug-row"><span>Rodada</span><b>${state.wave}/${isInfinite()?'∞':matchRounds()}</b></div>
       <div class="playtest-debug-row"><span>Vidas</span><b>${state.lives}</b></div>
       <div class="playtest-debug-row"><span>Salmões</span><b>🐟 ${Math.floor(state.money)}</b></div>
       <div class="playtest-debug-row"><span>Inimigos</span><b>${alive.length} + ${state.spawn.length}</b></div>
@@ -3389,17 +3601,17 @@ function initPersonalTd(){
   function heroRequiredXp(level){return level>=10?0:45+(Math.max(1,level)-1)*15;}
   function heroStats(hero=state.hero){
     if(!hero)return null;
-    const base=HEROES[hero.type]||HEROES.king,lv=Math.max(1,Math.min(10,hero.level||1));
-    return{...base,
+    const base=HEROES[hero.type]||HEROES.king,lv=Math.max(1,Math.min(10,hero.level||1)),litterBuff=litterTeamBonuses();
+    const out={...base,
       damage:Number(((base.damage||0)*(1+(lv-1)*.13)).toFixed(2)),
-      range:base.range?Math.round(base.range+(lv-1)*4):0,
-      rate:base.rate?Number((base.rate*Math.max(.66,1-(lv-1)*.035)).toFixed(3)):0,
+      range:base.range?Math.round((base.range+(lv-1)*4)*(1+(litterBuff.teamRange||0))):0,
+      rate:base.rate?Number((base.rate*Math.max(.66,1-(lv-1)*.035)/(1+(litterBuff.teamAttack||0))).toFixed(3)):0,
       auraRange:base.auraRange?Math.round(base.auraRange+(lv-1)*4):0,
-      farmIncome:base.farm?Math.round(28+(lv-1)*7):0,
-      detectsCamo:Boolean(base.detectsCamo||hero.type==='warrior'&&lv>=7),
-      breaksArmor:Boolean(hero.type==='warrior'&&lv>=6),
-      level:lv,isHeroSource:true,heroType:hero.type
-    };
+      farmIncome:base.farm?Math.round((28+(lv-1)*7)*(1+(litterBuff.farmIncomeBonus||0))):0,
+      detectsCamo:Boolean(base.detectsCamo||hero.type==='warrior'&&lv>=7||litterBuff.detectsCamo),
+      breaksArmor:Boolean(hero.type==='warrior'&&lv>=6||litterBuff.breaksArmor),
+      universalPop:Boolean(litterBuff.universalPop),popRewardMultiplier:1+(litterBuff.popRewardBonus||0),level:lv,isHeroSource:true,heroType:hero.type
+    };if(out.damage&&litterBuff.teamDamage)out.damage=Number((out.damage*(1+litterBuff.teamDamage)).toFixed(2));return out;
   }
   function grantHeroXp(amount){
     const h=state.hero;if(!h||h.level>=10)return[];
@@ -3591,21 +3803,21 @@ function initPersonalTd(){
   function showResult(victory,details={}){
     state.paused=true;state.menuOpen=false;hideGameModal('#pause-menu');
     const masteryRewards=masteryMatchRewards(),masteryXpTotal=masteryRewards.reduce((sum,r)=>sum+r.xp,0),masteryCoinTotal=masteryRewards.reduce((sum,r)=>sum+r.coins,0);
-    const endless=isInfinite();
-    const next=victory&&!endless?nextStageSelection():null;
+    const endless=isInfinite(),raid=isBossEvent();
+    const next=victory&&!endless&&!raid?nextStageSelection():null;
     const resultCard=$('#result-screen .result-card');
     if(resultCard){resultCard.classList.toggle('victory',victory);resultCard.classList.toggle('defeat',!victory);}
     if($('#result-icon'))$('#result-icon').textContent=victory?'🏆':(endless?'∞':'💔');
-    if($('#result-kicker'))$('#result-kicker').textContent=victory?$t('FASE CONCLUÍDA'):(endless?$t('MODO INFINITO ENCERRADO'):$t('DEFESA ROMPIDA'));
+    if($('#result-kicker'))$('#result-kicker').textContent=victory?(raid?$t('CAÇADA EM EQUIPE CONCLUÍDA'):$t('FASE CONCLUÍDA')):(endless?$t('MODO INFINITO ENCERRADO'):$t('DEFESA ROMPIDA'));
     if($('#result-title'))$('#result-title').textContent=victory?$t('Vitória!'):(endless?$t('Fim do Infinito'):$t('Derrota'));
     if($('#result-text'))$('#result-text').textContent=victory
-      ?$T`${currentMap().name} • ${currentDifficulty().name} concluído.`
+      ?(raid?$t('O time venceu as três invasões do Almirante Espinha!'):$T`${currentMap().name} • ${currentDifficulty().name} concluído.`)
       :(endless?$T`Você chegou até a rodada ${Math.max(state.wave,state.lastClearedWave)}. Seu recorde fica salvo para a próxima tentativa.`:$t('Os inimigos atravessaram sua defesa. Reorganize as torres e tente novamente.'));
     if($('#result-summary'))$('#result-summary').innerHTML=victory
-      ?$T`<span>⭐ ${mapStars(state.map)}/3 no mapa</span><span>🪙 +${(details.coins||0)+masteryCoinTotal}</span><span>XP conta +${details.xp||0}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`
+      ?(raid?$T`<span>⚔️ 3/3 invasões vencidas</span><span>🪙 +${(details.coins||0)+masteryCoinTotal}</span><span>XP conta +${details.xp||0}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`:$T`<span>⭐ ${mapStars(state.map)}/3 no mapa</span><span>🪙 +${(details.coins||0)+masteryCoinTotal}</span><span>XP conta +${details.xp||0}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`)
       :(endless
         ?$T`<span>✓ ${state.lastClearedWave} rodadas concluídas</span><span>∞ Recorde ${infiniteBestFor(state.map,state.difficulty)}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`
-        :$T`<span>Rodada ${state.wave}/${mapRounds(state.map,state.difficulty)}</span><span>Torres ${state.towers.length}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`);
+        :$T`<span>Rodada ${state.wave}/${matchRounds()}</span><span>Torres ${state.towers.length}</span><span>🐾 Maestria +${masteryXpTotal} XP</span>`);
     const nextBtn=$('#result-next');if(nextBtn){nextBtn.hidden=!next;nextBtn.textContent=next?`${next.label} →`:$t('Próxima fase →');nextBtn.dataset.nextMap=next?next.map:'';nextBtn.dataset.nextDifficulty=next?next.difficulty:'';}
     if($('#result-retry'))$('#result-retry').textContent=victory?$t('↻ Jogar novamente'):$t('↻ Tentar novamente');
     showGameModal('#result-screen');
@@ -4254,6 +4466,28 @@ function initPersonalTd(){
     return{...base,damage:Number(damage.toFixed(2)),rate:Number(Math.max(.28,rate).toFixed(3)),range:Math.round(range),splash,droneSpeed:Math.round(droneSpeed),droneCount,detectsCamo,revealsCamo,breaksArmor,stripArmor,normalizeField,celestialPaths:p.slice(),celestialPrimary:primary};
   }
 
+  function litterPaths(t){
+    if(!t.paths||!Array.isArray(t.paths))t.paths=[0,0,0];
+    while(t.paths.length<3)t.paths.push(0);
+    t.paths=t.paths.slice(0,3).map(v=>Math.max(0,Math.min(LITTER_MAX_TIER,Math.floor(Number(v)||0))));return t.paths;
+  }
+  function litterPrimaryPath(t){
+    const p=litterPaths(t);if(Number.isInteger(t.litterMainPath)&&p[t.litterMainPath]>=4)return t.litterMainPath;
+    const high=p.map((tier,i)=>({tier,i})).filter(x=>x.tier>=4).sort((a,b)=>b.tier-a.tier);if(!high.length){t.litterMainPath=null;return null;}
+    let chosen=high[0].i;if(high.length>1&&high[0].tier===high[1].tier&&Number.isInteger(t.litterLastPath)&&p[t.litterLastPath]>=4)chosen=t.litterLastPath;t.litterMainPath=chosen;return chosen;
+  }
+  function litterBaseStats(t){
+    const base=types.litter,p=litterPaths(t),primary=litterPrimaryPath(t);
+    let detectsCamo=p[0]>=1,breaksArmor=p[0]>=2,universalPop=p[0]>=5&&primary===0,damageBonus=p[0]>=4&&primary===0 ? .15 : 0;
+    const attackSteps=[0,.08,.16,.24,.34,.50],rangeSteps=[0,.08,.16,.24,.34,.40],popSteps=[0,.10,.18,.28,.40,.60],farmSteps=[0,.12,.24,.40,.60,.90];
+    return{...base,detectsCamo,breaksArmor,universalPop,teamDamage:damageBonus,teamAttack:attackSteps[p[1]]||0,teamRange:rangeSteps[p[1]]||0,
+      popRewardBonus:popSteps[p[2]]||0,farmIncomeBonus:farmSteps[p[2]]||0,litterPaths:p.slice(),litterPrimary:primary};
+  }
+  function litterTeamBonuses(){
+    const box=state.towers.find(t=>t.type==='litter');if(!box)return{detectsCamo:false,breaksArmor:false,universalPop:false,teamDamage:0,teamAttack:0,teamRange:0,popRewardBonus:0,farmIncomeBonus:0};
+    return litterBaseStats(box);
+  }
+
   function baseTowerStats(t){
     if(t.type==='dart')return dartBaseStats(t);
     if(t.type==='sniper')return sniperBaseStats(t);
@@ -4265,6 +4499,7 @@ function initPersonalTd(){
     if(t.type==='wizard')return wizardBaseStats(t);
     if(t.type==='electric')return electricBaseStats(t);
     if(t.type==='celestial')return celestialBaseStats(t);
+    if(t.type==='litter')return litterBaseStats(t);
     const base=types[t.type],step=Math.max(0,(t.level||1)-1);
     const normalRate=Math.max(base.rate*.48,base.rate*Math.pow(.82,step));
     const rootRate=base.rootHold?Math.max(base.minRate||4,base.rate-step*((base.rate-(base.minRate||4))/Math.max(1,MAX_LEVEL-1))):normalRate;
@@ -4337,10 +4572,11 @@ function initPersonalTd(){
   }
 
   function towerStats(t){
-    const st=baseTowerStats(t),buff=supportBonusesFor(t),observer=observerBonusesFor(t),heroBuff=heroBonusesFor(t);
+    const st=baseTowerStats(t),buff=supportBonusesFor(t),observer=observerBonusesFor(t),heroBuff=heroBonusesFor(t),litterBuff=t.type==='litter'?{detectsCamo:false,breaksArmor:false,universalPop:false,teamDamage:0,teamAttack:0,teamRange:0,popRewardBonus:0,farmIncomeBonus:0}:litterTeamBonuses();
     if(st.farm){
       if(buff.salmon)st.farmIncome=Math.round(st.farmIncome*(1+buff.salmon));
       if(heroBuff.salmon)st.farmIncome=Math.round(st.farmIncome*(1+heroBuff.salmon));
+      if(litterBuff.farmIncomeBonus)st.farmIncome=Math.round(st.farmIncome*(1+litterBuff.farmIncomeBonus));
     }else{
       if(st.damage&&buff.damage)st.damage=Number((st.damage*(1+buff.damage)).toFixed(2));
       if(st.rate&&buff.attack)st.rate=Number((st.rate/(1+buff.attack)).toFixed(3));
@@ -4350,7 +4586,12 @@ function initPersonalTd(){
       if(st.damage&&heroBuff.damage)st.damage=Number((st.damage*(1+heroBuff.damage)).toFixed(2));
       if(st.rate&&heroBuff.attack)st.rate=Number((st.rate/(1+heroBuff.attack)).toFixed(3));
       if(!st.globalRange&&st.range&&heroBuff.range)st.range=Math.round(st.range*(1+heroBuff.range));
+      if(st.damage&&litterBuff.teamDamage)st.damage=Number((st.damage*(1+litterBuff.teamDamage)).toFixed(2));
+      if(st.rate&&litterBuff.teamAttack)st.rate=Number((st.rate/(1+litterBuff.teamAttack)).toFixed(3));
+      if(!st.globalRange&&st.range&&litterBuff.teamRange)st.range=Math.round(st.range*(1+litterBuff.teamRange));
     }
+    if(litterBuff.detectsCamo)st.detectsCamo=true;if(litterBuff.breaksArmor)st.breaksArmor=true;if(litterBuff.universalPop)st.universalPop=true;
+    st.popRewardMultiplier=1+(litterBuff.popRewardBonus||0);
     const mastery=masteryState(t.type),mb=masteryBonusSummary(t.type,mastery.level);
     if(st.farm){
       st.farmIncome=Math.max(1,Math.round(st.farmIncome*(1+(mb.incomeBonus||0))));
@@ -4471,6 +4712,7 @@ function initPersonalTd(){
 
   function sellSelectedTower(){
     const t=selectedTower();if(!t)return;
+    if(requestLanAction('sell',{towerId:t.id})){setMsg($t('🐾 Venda solicitada ao anfitrião.'));return;}
     const refund=towerRefund(t),name=types[t.type].name;
     state.money+=refund;
     state.towers=state.towers.filter(x=>x.id!==t.id);
@@ -4481,6 +4723,7 @@ function initPersonalTd(){
 
   function moveRepositionedTower(x,y){
     const t=repositioningTower();if(!t){cancelReposition(true);return false;}
+    if(requestLanAction('move',{towerId:t.id,x,y})){state.repositionTower=null;syncPlacementUi();setMsg($t('🐾 Reposicionamento solicitado ao anfitrião.'));return true;}
     if(distPath(x,y)<43){setMsg($t('↔ Reposicionamento: muito perto da estrada. Escolha outro ponto.'));return false;}
     if(obstacleAt(x,y,24)){setMsg($t('↔ Reposicionamento: há um obstáculo nesse ponto.'));return false;}
     if(state.towers.some(other=>other.id!==t.id&&Math.hypot(other.x-x,other.y-y)<46)){setMsg($t('↔ Reposicionamento: muito perto de outra torre.'));return false;}
@@ -4579,6 +4822,11 @@ function initPersonalTd(){
     if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');
     if(next>CELESTIAL_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${CELESTIAL_SECONDARY_MAX}`;
     return'';
+  }
+  function litterPathLockReason(t,pathIndex){
+    const p=litterPaths(t),main=litterPrimaryPath(t),current=p[pathIndex],next=current+1;
+    if(current>=LITTER_MAX_TIER)return $t('Nível máximo');const active=p.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
+    if(current===0&&active.length>=2)return $t('Máximo de 2 caminhos');if(next>LITTER_SECONDARY_MAX&&main!==null&&main!==pathIndex)return $T`Secundário limitado ao T${LITTER_SECONDARY_MAX}`;return'';
   }
 
   // Só substitui o innerHTML quando o conteúdo realmente muda. Antes disso, este painel era
@@ -4717,8 +4965,13 @@ function initPersonalTd(){
     renderTreeHTML(root,renderPathCards(t,CELESTIAL_PATHS,p,celestialPathLockReason,'data-celestial-path',celestialPrimaryPath(t)));
     root.onclick=e=>{const btn=e.target.closest('[data-celestial-path]');if(!btn||btn.disabled)return;e.stopPropagation();upgradeCelestialPath(Number(btn.dataset.celestialPath));};
   }
+  function renderLitterUpgradeTree(t){
+    const root=$('#dart-upgrade-tree');if(!root)return;const p=litterPaths(t);
+    renderTreeHTML(root,renderPathCards(t,LITTER_PATHS,p,litterPathLockReason,'data-litter-path',litterPrimaryPath(t)));
+    root.onclick=e=>{const btn=e.target.closest('[data-litter-path]');if(!btn||btn.disabled)return;e.stopPropagation();upgradeLitterPath(Number(btn.dataset.litterPath));};
+  }
 
-  const NO_PRIORITY_TYPES=['salmon','frost','vine'];
+  const NO_PRIORITY_TYPES=['salmon','frost','vine','litter'];
   function updatePriorityRow(t){
     const row=$('#td-priority-row'),select=$('#td-priority');
     if(!row||!select)return;
@@ -4876,6 +5129,17 @@ function initPersonalTd(){
       renderCelestialUpgradeTree(t);return;
     }
 
+    if(t.type==='litter'){
+      if(tree)tree.hidden=false;if(bar)bar.classList.add('dart-mode');btn.hidden=true;
+      const p=litterPaths(t),active=p.filter(v=>v>0).length,buffs=[];
+      if(st.detectsCamo)buffs.push($t('👁️ todos detectam Camo'));if(st.breaksArmor)buffs.push($t('💥 todos quebram Blindagem'));if(st.universalPop)buffs.push($t('🧼 todos acertam tudo'));
+      if(st.teamAttack||st.teamRange)buffs.push($T`⚡ +${Math.round(st.teamAttack*100)}% velocidade • 📏 +${Math.round(st.teamRange*100)}% range`);
+      if(st.popRewardBonus||st.farmIncomeBonus)buffs.push($T`🐟 +${Math.round(st.popRewardBonus*100)}% estouros • 🎣 +${Math.round(st.farmIncomeBonus*100)}% fazendas`);
+      name.textContent=$T`${st.name} • suporte global único`;
+      stats.textContent=$T`Não ataca • limite global 1 • caminhos ${p.map((v,i)=>`${i+1}:T${v}`).join(' / ')} • ${active}/2 escolhidos${Number.isInteger(t.litterMainPath)?$T` • principal C${t.litterMainPath+1}`:''}${buffs.length?' • '+buffs.join(' • '):''}`;
+      renderLitterUpgradeTree(t);return;
+    }
+
     if(tree){tree.hidden=true;tree.innerHTML='';tree.__lastHtml='';}if(bar)bar.classList.remove('dart-mode');btn.hidden=false;
     const max=t.level>=MAX_LEVEL,cost=upgradeCost(t);
     let special='';
@@ -4945,13 +5209,18 @@ function initPersonalTd(){
   };
 
   function waveEnemyCount(round){
+    const coopMultiplier=lan?.connected?2:1;
+    if(isBossEvent()){
+      const bossRound=round===20||round===40||round===60;
+      return Math.round((bossRound?18+round*.45:12+round*1.35)*coopMultiplier);
+    }
     if(isInfinite()){
       const hardExtra=state.difficulty==='hard'?Math.floor(round/10)*4:state.difficulty==='normal'?Math.floor(round/15)*3:0;
-      return Math.min(128,10+round*4+hardExtra);
+      return Math.min(256,(10+round*4+hardExtra)*coopMultiplier);
     }
-    const totalRounds=mapRounds(state.map,state.difficulty);
+    const totalRounds=matchRounds();
     const base=10+round*5+(round===totalRounds?14:0);
-    return Math.round(base*(currentMap().enemyDensity||1));
+    return Math.round(base*(currentMap().enemyDensity||1)*coopMultiplier);
   }
 
   function waveFeatureSet(round){
@@ -4961,13 +5230,13 @@ function initPersonalTd(){
       const k=enemyKind(round,i);
       if(k!=='normal')kinds.add(k);
     }
-    const boss=!isInfinite()&&round===mapRounds(state.map,state.difficulty);
+    const boss=isBossEvent()?(round===20||round===40||round===60):!isInfinite()&&round===matchRounds();
     return{tier:tierOf(waveHp(round)).name,kinds,boss};
   }
 
   function renderNextWavePreview(){
     const root=$('#next-wave-alert');if(!root)return;
-    const totalRounds=mapRounds(state.map,state.difficulty),next=state.wave+1;
+    const totalRounds=matchRounds(),next=state.wave+1;
     if(!isInfinite()&&(state.completed||next>totalRounds)){
       root.className='next-wave-alert done';
       root.innerHTML=$t('<span class="next-wave-icon">✓</span><div><b>Última rodada chamada</b><small>Termine os inimigos restantes.</small></div>');
@@ -4976,7 +5245,7 @@ function initPersonalTd(){
     const previous=waveFeatureSet(state.wave),upcoming=waveFeatureSet(next),news=[];
     if(!previous.tier||upcoming.tier!==previous.tier)news.push(`🎈 ${upcoming.tier}`);
     for(const kind of upcoming.kinds)if(!previous.kinds.has(kind))news.push(waveKindLabels[kind]||kind);
-    if(upcoming.boss)news.push('👑 BOSS');
+    if(upcoming.boss)news.push(isBossEvent()?'🦈 ALMIRANTE ESPINHA':'👑 BOSS');
     const milestone=isInfinite()&&next%10===0;
     if(milestone)news.push($T`🪙 +${infiniteMilestoneReward(next)} moedas permanentes ao concluir`);
     root.className=`next-wave-alert ${news.length?'warning':'quiet'}`;
@@ -4984,6 +5253,19 @@ function initPersonalTd(){
     root.innerHTML=news.length
       ?`<span class="next-wave-icon">${milestone?'🪙':'⚠'}</span><div><b>${headline}</b><small>${news.join(' • ')}</small></div>`
       :$T`<span class="next-wave-icon">✓</span><div><b>${headline}</b><small>As ameaças conhecidas continuam, só ficam mais numerosas/fortes.</small></div>`;
+  }
+
+  function renderEventBossHud(){
+    const root=$('#event-boss-hud');if(!root)return;
+    const boss=[...state.enemies,...state.spawn].find(e=>e.eventBoss&&!e.dead);
+    root.hidden=!isBossEvent()||!boss;if(!boss)return;
+    const hpPct=Math.max(0,Math.min(100,(boss.hp||0)/Math.max(1,boss.maxHp||1)*100)),shieldPct=Math.max(0,Math.min(100,(boss.bossShieldHp||0)/Math.max(1,boss.bossShieldMax||1)*100));
+    const requirement=bossShieldRequirement(boss.bossPhase||1);
+    if($('#event-boss-title'))$('#event-boss-title').textContent=boss.name;if($('#event-boss-encounter'))$('#event-boss-encounter').textContent=$T`INVASÃO ${boss.encounter}/3 • RODADA ${boss.round}`;
+    if($('#event-boss-phase'))$('#event-boss-phase').textContent=$T`ETAPA ${boss.bossPhase}/4`;
+    if($('#event-boss-health-fill'))$('#event-boss-health-fill').style.width=`${hpPct}%`;if($('#event-boss-health-text'))$('#event-boss-health-text').textContent=`${Math.ceil(boss.hp)} / ${Math.ceil(boss.maxHp)} HP`;
+    if($('#event-boss-shield-fill'))$('#event-boss-shield-fill').style.width=`${shieldPct}%`;if($('#event-boss-shield-text'))$('#event-boss-shield-text').textContent=(boss.bossShieldHp||0)>0?$T`${requirement.icon} Escudo: ${requirement.label} • ${Math.ceil(boss.bossShieldHp)} HP`:$t('✓ Escudo rompido • velocidade normal');
+    root.classList.toggle('shield-down',!(boss.bossShieldHp>0));
   }
 
   function renderHeroHud(){
@@ -5019,20 +5301,21 @@ function initPersonalTd(){
   }
 
   function updateStats(){
-    const map=currentMap(),diff=currentDifficulty(),totalRounds=mapRounds(state.map,state.difficulty),endless=isInfinite();
-    renderHeroHud();renderSynergies();
+    const map=currentMap(),diff=currentDifficulty(),totalRounds=matchRounds(),endless=isInfinite();
+    renderHeroHud();renderSynergies();renderEventBossHud();
     if($('#td-lives'))$('#td-lives').textContent=Math.max(0,state.lives);
-    if($('#td-money'))$('#td-money').textContent=Math.floor(state.money);
+    const moneyEl=$('#td-money');
+    if(moneyEl){moneyEl.textContent=Math.floor(state.money);const label=moneyEl.parentElement?.querySelector('small');if(label)label.textContent=lan?.connected?$t('seus salmões'):$t('salmões');}
     if($('#td-wave'))$('#td-wave').textContent=state.wave;
     if($('#td-wave-max'))$('#td-wave-max').textContent=endless?'∞':totalRounds;
     if($('#td-count'))$('#td-count').textContent=state.enemies.length+state.spawn.length;
     if($('#td-map-meta'))$('#td-map-meta').textContent=endless
       ?$T`${map.description} • ∞ Infinito ${diff.name} • recorde ${infiniteBestFor(state.map,state.difficulty)} • moedas permanentes a cada 10 rodadas.`
-      :$T`${map.description} • ${diff.name} • estrelas do mapa ${mapStars(state.map)}/3.`;
+      :isBossEvent()?$T`${map.description} • 👑 Evento diário • invasões nas rodadas 20, 40 e 60.`:$T`${map.description} • ${diff.name} • estrelas do mapa ${mapStars(state.map)}/3.`;
     if($('#game-map-title'))$('#game-map-title').textContent=map.name;
     if($('#game-difficulty-text'))$('#game-difficulty-text').textContent=endless
       ?$T`∞ Modo Infinito • ${diff.name} • melhor: rodada ${infiniteBestFor(state.map,state.difficulty)}`
-      :$T`🏁 Campanha • ${diff.name} • ${profile.maps[state.map].cleared[state.difficulty]?$t('⭐ já concluída'):$t('☆ estrela ainda não conquistada')}`;
+      :isBossEvent()?$t('👑 Evento diário • Maré Blindada • equipe LAN/VPN'):$T`🏁 Campanha • ${diff.name} • ${profile.maps[state.map].cleared[state.difficulty]?$t('⭐ já concluída'):$t('☆ estrela ainda não conquistada')}`;
     const start=$('#td-start');
     if(start){
       // Mantém os mesmos elementos durante o clique. Recriar o conteúdo a cada frame fazia
@@ -5068,7 +5351,9 @@ function initPersonalTd(){
 
   function reset(){
     const map=currentMap(),diff=currentDifficulty();
-    state.money=MATCH_START_MONEY;
+    const startingMoney=isBossEvent()?eventStartMoney(activeWalletIds().length):MATCH_START_MONEY;
+    state.playerWallets=Object.fromEntries(activeWalletIds().map(id=>[id,startingMoney]));
+    if(!state.playerWallets.host)state.playerWallets.host=startingMoney;
     state.lives=Math.max(1,map.lives+diff.extraLives);
     state.wave=0;state.lastClearedWave=0;state.lastFarmPaidWave=0;state.selected=null;state.selectedTower=null;state.selectedHero=false;state.repositionTower=null;state.hero=null;state.nextTowerId=1;state.nextEnemyId=1;
     state.unitPlacedThisMatch=false;
@@ -5082,6 +5367,8 @@ function initPersonalTd(){
     hideGameModal('#pause-menu');hideGameModal('#result-screen');
     setMsg(isInfinite()
       ?$T`${map.name} • ∞ Infinito ${diff.name}. Não existe rodada final: a dificuldade sobe continuamente e cada 10 rodadas concluídas rende moedas permanentes.`
+      :isBossEvent()
+        ?$t('Arena da Maré Blindada. Prepare a equipe: Almirante Espinha invade nas rodadas 20, 40 e 60 com quatro etapas de escudo.')
       :state.map==='church'
         ?$T`${map.name} • ${diff.name}. ⛪ Coloque gatinhos nos bancos marcados com patinhas para enxergar por cima dos pilares. As duas rotas se cruzam no centro.`
         :$T`${map.name} • ${diff.name}. Obstáculos grandes bloqueiam a visão. Chame as rodadas no seu ritmo — você pode sobrepor ondas.`);
@@ -5091,7 +5378,7 @@ function initPersonalTd(){
   function loadSelection(mapId,diffId,modeId='campaign'){
     state.map=mapId in maps?mapId:'grove';
     state.difficulty=diffId in difficulties?diffId:'easy';
-    state.mode=modeId==='infinite'?'infinite':'campaign';
+    state.mode=modeId==='infinite'?'infinite':modeId==='boss-event'?'boss-event':'campaign';
     lobbySelection={map:state.map,difficulty:state.difficulty,mode:state.mode,category:'beginner'};
     reset();
   }
@@ -5129,7 +5416,7 @@ function initPersonalTd(){
       const growth=Math.pow(state.difficulty==='hard'?1.095:state.difficulty==='normal'?1.082:1.07,post/5);
       return Number((layered*growth).toFixed(2));
     }
-    const totalRounds=mapRounds(state.map,state.difficulty);
+    const totalRounds=matchRounds();
     const maxTier=state.difficulty==='easy'?4:state.difficulty==='hard'?6:5;
     const progress=totalRounds>1?Math.min(1,(wave-1)/(totalRounds-1)):1;
     return Number((1+progress*(maxTier-1)).toFixed(2));
@@ -5137,7 +5424,7 @@ function initPersonalTd(){
 
   function specialEnemyKind(round,index){
     const cat=mapCategoryForMap(state.map).id;
-    const total=isInfinite()?Math.max(36,round):mapRounds(state.map,state.difficulty);
+    const total=isInfinite()?Math.max(36,round):matchRounds();
     const progress=isInfinite()?Math.min(1,round/36):Math.min(1,round/Math.max(1,total));
     const diffShift=state.difficulty==='easy'?5:state.difficulty==='hard'?-2:0;
     const cadence=base=>Math.max(6,base+diffShift);
@@ -5166,7 +5453,7 @@ function initPersonalTd(){
     const armoredStart=Math.max(2,4+offset),camoStart=Math.max(3,6+offset);
     const heavyStart=Math.max(6,9+offset),camoArmoredStart=Math.max(9,12+offset);
     const regenStart=Math.max(3,5+offset),fastStart=Math.max(2,3+offset);
-    const finalRound=!isInfinite()&&round===mapRounds(state.map,state.difficulty);
+    const finalRound=!isInfinite()&&round===matchRounds();
     const armoredMod=Math.max(4,7-Math.floor(round/8)),camoMod=Math.max(5,9-Math.floor(round/8));
     const heavyMod=11,camoArmoredMod=17;
     const regenMod=Math.max(6,9-Math.floor(round/10)),fastMod=Math.max(5,7-Math.floor(round/10));
@@ -5209,6 +5496,16 @@ function initPersonalTd(){
     const reward=Math.round((90+round*8)*map.rewardMultiplier*diff.waveReward);
     return{at:0,round,kind:'boss',armored:false,camo:false,name:BOSS_NAMES[state.map]||$t('Chefão'),
       hp,maxHp:hp,elite:false,speed,reward,regenPause:0,d:0,slowTimer:0,color:'#ffb347',bossScale:75,strongestHp:strongest};
+  }
+
+  function makeDailyBoss(round){
+    const map=currentMap(),diff=currentDifficulty(),strongest=strongestRegularDurability(round),encounter=Math.max(1,Math.min(3,Math.round(round/20)));
+    const players=Math.max(2,lan?.playerCount||2),teamScale=eventTeamScale(players),bossScale=[0,120,185,275][encounter];
+    const hp=Number((strongest*bossScale*teamScale).toFixed(1)),shieldMax=Number((hp*(.12+encounter*.025)).toFixed(1));
+    const speed=(50+round*2.2)*map.speedMultiplier*diff.speed*.22,reward=Math.round((220+encounter*180)*map.rewardMultiplier*diff.waveReward);
+    return{at:0,round,kind:'boss',eventBoss:true,raidBoss:'spine',encounter,armored:false,camo:false,name:$t('Almirante Espinha'),
+      hp,maxHp:hp,elite:false,speed,reward,regenPause:0,d:0,slowTimer:0,color:'#55c7c2',bossScale,strongestHp:strongest,
+      bossPhase:1,bossShieldHp:shieldMax,bossShieldMax:shieldMax,blockedFxTimer:0};
   }
 
   // Em mapas com duas rotas paralelas (map.paths.length===2): as 2 primeiras rodadas usam
@@ -5283,24 +5580,25 @@ function initPersonalTd(){
   }
 
   function startWave(){
-    const map=currentMap(),diff=currentDifficulty(),totalRounds=mapRounds(state.map,state.difficulty),endless=isInfinite();
+    if(requestLanAction('startWave')){setMsg($t('🐾 Rodada solicitada ao anfitrião.'));return;}
+    const map=currentMap(),diff=currentDifficulty(),totalRounds=matchRounds(),endless=isInfinite();
     if(state.lives<=0){reset();return;}
     if(!endless&&state.completed){setMsg($T`${map.name} já foi concluído. Reinicie ou escolha outra dificuldade.`);return;}
     if(!endless&&state.wave>=totalRounds){setMsg($t('A rodada final já foi chamada. Termine os inimigos restantes.'));return;}
     const overlapping=state.enemies.length||state.spawn.length;
     state.wave++;state.waveActive=true;notifyMatchTutorialAction('waveStarted');
-    const final=!endless&&state.wave===totalRounds,count=waveEnemyCount(state.wave);
+    const final=!endless&&state.wave===totalRounds,raidBossRound=isBossEvent()&&(state.wave===20||state.wave===40||state.wave===60),count=waveEnemyCount(state.wave);
     const newcomers=Array.from({length:count},(_,i)=>{
       const e=makeEnemy(state.wave,i);
       e.path=pickEnemyPath(state.wave,i);
       return e;
     });
     let boss=null,miniBoss=null;
-    if(!endless&&!final&&state.wave===15&&state.difficulty!=='easy'){
+    if(!endless&&!isBossEvent()&&!final&&state.wave===15&&state.difficulty!=='easy'){
       miniBoss=makeMiniBoss(state.wave);miniBoss.path=0;miniBoss.at=(newcomers.length?newcomers[newcomers.length-1].at:0)+1.7;newcomers.push(miniBoss);
     }
-    if(final){
-      boss=makeBoss(state.wave);
+    if(raidBossRound||final){
+      boss=raidBossRound?makeDailyBoss(state.wave):makeBoss(state.wave);
       boss.path=0;
       boss.at=(newcomers.length?newcomers[newcomers.length-1].at:0)+2.6;
       newcomers.push(boss);
@@ -5315,24 +5613,28 @@ function initPersonalTd(){
     const extra=[fast?$T`${fast} rápido(s)`:'',regen?$T`${regen} regenerador(es)`:'',...Object.entries(specialCounts).filter(([,n])=>n).map(([k,n])=>`${SPECIAL_ENEMY_INFO[k].icon} ${n} ${SPECIAL_ENEMY_INFO[k].name}`)].filter(Boolean).join(' • ');
     const roundLabel=endless?`${state.wave}/∞`:`${state.wave}/${totalRounds}`;
     const milestone=endless&&state.wave%10===0?$T` 🪙 MARCO: conclua a rodada ${state.wave} para receber +${infiniteMilestoneReward(state.wave)} moedas permanentes.`:'';
-    sfx(final?'boss':'wave');setMsg($T`${overlapping?$t('🚀 Rodada chamada antecipadamente! '):' '}${roundLabel}: ${count} alvos • ${armored} blindado(s) • ${camo} camo${extra?' • '+extra:''}.${miniBoss?$T` MINI BOSS! 👹 ${miniBoss.name} com ${miniBoss.hp.toFixed(0)} HP — 30× o inimigo mais resistente até aqui.`:''}${final?$T` RODADA FINAL! 👑 ${boss.name} chegou com ${boss.hp.toFixed(0)} HP — 75× a vida do inimigo regular mais resistente e anda a 55% da velocidade-base!`:''}${milestone}`);
+    const bossNotice=raidBossRound
+      ?$T` 🦈 INVASÃO ${boss.encounter}/3! ${boss.name} chegou com ${boss.hp.toFixed(0)} HP. Rompa quatro escudos especializados e elimine suas quatro etapas de vida.`
+      :final?$T` RODADA FINAL! 👑 ${boss.name} chegou com ${boss.hp.toFixed(0)} HP — 75× a vida do inimigo regular mais resistente e anda a 55% da velocidade-base!`:'';
+    sfx((final||raidBossRound)?'boss':'wave');setMsg($T`${overlapping?$t('🚀 Rodada chamada antecipadamente! '):' '}${roundLabel}: ${count} alvos • ${armored} blindado(s) • ${camo} camo${extra?' • '+extra:''}.${miniBoss?$T` MINI BOSS! 👹 ${miniBoss.name} com ${miniBoss.hp.toFixed(0)} HP — 30× o inimigo mais resistente até aqui.`:''}${bossNotice}${milestone}`);
     updateStats();
   }
 
-  function towerCount(typeId){return state.towers.reduce((sum,t)=>sum+(t.type===typeId?1:0),0);}
+  function towerCount(typeId,ownerId=localWalletId()){return state.towers.reduce((sum,t)=>sum+(t.type===typeId&&(!t.owner||t.owner===ownerId)?1:0),0);}
 
   function placeTower(x,y){
     const typeId=state.selected,type=types[typeId];if(!type)return false;
+    if(requestLanAction('placeTower',{towerType:typeId,x,y})){cancelPlacement(true);setMsg($T`🐾 Posicionamento de ${type.name} enviado ao anfitrião.`);return true;}
     if(!isTowerUnlocked(typeId)){setMsg($T`${type.name} libera no nível ${type.unlockLevel}.`);return false;}
-    const placed=towerCount(typeId),price=towerPrice(typeId,state.map),limit=type.limit||TOWER_LIMIT_PER_TYPE;
+    const placed=typeId==='litter'?state.towers.filter(t=>t.type==='litter').length:towerCount(typeId),price=towerPrice(typeId,state.map),limit=type.limit||TOWER_LIMIT_PER_TYPE;
     if(placed>=limit){setMsg($T`🐾 Limite atingido: no máximo ${limit} ${type.name} por mapa.`);renderUnlocks();return false;}
     if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${type.name} neste tier de mapa.`);return false;}
     if(distPath(x,y)<43){setMsg($t('Muito perto da estrada. Escolha outro ponto para confirmar.'));return false;}
     if(obstacleAt(x,y,24)){setMsg($t('🌳 Esse obstáculo ocupa o espaço e também bloquearia a visão. Escolha outro ponto.'));return false;}
     if(state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<46)||(state.hero&&Math.hypot(state.hero.x-x,state.hero.y-y)<52)){setMsg($t('Muito perto de outra unidade. Escolha outro ponto.'));return false;}
     state.money-=price;
-    const pathTower=typeId==='dart'||typeId==='sniper';
-    const tower={id:state.nextTowerId++,x,y,type:typeId,cool:0,level:1,angle:0,paths:pathTower?[0,0,0]:undefined,dartMainPath:null,dartLastPath:null,sniperMainPath:null,sniperLastPath:null,planeTimer:0,planeLastWave:state.wave,
+    const pathTower=['dart','sniper','frost','vine','burst','ninja','laser','wizard','electric','celestial','litter'].includes(typeId);
+    const tower={id:state.nextTowerId++,x,y,type:typeId,owner:localWalletId(),cool:0,level:1,angle:0,paths:pathTower?[0,0,0]:undefined,dartMainPath:null,dartLastPath:null,sniperMainPath:null,sniperLastPath:null,planeTimer:0,planeLastWave:state.wave,
       spent:price,damageDealt:0,pops:0,incomeGenerated:0,masteryAbilityCd:0,masteryBuffTimer:0,fearCooldown:typeId==='demonking'?1.4:0};
     state.towers.push(tower);state.masterySession[typeId].used=true;state.unitPlacedThisMatch=true;
     const count=towerCount(typeId);
@@ -5343,6 +5645,7 @@ function initPersonalTd(){
   }
 
   function placeHero(x,y){
+    if(requestLanAction('placeHero',{x,y})){cancelPlacement(true);setMsg($t('🐾 Posicionamento do herói enviado ao anfitrião.'));return true;}
     if(state.hero){setMsg($t('🦸 Só é permitido 1 Herói Gatinho por partida.'));return false;}
     const id=profile.selectedHero||'king',h=HEROES[id]||HEROES.king,price=heroPrice(id,state.map);
     if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} para colocar ${h.name}.`);return false;}
@@ -5351,7 +5654,7 @@ function initPersonalTd(){
     if(state.towers.some(t=>Math.hypot(t.x-x,t.y-y)<52)){setMsg($t('Muito perto de outro gatinho. Escolha outro ponto.'));return false;}
     state.money-=price;
     state.unitPlacedThisMatch=true;
-    state.hero={type:id,x,y,level:1,xp:0,cool:0,skillCd:0,ultimateCd:0,commandTimer:0,ultimateTimer:0,farmBoostWaves:0,damageDealt:0,pops:0,spent:price,priority:id==='warrior'?'strong':'first'};
+    state.hero={type:id,owner:localWalletId(),x,y,level:1,xp:0,cool:0,skillCd:0,ultimateCd:0,commandTimer:0,ultimateTimer:0,farmBoostWaves:0,damageDealt:0,pops:0,spent:price,priority:id==='warrior'?'strong':'first'};
     cancelPlacement(true);sfx('place');
     setMsg($T`🦸 ${h.name} entrou em campo! Ele sobe do nível 1 ao 10 nesta partida. Habilidade no Nv.5 e Ultimate no Nv.10.`);
     renderHeroHud();updateStats();announceNewSynergies();return true;
@@ -5359,11 +5662,12 @@ function initPersonalTd(){
 
   function heroAt(x,y){return state.hero&&Math.hypot(state.hero.x-x,state.hero.y-y)<=32?state.hero:null;}
 
-  function towerAt(x,y){return[...state.towers].reverse().find(t=>{const tier=t.type==='dart'?Math.max(0,...dartPaths(t)):t.type==='sniper'?Math.max(0,...sniperPaths(t)):t.type==='frost'?Math.max(0,...frostPaths(t)):t.type==='vine'?Math.max(0,...vinePaths(t)):t.type==='burst'?Math.max(0,...burstPaths(t)):t.type==='ninja'?Math.max(0,...ninjaPaths(t)):t.type==='laser'?Math.max(0,...laserPaths(t)):t.type==='wizard'?Math.max(0,...wizardPaths(t)):t.type==='electric'?Math.max(0,...electricPaths(t)):Math.max(0,(t.level||1)-1);return Math.hypot(t.x-x,t.y-y)<=24+tier*2;})||null;}
+  function towerAt(x,y){return[...state.towers].reverse().find(t=>{const tier=t.type==='dart'?Math.max(0,...dartPaths(t)):t.type==='sniper'?Math.max(0,...sniperPaths(t)):t.type==='frost'?Math.max(0,...frostPaths(t)):t.type==='vine'?Math.max(0,...vinePaths(t)):t.type==='burst'?Math.max(0,...burstPaths(t)):t.type==='ninja'?Math.max(0,...ninjaPaths(t)):t.type==='laser'?Math.max(0,...laserPaths(t)):t.type==='wizard'?Math.max(0,...wizardPaths(t)):t.type==='electric'?Math.max(0,...electricPaths(t)):t.type==='celestial'?Math.max(0,...celestialPaths(t)):t.type==='litter'?Math.max(0,...litterPaths(t)):Math.max(0,(t.level||1)-1);return Math.hypot(t.x-x,t.y-y)<=24+tier*2;})||null;}
 
   function upgradeDartPath(pathIndex){
     const t=selectedTower();
     if(!t||t.type!=='dart'){setMsg($t('Selecione um Gatinho Dardo para usar os caminhos de upgrade.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(pathIndex<0||pathIndex>=DART_PATHS.length)return;
     const p=dartPaths(t),current=p[pathIndex],lock=dartPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${DART_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
@@ -5381,6 +5685,7 @@ function initPersonalTd(){
   function upgradeSniperPath(pathIndex){
     const t=selectedTower();
     if(!t||t.type!=='sniper'){setMsg($t('Selecione um Gato Sniper para usar os caminhos de upgrade.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(pathIndex<0||pathIndex>=SNIPER_PATHS.length)return;
     const p=sniperPaths(t),current=p[pathIndex],lock=sniperPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${SNIPER_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
@@ -5399,6 +5704,7 @@ function initPersonalTd(){
   function upgradeFrostPath(pathIndex){
     const t=selectedTower();
     if(!t||t.type!=='frost'){setMsg($t('Selecione um Gato Gelinho para usar os caminhos de upgrade.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(pathIndex<0||pathIndex>=FROST_PATHS.length)return;
     const p=frostPaths(t),current=p[pathIndex],lock=frostPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${FROST_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
@@ -5415,6 +5721,7 @@ function initPersonalTd(){
   function upgradeVinePath(pathIndex){
     const t=selectedTower();
     if(!t||t.type!=='vine'){setMsg($t('Selecione um Gato Cipó para usar os caminhos de upgrade.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(pathIndex<0||pathIndex>=VINE_PATHS.length)return;
     const p=vinePaths(t),current=p[pathIndex],lock=vinePathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${VINE_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
@@ -5431,6 +5738,7 @@ function initPersonalTd(){
   function upgradeBurstPath(pathIndex){
     const t=selectedTower();
     if(!t||t.type!=='burst'){setMsg($t('Selecione um Gato Bombinha para usar os caminhos de upgrade.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(pathIndex<0||pathIndex>=BURST_PATHS.length)return;
     const p=burstPaths(t),current=p[pathIndex],lock=burstPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${BURST_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
@@ -5448,6 +5756,7 @@ function initPersonalTd(){
   function upgradeNinjaPath(pathIndex){
     const t=selectedTower();
     if(!t||t.type!=='ninja'){setMsg($t('Selecione um Gato Ninja para usar os caminhos de upgrade.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(pathIndex<0||pathIndex>=NINJA_PATHS.length)return;
     const p=ninjaPaths(t),current=p[pathIndex],lock=ninjaPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${NINJA_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
@@ -5465,6 +5774,7 @@ function initPersonalTd(){
   function upgradeLaserPath(pathIndex){
     const t=selectedTower();
     if(!t||t.type!=='laser'){setMsg($t('Selecione um Gato Laser para usar os caminhos de upgrade.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(pathIndex<0||pathIndex>=LASER_PATHS.length)return;
     const p=laserPaths(t),current=p[pathIndex],lock=laserPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${LASER_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
@@ -5482,6 +5792,7 @@ function initPersonalTd(){
   function upgradeWizardPath(pathIndex){
     const t=selectedTower();
     if(!t||t.type!=='wizard'){setMsg($t('Selecione um Gato Mago para usar os caminhos de upgrade.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(pathIndex<0||pathIndex>=WIZARD_PATHS.length)return;
     const p=wizardPaths(t),current=p[pathIndex],lock=wizardPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${WIZARD_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
@@ -5499,6 +5810,7 @@ function initPersonalTd(){
   function upgradeElectricPath(pathIndex){
     const t=selectedTower();
     if(!t||t.type!=='electric'){setMsg($t('Selecione um Gato Volts para usar os caminhos de upgrade.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(pathIndex<0||pathIndex>=ELECTRIC_PATHS.length)return;
     const p=electricPaths(t),current=p[pathIndex],lock=electricPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${ELECTRIC_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
@@ -5516,6 +5828,7 @@ function initPersonalTd(){
   function upgradeCelestialPath(pathIndex){
     const t=selectedTower();
     if(!t||t.type!=='celestial'){setMsg($t('Selecione um Gato Celestial para usar os caminhos de upgrade.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(pathIndex<0||pathIndex>=CELESTIAL_PATHS.length)return;
     const p=celestialPaths(t),current=p[pathIndex],lock=celestialPathLockReason(t,pathIndex);
     if(lock){setMsg(`🔒 ${CELESTIAL_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
@@ -5529,11 +5842,23 @@ function initPersonalTd(){
     updateUpgradePanel();updateStats();
   }
 
+  function upgradeLitterPath(pathIndex){
+    const t=selectedTower();if(!t||t.type!=='litter'){setMsg($t('Selecione a Caixinha de Areia para usar os caminhos de suporte.'));return;}
+    if(requestLanAction('upgradePath',{towerId:t.id,path:pathIndex})){setMsg($t('🐾 Upgrade de suporte solicitado ao anfitrião.'));return;}
+    if(pathIndex<0||pathIndex>=LITTER_PATHS.length)return;const p=litterPaths(t),current=p[pathIndex],lock=litterPathLockReason(t,pathIndex);
+    if(lock){setMsg(`🔒 ${LITTER_PATHS[pathIndex].name}: ${lock}.`);updateUpgradePanel();return;}
+    const next=current+1,tier=LITTER_PATHS[pathIndex].tiers[current],price=upgradePrice(tier.cost);if(state.money<price){setMsg($T`Faltam 🐟 ${price-Math.floor(state.money)} salmões para ${tier.name}.`);return;}
+    state.money-=price;t.spent=(t.spent||towerPrice(t.type,state.map))+price;p[pathIndex]=next;t.paths=p;t.litterLastPath=pathIndex;if(next===4)t.litterMainPath=pathIndex;
+    state.pulses.push({x:t.x,y:t.y,range:110+next*12,life:.75,maxLife:.75,color:LITTER_PATHS[pathIndex].color});spawnFloatText(t.x,t.y-34,`${LITTER_PATHS[pathIndex].icon} T${next}`,LITTER_PATHS[pathIndex].color);
+    setMsg(`${LITTER_PATHS[pathIndex].icon} ${LITTER_PATHS[pathIndex].name} T${next}: ${tier.name}. ${tier.description}`);updateUpgradePanel();updateStats();
+  }
+
   function upgradeTower(){
     const t=selectedTower();
     if(!t){setMsg($t('Clique primeiro em um gatinho já posicionado.'));return;}
+    if(requestLanAction('upgrade',{towerId:t.id})){setMsg($t('🐾 Upgrade solicitado ao anfitrião.'));return;}
     if(t.type==='mister'){setMsg($t('Mister não aceita upgrades. Ele está ocupado demais jogando.'));return;}
-    if(t.type==='dart'||t.type==='sniper'||t.type==='frost'||t.type==='vine'||t.type==='burst'||t.type==='ninja'||t.type==='laser'||t.type==='wizard'||t.type==='electric'||t.type==='celestial'){setMsg($T`${types[t.type].name} usa a árvore de 3 caminhos na aba de upgrades da direita.`);updateUpgradePanel();return;}
+    if(t.type==='dart'||t.type==='sniper'||t.type==='frost'||t.type==='vine'||t.type==='burst'||t.type==='ninja'||t.type==='laser'||t.type==='wizard'||t.type==='electric'||t.type==='celestial'||t.type==='litter'){setMsg($T`${types[t.type].name} usa a árvore de 3 caminhos na aba de upgrades da direita.`);updateUpgradePanel();return;}
     if(t.level>=MAX_LEVEL){setMsg($T`${types[t.type].name} já está no nível máximo.`);return;}
     const cost=upgradeCost(t);
     if(state.money<cost){setMsg($T`Faltam 🐟 ${cost-Math.floor(state.money)} salmões para o upgrade.`);return;}
@@ -5555,7 +5880,7 @@ function initPersonalTd(){
   function activateMasteryAbility(){
     const t=selectedTower();if(!t||masteryState(t.type).level<50)return;
     if((t.masteryAbilityCd||0)>0){setMsg($T`⭐ ${MASTERY_ABILITIES[t.type].name} recarrega em ${Math.ceil(t.masteryAbilityCd)}s.`);return;}
-    const st=towerStats(t),ab=MASTERY_ABILITIES[t.type],alive=state.enemies.filter(e=>!e.dead);if(!alive.length&&t.type!=='salmon'&&t.type!=='mister'){setMsg($t('Não há inimigos no mapa para usar essa habilidade.'));return;}
+    const st=towerStats(t),ab=MASTERY_ABILITIES[t.type],alive=state.enemies.filter(e=>!e.dead);if(!alive.length&&t.type!=='salmon'&&t.type!=='mister'&&t.type!=='litter'){setMsg($t('Não há inimigos no mapa para usar essa habilidade.'));return;}
     const strongest=()=>alive.slice().sort((a,b)=>(b.hp||0)-(a.hp||0))[0];
     if(t.type==='mister'){
       t.misterQuit=false;t.misterTime=MISTER_QUIT_SECONDS-10;spawnFloatText(t.x,t.y-34,$t('🎮 Só mais uma...'),'#7ee36b');
@@ -5601,6 +5926,9 @@ function initPersonalTd(){
     }else if(t.type==='celestial'){
       t.masteryBuffTimer=12;state.pulses.push({x:t.x,y:t.y,range:st.range,life:1,maxLife:1,color:'#8fdcff'});
       for(const e of alive){const p=pointAt(e.d,e.path);if(Math.hypot(p.x-t.x,p.y-t.y)<=st.range&&e.camo)e.revealed=true;}
+    }else if(t.type==='litter'){
+      t.masteryBuffTimer=10;state.pulses.push({x:t.x,y:t.y,range:Math.max(W,H),life:1,maxLife:1,color:'#7de2d3'});
+      spawnFloatText(t.x,t.y-38,$t('🧼 EQUIPE REVIGORADA'),'#b9fff3');
     }
     t.masteryAbilityCd=ab.cooldown;recordMastery(t.type,'actions',8);sfx('boss');setMsg($T`${ab.icon} ${types[t.type].name}: ${ab.name} ativada!`);updateUpgradePanel();updateStats();
   }
@@ -5861,16 +6189,16 @@ function initPersonalTd(){
     state.bombs=state.bombs.filter(b=>!b.hit);
   }
 
-  function breakArmor(enemy){
+  function breakArmor(enemy,ownerId='host',rewardMultiplier=1){
     const armorReward=enemy.armorReward||0;
     enemy.kind='normal';enemy.armored=false;enemy.camo=false;enemy.armorHp=0;
     enemy.hp=enemy.innerHp;enemy.maxHp=enemy.innerHp;enemy.color=enemy.innerColor||'#ff7180';
     enemy.justUnarmored=performance.now()/1000+.55;
     sfx('armorbreak');
     if(armorReward>0){
-      state.money+=armorReward;
+      const earned=Math.max(1,Math.round(armorReward*rewardMultiplier));addWallet(ownerId,earned);
       const p=pointAt(enemy.d,enemy.path);
-      spawnFloatText(p.x,p.y-14,`🐟 +${armorReward}`,'#9fe0ff');
+      spawnFloatText(p.x,p.y-14,`🐟 +${earned}`,'#9fe0ff');
     }
   }
 
@@ -5979,16 +6307,33 @@ function initPersonalTd(){
     for(const s of state.shadowBloons){const p=pointAt(s.d,s.path),pulse=.85+.12*Math.sin(now*5+s.d*.02);ctx.save();ctx.translate(p.x,p.y);ctx.globalAlpha=.92;ctx.shadowColor='#a64dff';ctx.shadowBlur=12;ctx.fillStyle='#17131f';ctx.beginPath();ctx.ellipse(0,0,13*pulse,16*pulse,0,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#d45cff';ctx.beginPath();ctx.ellipse(-4,-2,2.3,1.7,-.2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(4,-2,2.3,1.7,.2,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#7e3ab8';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,15);ctx.quadraticCurveTo(-5,22,2,26);ctx.stroke();ctx.restore();}
   }
 
+  function bossShieldRequirement(phase){
+    return phase===1?{icon:'💥',label:$t('Antiblindagem'),test:s=>s.breaksArmor}:phase===2?{icon:'👁️',label:$t('Detecção Camo'),test:s=>s.detectsCamo}:phase===3?{icon:'🔥',label:$t('Fogo ou Laser'),test:s=>s.sourceType==='laser'||Boolean(s.burn)}:{icon:'🐾',label:$t('Todos os ataques'),test:()=>true};
+  }
+
   function damageEnemy(enemy,amount,sourceRef){
     if(!enemy||enemy.dead)return false;
     const source=typeof sourceRef==='string'?types[sourceRef]:(sourceRef||{});
     if(enemy.camo&&!enemy.revealed&&!source.detectsCamo)return false;
 
     let dealt=Math.max(0,Number(amount)||0);
+    const sourceTower=Number.isFinite(source.sourceTowerId)?state.towers.find(t=>t.id===source.sourceTowerId):null;
+    const sourceHero=source.isHeroSource?state.hero:null;
+    const rewardOwner=sourceTower?.owner||sourceHero?.owner||'host';
     if(enemy.kind==='boss'&&source.hunterBossBonus)dealt*=1+source.hunterBossBonus;
     else if(isSpecialEnemy(enemy)&&source.hunterSpecialBonus)dealt*=1+source.hunterSpecialBonus;
     if((enemy.markTimer||0)>0&&(enemy.markBonus||0)>0)dealt*=1+enemy.markBonus;
     if((enemy.fearTimer||0)>0&&(enemy.fearBonus||0)>0)dealt*=1+enemy.fearBonus;
+
+    if(enemy.eventBoss&&(enemy.bossShieldHp||0)>0){
+      const requirement=bossShieldRequirement(enemy.bossPhase||1),eligible=source.universalPop||requirement.test(source),p=pointAt(enemy.d,enemy.path);
+      if(!eligible){if((enemy.blockedFxTimer||0)<=0){spawnFloatText(p.x,p.y-58,`${requirement.icon} ${requirement.label}`,'#8ff3e9');enemy.blockedFxTimer=.55;}return false;}
+      const actual=Math.min(enemy.bossShieldHp,dealt);enemy.bossShieldHp=Math.max(0,enemy.bossShieldHp-dealt);
+      spawnDamageNumber(enemy,actual,{crit:source.critical});spawnImpactFx(enemy,actual,source);
+      if(sourceTower){sourceTower.damageDealt=(sourceTower.damageDealt||0)+actual;recordMastery(sourceTower.type,'damage',actual);}if(sourceHero)sourceHero.damageDealt=(sourceHero.damageDealt||0)+actual;
+      if(enemy.bossShieldHp<=0){spawnFloatText(p.x,p.y-58,$t('🛡️ ESCUDO ROMPIDO!'),'#ffe087');state.pulses.push({x:p.x,y:p.y,range:82,life:.8,maxLife:.8,color:'#55c7c2'});sfx('armorbreak');}
+      return true;
+    }
 
     if((enemy.divineShield||0)>0){
       enemy.divineShield=0;enemy.angelSlowFactor=1;
@@ -5997,14 +6342,12 @@ function initPersonalTd(){
       return false;
     }
     if(enemy.kind==='jester'&&dealt>0){
-      const cap=enemy.moneyPenaltyCap||500,penalty=Math.min(cap,Math.max(1,Math.ceil(dealt))),lost=Math.min(state.money,penalty);
-      state.money=Math.max(0,state.money-lost);
+      const cap=enemy.moneyPenaltyCap||500,penalty=Math.min(cap,Math.max(1,Math.ceil(dealt))),lost=Math.min(walletAmount(rewardOwner),penalty);
+      addWallet(rewardOwner,-lost);
       const p=pointAt(enemy.d,enemy.path);spawnFloatText(p.x,p.y-32,`🃏 -🐟 ${lost}`,'#ff8fbf');
       if(penalty>=cap)spawnFloatText(p.x,p.y-46,$t('LIMITE 🐟 500'),'#ffd0e4');
     }
 
-    const sourceTower=Number.isFinite(source.sourceTowerId)?state.towers.find(t=>t.id===source.sourceTowerId):null;
-    const sourceHero=source.isHeroSource?state.hero:null;
     if(enemy.armored){
       if(!source.breaksArmor)return false;
       const beforeArmor=Math.max(0,enemy.armorHp||0),actual=Math.min(beforeArmor,dealt);
@@ -6014,17 +6357,23 @@ function initPersonalTd(){
       if(sourceTower){sourceTower.damageDealt=(sourceTower.damageDealt||0)+actual;recordMastery(sourceTower.type,'damage',actual);}
       if(sourceHero)sourceHero.damageDealt=(sourceHero.damageDealt||0)+actual;
       if(source.sourceType==='burst'&&synergyActive('improvisedArtillery'))enemy.powderTimer=Math.max(enemy.powderTimer||0,4);
-      if(enemy.armorHp<=0){breakArmor(enemy);setMsg($t('💥 Blindagem quebrada: saiu um balão normal de dentro!'));}
+      if(enemy.armorHp<=0){breakArmor(enemy,rewardOwner,source.popRewardMultiplier||1);setMsg($t('💥 Blindagem quebrada: saiu um balão normal de dentro!'));}
       return true;
     }
     if(enemy.kind==='regen'||enemy.kind==='boss')enemy.regenPause=1.6;
-    const beforeHp=Math.max(0,enemy.hp||0),actual=Math.min(beforeHp,dealt);
+    const beforeHp=Math.max(0,enemy.hp||0),phaseFloor=enemy.eventBoss?enemy.maxHp*Math.max(0,1-(enemy.bossPhase||1)*.25):0,actual=Math.min(beforeHp,dealt,enemy.eventBoss?Math.max(0,beforeHp-phaseFloor):beforeHp);
     enemy.hp-=dealt;
+    if(enemy.eventBoss)enemy.hp=Math.max(phaseFloor,enemy.hp);
     spawnDamageNumber(enemy,actual,{crit:source.critical});
     spawnImpactFx(enemy,actual,source);
     if(sourceTower){sourceTower.damageDealt=(sourceTower.damageDealt||0)+actual;recordMastery(sourceTower.type,'damage',actual);}
     if(sourceHero)sourceHero.damageDealt=(sourceHero.damageDealt||0)+actual;
     if(source.sourceType==='burst'&&synergyActive('improvisedArtillery'))enemy.powderTimer=Math.max(enemy.powderTimer||0,4);
+    if(enemy.eventBoss&&enemy.hp<=phaseFloor+.001&&(enemy.bossPhase||1)<4){
+      enemy.bossPhase++;enemy.bossShieldMax=Number((enemy.maxHp*(.12+(enemy.encounter||1)*.025)).toFixed(1));enemy.bossShieldHp=enemy.bossShieldMax;
+      const requirement=bossShieldRequirement(enemy.bossPhase),p=pointAt(enemy.d,enemy.path);
+      spawnFloatText(p.x,p.y-60,$T`ETAPA ${enemy.bossPhase}/4 • ${requirement.icon}`,'#fff0a0');state.pulses.push({x:p.x,y:p.y,range:92,life:1,maxLife:1,color:'#55c7c2'});sfx('boss');
+    }
     if(enemy.hp<=0&&!enemy.dead){
       const feared=(enemy.fearTimer||0)>0,fearSource=enemy.fearSource;
       enemy.dead=true;
@@ -6035,15 +6384,15 @@ function initPersonalTd(){
       if(enemy.kind==='boss'){
         sfx('boss');
         playMusicTheme(state.map);
-        state.money+=enemy.reward;
+        const earned=Math.max(1,Math.round(enemy.reward*(source.popRewardMultiplier||1)));addWallet(rewardOwner,earned);
         const bonusCoins=Math.round(20*currentDifficulty().coinMultiplier);
         profile.coins+=bonusCoins;saveProfile();
-        spawnFloatText(p.x,p.y-18,`👑 +🐟 ${enemy.reward} • +🪙${bonusCoins}`,'#ffd36b');
-        setMsg($T`👑 Você derrotou ${enemy.name}! +🐟 ${enemy.reward} na partida e +🪙${bonusCoins} moedas permanentes.`);
+        spawnFloatText(p.x,p.y-18,`👑 +🐟 ${earned} • +🪙${bonusCoins}`,'#ffd36b');
+        setMsg($T`👑 Você derrotou ${enemy.name}! +🐟 ${earned} na partida e +🪙${bonusCoins} moedas permanentes.`);
       }else{
         sfx('pop');
-        state.money+=enemy.reward;
-        spawnFloatText(p.x,p.y-14,`🐟 +${enemy.reward}`,enemy.elite?'#ffd36b':'#ffe89a');
+        const earned=Math.max(1,Math.round(enemy.reward*(source.popRewardMultiplier||1)));addWallet(rewardOwner,earned);
+        spawnFloatText(p.x,p.y-14,`🐟 +${earned}`,enemy.elite?'#ffd36b':'#ffe89a');
       }
     }
     return true;
@@ -6064,26 +6413,28 @@ function initPersonalTd(){
       state.lastFarmPaidWave=next;
       if(state.hero)grantHeroXp(38+next*4);
       const farms=state.towers.filter(t=>types[t.type]?.farm);
-      let cash=0;
+      let cash=0;const cashByOwner={};
+      const credit=(owner,amount)=>{const id=owner||'host';cash+=amount;cashByOwner[id]=(cashByOwner[id]||0)+amount;};
       const merchantBoost=state.hero?.type==='merchant'&&(state.hero.farmBoostWaves||0)>0;
       for(const farm of farms){
         let income=towerStats(farm).farmIncome||0;
         if(merchantBoost)income=Math.round(income*2);
-        cash+=income;
+        credit(farm.owner,income);
         farm.incomeGenerated=(farm.incomeGenerated||0)+income;recordMastery(farm.type,'income',income);
         spawnFloatText(farm.x,farm.y-28,`🎣 +🐟 ${income}`,'#ffcf8a');
       }
       if(state.hero?.type==='merchant'){
-        const hIncome=heroStats(state.hero).farmIncome||0;cash+=hIncome;
+        const hIncome=heroStats(state.hero).farmIncome||0;credit(state.hero.owner,hIncome);
         spawnFloatText(state.hero.x,state.hero.y-30,`🐟 +${hIncome}`,HEROES.merchant.color);
         if(merchantBoost)state.hero.farmBoostWaves=Math.max(0,(state.hero.farmBoostWaves||0)-1);
       }
       if(cash>0&&synergyActive('fishMarket')&&next%5===0){
-        const festival=Math.max(1,Math.round(cash*.35));cash+=festival;
+        const festival=Math.max(1,Math.round(cash*.35));
+        const baseCash=Math.max(1,cash);for(const [owner,amount] of Object.entries({...cashByOwner}))credit(owner,Math.round(festival*(amount/baseCash)));
         const fx=state.hero||farms[0];if(fx)spawnFloatText(fx.x,fx.y-52,`🎣🐟 FESTIVAL +${festival}`,'#ffe0a1');
         setMsg($T`🎣🐟 Mercado de Peixes: Festival do Salmão! +${festival} salmões de renda extra na rodada ${next}.`);
       }
-      if(cash>0){state.money+=cash;awards.push({wave:next,cash});}
+      if(cash>0){for(const [owner,amount] of Object.entries(cashByOwner))addWallet(owner,amount);awards.push({wave:next,cash});}
     }
     return awards;
   }
@@ -6092,7 +6443,7 @@ function initPersonalTd(){
     if(state.pendingClearCash<=0&&state.pendingWaveXp<=0)return{levels:[],xp:0,cash:0};
     const cash=state.pendingClearCash,xp=state.pendingWaveXp;
     state.pendingClearCash=0;state.pendingWaveXp=0;
-    state.money+=cash;
+    addAllWallets(cash);
     const levels=grantXp(xp);
     saveProfile();
     return{levels,xp,cash};
@@ -6137,6 +6488,16 @@ function initPersonalTd(){
     if(secretUnlocks.length)setTimeout(()=>queueSecretReveals(secretUnlocks),450);
   }
 
+  function completeBossEvent(){
+    if(state.rewardGranted)return;
+    state.rewardGranted=true;state.completed=true;state.waveActive=false;
+    const diff=currentDifficulty(),coinReward=Math.round(180*diff.coinMultiplier),xpReward=Math.round(260*diff.xpMultiplier);
+    profile.coins+=coinReward;const levels=grantXp(xpReward);saveProfile();
+    const levelText=levels.length?$T` • 🎖️ Subiu para o nível ${profile.level}!`:'';
+    setMsg($T`👑 Evento diário concluído! O time venceu as três invasões do Almirante Espinha. +🪙 ${coinReward} • +${xpReward} XP${levelText}`);
+    updateStats();showResult(true,{coins:coinReward,xp:xpReward,bossHunt:true});
+  }
+
   function update(dt,now){
     updateParticles(dt);
     if(state.paused||state.lives<=0||state.completed)return;
@@ -6167,6 +6528,7 @@ function initPersonalTd(){
       e.arcaneBloomCd=Math.max(0,(e.arcaneBloomCd||0)-dt);
       e.alchemyStageTimer=Math.max(0,(e.alchemyStageTimer||0)-dt);
       if(e.alchemyStageTimer<=0&&e.alchemyStage){e.alchemyStage=0;e.plasmaCatalystHits=0;}
+      if(e.eventBoss)e.blockedFxTimer=Math.max(0,(e.blockedFxTimer||0)-dt);
       if(e.burn&&e.burn.ticks>0&&!e.dead){
         e.burn.timer-=dt;
         while(e.burn&&e.burn.timer<=0&&e.burn.ticks>0&&!e.dead){
@@ -6193,8 +6555,9 @@ function initPersonalTd(){
         }
       }
       const angelSlow=(e.divineShield||0)>0?(e.angelSlowFactor||.82):1;
-      if(e.rootTimer<=0)e.d+=e.speed*(e.slowTimer>0?(e.slowFactor||.55):1)*globalSlow*angelSlow*dt;
-      if((e.kind==='regen'||e.kind==='boss')&&!e.armored){
+      const eventShieldSlow=e.eventBoss&&(e.bossShieldHp||0)>0 ? .16 : 1;
+      if(e.rootTimer<=0)e.d+=e.speed*(e.slowTimer>0?(e.slowFactor||.55):1)*globalSlow*angelSlow*eventShieldSlow*dt;
+      if((e.kind==='regen'||e.kind==='boss')&&!e.eventBoss&&!e.armored){
         e.regenPause=Math.max(0,(e.regenPause||0)-dt);
         if(e.regenPause<=0&&e.hp<e.maxHp)e.hp=Math.min(e.maxHp,e.hp+e.maxHp*.045*dt);
       }
@@ -6245,7 +6608,7 @@ function initPersonalTd(){
         if(t.misterQuit)return;
       }
       const st=towerStats(t);
-      if(st.farm)return;
+      if(st.farm||st.supportOnly)return;
       if((t.stunTimer||0)>0)return;
 
       {
@@ -6526,7 +6889,7 @@ function initPersonalTd(){
     if(state.waveActive&&!state.enemies.length&&!state.spawn.length){
       state.waveActive=false;
       const settled=settleCalledWaves();
-      if(!isInfinite()&&state.wave>=mapRounds(state.map,state.difficulty))completeMap();
+      if(!isInfinite()&&state.wave>=matchRounds())isBossEvent()?completeBossEvent():completeMap();
       else{
         const levelText=settled.levels.length?$T` • 🎖️ Nível ${profile.level}!`:'';
         const milestoneText=milestoneAwards.length?$T` • 🪙 +${milestoneAwards.reduce((sum,x)=>sum+x.coins,0)} moedas permanentes`:'';
@@ -6689,8 +7052,28 @@ function drawTowerDeadZones(t,st){
   ctx.globalAlpha=1;ctx.restore();
 }
 
+function drawLitterBoxTower(t,st,selected,tier){
+  const now=performance.now()/1000,p=litterPaths(t),accent=st.accent||'#7de2d3',size=25+Math.min(5,tier)*1.6;
+  if(selected){ctx.fillStyle=accent+'14';ctx.fillRect(0,0,W,H);ctx.strokeStyle=accent+'99';ctx.lineWidth=2;ctx.setLineDash([8,7]);ctx.strokeRect(8,8,W-16,H-16);ctx.setLineDash([]);}
+  ctx.save();ctx.translate(t.x,t.y);
+  ctx.fillStyle='#00000044';ctx.beginPath();ctx.ellipse(0,18,size+7,10,0,0,Math.PI*2);ctx.fill();
+  ctx.shadowColor=accent;ctx.shadowBlur=selected||tier>=4?14:5;
+  const box=ctx.createLinearGradient(-size,-16,size,22);box.addColorStop(0,'#8e633b');box.addColorStop(.48,'#d8aa6f');box.addColorStop(1,'#76502f');
+  ctx.fillStyle=box;ctx.strokeStyle=tier>=4?'#f5d374':'#56391f';ctx.lineWidth=tier>=4?3:2;ctx.beginPath();ctx.roundRect(-size,-13,size*2,34,7);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+  ctx.fillStyle='#f0d294';ctx.beginPath();ctx.ellipse(0,-10,size-4,9,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff0bd88';ctx.lineWidth=1.4;ctx.stroke();
+  for(let i=0;i<9;i++){const a=i*2.4+t.id,x=Math.cos(a)*(4+(i%3)*6),y=-10+Math.sin(a)*3;ctx.fillStyle=i%2?'#c79b5b':'#e5bf7c';ctx.beginPath();ctx.arc(x,y,1.2,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle='#56391f';ctx.font='900 17px Segoe UI Emoji,Segoe UI Symbol';ctx.textAlign='center';ctx.fillText('🐾',0,15);
+  if(p[0]){ctx.fillStyle='#55c7c2';ctx.font='900 12px Segoe UI Emoji';ctx.fillText(p[0]>=5?'🌈':'🛡️',-size+4,-21);}
+  if(p[1]){ctx.strokeStyle='#7de2d3';ctx.lineWidth=2;ctx.globalAlpha=.55+.25*Math.sin(now*4);for(const rr of[7,12]){ctx.beginPath();ctx.arc(size-3,-18,rr,-.7,.7);ctx.stroke();}ctx.globalAlpha=1;}
+  if(p[2]){ctx.fillStyle='#ffcf73';ctx.font='900 13px Segoe UI Emoji';ctx.fillText(p[2]>=5?'🐟':'🪙',0,-27);}
+  if(tier>=4){ctx.strokeStyle=accent;ctx.lineWidth=1.8;ctx.globalAlpha=.55+.3*Math.sin(now*3);ctx.beginPath();ctx.arc(0,2,size+10,now,now+Math.PI*1.5);ctx.stroke();ctx.globalAlpha=1;}
+  ctx.fillStyle='#fff8df';ctx.strokeStyle='#56391f';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(-14,20,28,12,5);ctx.fill();ctx.stroke();ctx.fillStyle='#56391f';ctx.font='900 8px Segoe UI,Arial';ctx.fillText(`SUP T${tier}`,0,29);
+  ctx.restore();
+}
+
 function drawTower(t){
-    const st=towerStats(t),dartTier=t.type==='dart'?Math.max(0,...dartPaths(t)):null,sniperTier=t.type==='sniper'?Math.max(0,...sniperPaths(t)):null,frostTier=t.type==='frost'?Math.max(0,...frostPaths(t)):null,vineTier=t.type==='vine'?Math.max(0,...vinePaths(t)):null,burstTier=t.type==='burst'?Math.max(0,...burstPaths(t)):null,ninjaTier=t.type==='ninja'?Math.max(0,...ninjaPaths(t)):null,laserTier=t.type==='laser'?Math.max(0,...laserPaths(t)):null,wizardTier=t.type==='wizard'?Math.max(0,...wizardPaths(t)):null,electricTier=t.type==='electric'?Math.max(0,...electricPaths(t)):null,celestialTier=t.type==='celestial'?Math.max(0,...celestialPaths(t)):null,pathTier=t.type==='dart'?dartTier:t.type==='sniper'?sniperTier:t.type==='frost'?frostTier:t.type==='vine'?vineTier:t.type==='burst'?burstTier:t.type==='ninja'?ninjaTier:t.type==='laser'?laserTier:t.type==='wizard'?wizardTier:t.type==='electric'?electricTier:t.type==='celestial'?celestialTier:null,lv=pathTier!==null?Math.max(1,pathTier):t.level||1,selected=t.id===state.selectedTower;
+    const st=towerStats(t),dartTier=t.type==='dart'?Math.max(0,...dartPaths(t)):null,sniperTier=t.type==='sniper'?Math.max(0,...sniperPaths(t)):null,frostTier=t.type==='frost'?Math.max(0,...frostPaths(t)):null,vineTier=t.type==='vine'?Math.max(0,...vinePaths(t)):null,burstTier=t.type==='burst'?Math.max(0,...burstPaths(t)):null,ninjaTier=t.type==='ninja'?Math.max(0,...ninjaPaths(t)):null,laserTier=t.type==='laser'?Math.max(0,...laserPaths(t)):null,wizardTier=t.type==='wizard'?Math.max(0,...wizardPaths(t)):null,electricTier=t.type==='electric'?Math.max(0,...electricPaths(t)):null,celestialTier=t.type==='celestial'?Math.max(0,...celestialPaths(t)):null,litterTier=t.type==='litter'?Math.max(0,...litterPaths(t)):null,pathTier=t.type==='dart'?dartTier:t.type==='sniper'?sniperTier:t.type==='frost'?frostTier:t.type==='vine'?vineTier:t.type==='burst'?burstTier:t.type==='ninja'?ninjaTier:t.type==='laser'?laserTier:t.type==='wizard'?wizardTier:t.type==='electric'?electricTier:t.type==='celestial'?celestialTier:t.type==='litter'?litterTier:null,lv=pathTier!==null?Math.max(1,pathTier):t.level||1,selected=t.id===state.selectedTower;
+    if(t.type==='litter'){drawLitterBoxTower(t,st,selected,Math.max(1,litterTier||0));return;}
     const mastered=masteryState(t.type).level>=50;
     const elvenWizardSkin=t.type==='wizard'&&profile.equippedSkins?.wizard==='elvenMage';
     const r=17+Math.max(0,lv-1)*1.8,fur=elvenWizardSkin?'#f5f1e8':(st.fur||'#d8a56f'),accent=elvenWizardSkin?'#65e1dc':(mastered?'#f4d36b':(st.accent||st.color));
@@ -6948,7 +7331,14 @@ function drawMap(){
   const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,map.sky[0]);sky.addColorStop(1,map.sky[1]);ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
 
   // Luz principal / céu
-  if(state.map==='grove'){
+  if(isBossEvent()){
+    ctx.fillStyle=map.ground;ctx.fillRect(0,H*.38,W,H*.62);
+    const moon=ctx.createRadialGradient(850,72,4,850,72,105);moon.addColorStop(0,'#a8fff4aa');moon.addColorStop(.25,'#55c7c244');moon.addColorStop(1,'#55c7c200');ctx.fillStyle=moon;ctx.fillRect(730,-35,245,230);
+    ctx.fillStyle='#c9fff0';ctx.beginPath();ctx.arc(850,72,23,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#55c7c233';ctx.lineWidth=2;for(let y=250;y<H;y+=44){ctx.beginPath();for(let x=-30;x<W+40;x+=55){ctx.quadraticCurveTo(x+14,y-8,x+28,y);ctx.quadraticCurveTo(x+42,y+8,x+56,y);}ctx.stroke();}
+    ctx.fillStyle='#12303a';for(let i=0;i<8;i++){const x=i*160-40,h=38+(i%3)*22;ctx.beginPath();ctx.moveTo(x,240);ctx.lineTo(x+70,240-h);ctx.lineTo(x+145,240);ctx.closePath();ctx.fill();}
+    ctx.fillStyle='#87f4ea55';ctx.font='900 54px Segoe UI Emoji';ctx.textAlign='center';ctx.fillText('⚓',W/2,565);
+  }else if(state.map==='grove'){
     const moon=ctx.createRadialGradient(760,82,4,760,82,95);moon.addColorStop(0,'#fff1bddd');moon.addColorStop(.23,'#f3d98766');moon.addColorStop(1,'#f3d98700');ctx.fillStyle=moon;ctx.fillRect(650,-20,220,220);
     ctx.fillStyle='#e9e2ba';ctx.beginPath();ctx.arc(760,82,24,0,Math.PI*2);ctx.fill();
     ctx.fillStyle=map.ground;ctx.fillRect(0,H*.46,W,H*.54);
@@ -7101,7 +7491,7 @@ function drawEnemy(e){
     const p=pointAt(e.d,e.path),isBoss=e.kind==='boss';
     const baseR=14+Math.min(8,Math.log2(Math.max(2,e.maxHp+1))*1.7)+(e.elite?2:0);
     let r=baseR;
-    if(isBoss)r=e.miniBoss?27:32;
+    if(isBoss)r=e.eventBoss?40:e.miniBoss?27:32;
     else if(e.kind==='camoArmored')r=baseR+4;
     else if(e.kind==='heavyArmored')r=baseR+5;
     else if(e.armored)r=baseR+3;
@@ -7111,11 +7501,12 @@ function drawEnemy(e){
       // Boss visual: um dirigível/carrinho voador, bem maior e imediatamente reconhecível.
       const bob=Math.sin(t*3+e.id)*2.2;
       ctx.translate(0,bob);
-      const bossGlow=e.miniBoss?'#f29b5455':'#ffcf6b55',bossGlowEnd=e.miniBoss?'#f29b5400':'#ffcf6b00';const glow=ctx.createRadialGradient(0,0,10,0,0,72);glow.addColorStop(0,bossGlow);glow.addColorStop(1,bossGlowEnd);ctx.fillStyle=glow;ctx.fillRect(-78,-58,156,116);
+      const raidColor=e.raidBoss==='spine'?'#55c7c2':e.raidBoss==='eclipse'?'#8d5cff':null;
+      const bossGlow=raidColor?`${raidColor}77`:e.miniBoss?'#f29b5455':'#ffcf6b55',bossGlowEnd=raidColor?`${raidColor}00`:e.miniBoss?'#f29b5400':'#ffcf6b00';const glow=ctx.createRadialGradient(0,0,10,0,0,72);glow.addColorStop(0,bossGlow);glow.addColorStop(1,bossGlowEnd);ctx.fillStyle=glow;ctx.fillRect(-78,-58,156,116);
       // envelope do dirigível
-      const body=ctx.createLinearGradient(0,-28,0,25);body.addColorStop(0,e.miniBoss?'#ef9f58':'#d95b68');body.addColorStop(.55,e.miniBoss?'#ba5b35':'#9f3447');body.addColorStop(1,e.miniBoss?'#713823':'#6e2535');
-      ctx.fillStyle=body;ctx.strokeStyle='#ffd36b';ctx.lineWidth=3.5;ctx.beginPath();ctx.ellipse(0,-8,54,25,0,0,Math.PI*2);ctx.fill();ctx.stroke();
-      ctx.strokeStyle='#ffd36b88';ctx.lineWidth=1.3;for(const off of [-26,0,26]){ctx.beginPath();ctx.ellipse(off*.25,-8,Math.max(12,54-Math.abs(off)),23,0,0,Math.PI*2);ctx.stroke();}
+      const body=ctx.createLinearGradient(0,-28,0,25);body.addColorStop(0,e.raidBoss==='spine'?'#83f1e5':e.raidBoss==='eclipse'?'#b88cff':e.miniBoss?'#ef9f58':'#d95b68');body.addColorStop(.55,e.raidBoss==='spine'?'#278e91':e.raidBoss==='eclipse'?'#5c2a91':e.miniBoss?'#ba5b35':'#9f3447');body.addColorStop(1,e.raidBoss==='spine'?'#123f52':e.raidBoss==='eclipse'?'#25153f':e.miniBoss?'#713823':'#6e2535');
+      ctx.fillStyle=body;ctx.strokeStyle=raidColor||'#ffd36b';ctx.lineWidth=3.5;ctx.beginPath();ctx.ellipse(0,-8,54,25,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.strokeStyle=raidColor?`${raidColor}aa`:'#ffd36b88';ctx.lineWidth=1.3;for(const off of [-26,0,26]){ctx.beginPath();ctx.ellipse(off*.25,-8,Math.max(12,54-Math.abs(off)),23,0,0,Math.PI*2);ctx.stroke();}
       // cauda e estabilizadores
       ctx.fillStyle='#7d2b3a';ctx.beginPath();ctx.moveTo(-49,-8);ctx.lineTo(-70,-24);ctx.lineTo(-62,-5);ctx.lineTo(-72,9);ctx.closePath();ctx.fill();ctx.strokeStyle='#ffd36b';ctx.stroke();
       // cabine/carrinho voador pendurado
@@ -7124,8 +7515,17 @@ function drawEnemy(e){
       ctx.strokeStyle='#7b8790';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-17,15);ctx.lineTo(-11,5);ctx.moveTo(17,15);ctx.lineTo(11,5);ctx.stroke();
       // hélices
       for(const x of [-30,30]){ctx.save();ctx.translate(x,34);ctx.rotate(t*8+(x<0?0:1));ctx.strokeStyle='#d7dde2';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-11,0);ctx.lineTo(11,0);ctx.moveTo(0,-11);ctx.lineTo(0,11);ctx.stroke();ctx.restore();ctx.fillStyle='#555f68';ctx.beginPath();ctx.arc(x,34,3,0,Math.PI*2);ctx.fill();}
-      ctx.font='900 15px Segoe UI Emoji,Segoe UI Symbol';ctx.textAlign='center';ctx.fillText(e.miniBoss?'👹':'👑',0,-37);
-      ctx.fillStyle='#fff';ctx.font='900 8px Segoe UI,Arial';ctx.fillText(e.miniBoss?'MINI BOSS':'BOSS',0,31);
+      ctx.font='900 15px Segoe UI Emoji,Segoe UI Symbol';ctx.textAlign='center';ctx.fillText(e.raidBoss==='spine'?'🦈':e.raidBoss==='eclipse'?'🌑':e.miniBoss?'👹':'👑',0,-37);
+      ctx.fillStyle='#fff';ctx.font='900 8px Segoe UI,Arial';ctx.fillText(e.raidBoss?'RAID BOSS':e.miniBoss?'MINI BOSS':'BOSS',0,31);
+      if(e.eventBoss){
+        const requirement=bossShieldRequirement(e.bossPhase||1),active=(e.bossShieldHp||0)>0;
+        for(let i=0;i<4;i++){ctx.fillStyle=i<(e.bossPhase||1)?'#173b43':'#57d8ca';ctx.strokeStyle='#9cfff3aa';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(-38+i*20,38,16,5,2);ctx.fill();ctx.stroke();}
+        if(active){
+          const pulse=3+Math.sin(t*5)*2;ctx.strokeStyle='#8ffff0';ctx.lineWidth=3;ctx.shadowColor='#55e6d5';ctx.shadowBlur=14;
+          ctx.globalAlpha=.78;ctx.beginPath();ctx.ellipse(0,-1,65+pulse,49+pulse,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.10;ctx.fillStyle='#55c7c2';ctx.fill();ctx.globalAlpha=1;ctx.shadowBlur=0;
+          ctx.fillStyle='#eafffb';ctx.font='900 13px Segoe UI Emoji,Segoe UI Symbol';ctx.fillText(requirement.icon,50,-34);
+        }
+      }
     }else if(e.kind==='healer'){
       const tc=tierOf(e.hp);ctx.fillStyle=tc.color;ctx.strokeStyle=e.elite?'#ffd36b':'#8dffad';ctx.lineWidth=e.elite?3:2.5;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();ctx.stroke();
       ctx.fillStyle='#fff';ctx.font='900 13px Segoe UI Emoji,Segoe UI Symbol';ctx.textAlign='center';ctx.fillText('❤️',0,5);ctx.strokeStyle='#62d88788';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+5+Math.sin(t*4)*2,0,Math.PI*2);ctx.stroke();
@@ -7182,7 +7582,7 @@ function drawEnemy(e){
       ctx.fillStyle='#7fd88b';for(const a of [.4,1.8,3.4,5.2]){ctx.beginPath();ctx.ellipse(Math.cos(a)*(r+5),4+Math.sin(a)*(r+5),4,2,a,0,Math.PI*2);ctx.fill();}
     }
     ctx.restore();
-    if(isBoss){ctx.fillStyle='#ffd36b';ctx.font='900 10px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText(e.name,p.x,p.y-52);}
+    if(isBoss){ctx.fillStyle=e.raidBoss==='spine'?'#87f4ea':e.raidBoss==='eclipse'?'#d6a5ff':'#ffd36b';ctx.font='900 10px Segoe UI,Arial';ctx.textAlign='center';ctx.fillText(e.name,p.x,p.y-52);}
     const hpHalf=isBoss?52:r;const hpY=isBoss?p.y-43:p.y-r-9;ctx.fillStyle='#0009';ctx.fillRect(p.x-hpHalf,hpY,hpHalf*2,5);ctx.fillStyle=e.hp/e.maxHp>.35?'#4bd6a0':'#ff7180';ctx.fillRect(p.x-hpHalf,hpY,Math.max(0,hpHalf*2*(e.hp/e.maxHp)),5);
   }
 
@@ -7302,7 +7702,9 @@ function loop(ts){
   if(!state.last)state.last=ts;
   const realDt=Math.min(.05,(ts-state.last)/1000);state.last=ts;
   const simDt=realDt*state.gameSpeed;
-  update(simDt,ts);draw();renderPlaytestDebug(ts);requestAnimationFrame(loop);
+  if(!lanGuest())update(simDt,ts);
+  if(lanHost())broadcastLanSnapshot();
+  draw();renderPlaytestDebug(ts);requestAnimationFrame(loop);
 }
 
 canvas.addEventListener('click',e=>{
@@ -7310,12 +7712,14 @@ canvas.addEventListener('click',e=>{
   if(state.repositionTower){moveRepositionedTower(x,y);return;}
   const hitHero=heroAt(x,y);
   if(hitHero){
+    if(lan?.connected&&hitHero.owner&&hitHero.owner!==localWalletId()){cancelPlacement(true);state.selectedTower=null;state.selectedHero=false;setMsg($t('🦸 Este herói pertence a outro jogador.'));return;}
     cancelPlacement(true);state.selectedTower=null;state.selectedHero=true;updateUpgradePanel();const hs=heroStats(hitHero),def=HEROES[hitHero.type];
     setMsg($T`🦸 ${def.name} • Nv.${hitHero.level}/10 • ${def.role}${def.farm?$T` • +🐟 ${hs.farmIncome}/rodada`:$T` • Dano ${hs.damage} • Range ${hs.range}`} • eliminações ${hitHero.pops||0}. XP e habilidades ficam no painel HERÓI à direita.`);
     renderHeroHud();return;
   }
   const hit=towerAt(x,y);
   if(hit){
+    if(lan?.connected&&hit.owner&&hit.owner!==localWalletId()){cancelPlacement(true);state.selectedTower=null;state.selectedHero=false;setMsg($t('🐾 Este gatinho pertence a outro jogador. Você pode colocar e melhorar os seus próprios gatinhos.'));return;}
     cancelPlacement(true);state.selectedTower=hit.id;state.selectedHero=false;notifyMatchTutorialAction('towerInspected');renderHeroHud();const st=towerStats(hit);
     const cadence=st.farm?$T`+🐟 ${st.farmIncome} por rodada`:st.rootHold?$T`recarga ${st.rate.toFixed(1)}s`:$T`${(1/st.rate).toFixed(1)} ataques/s`;
     setMsg(hit.type==='dart'
@@ -7402,6 +7806,7 @@ if($('#td-mastery-ability'))$('#td-mastery-ability').onclick=e=>{e.stopPropagati
 if($('#td-upgrade-close'))$('#td-upgrade-close').onclick=e=>{e.stopPropagation();closeUpgradePanel(false);};
 if($('#td-priority'))$('#td-priority').onchange=e=>{
   const t=selectedTower();if(!t)return;
+  if(requestLanAction('priority',{towerId:t.id,priority:e.target.value}))return;
   t.priority=TARGET_PRIORITIES.includes(e.target.value)?e.target.value:'first';
 };
 
@@ -7412,7 +7817,9 @@ document.addEventListener('click',e=>{
 });
 
 $$('[data-speed]').forEach(btn=>btn.onclick=()=>{
-  state.gameSpeed=Math.max(1,Math.min(3,Number(btn.dataset.speed)||1));
+  const speed=Math.max(1,Math.min(3,Number(btn.dataset.speed)||1));
+  if(requestLanAction('speed',{speed})){setMsg($t('🐾 Mudança de velocidade solicitada ao anfitrião.'));return;}
+  state.gameSpeed=speed;
   updateSpeedButtons();setMsg($T`Velocidade alterada para ${state.gameSpeed}×.`);
 });
 
@@ -7429,7 +7836,7 @@ $$('.td-tower-picker [data-td-tower]').forEach(btn=>btn.onclick=()=>{
   const id=btn.dataset.tdTower,t=types[id];
   if(state.repositionTower)cancelReposition(true);
   if(!isTowerUnlocked(id)){setMsg($T`${t.name} libera no nível ${t.unlockLevel}.`);return;}
-  const limit=t.limit||TOWER_LIMIT_PER_TYPE;if(towerCount(id)>=limit){setMsg($T`🐾 ${t.name}: limite de ${limit} unidade${limit===1?'':'s'} atingido.`);return;}
+  const limit=t.limit||TOWER_LIMIT_PER_TYPE,placed=id==='litter'?state.towers.filter(tower=>tower.type==='litter').length:towerCount(id);if(placed>=limit){setMsg($T`🐾 ${t.name}: limite de ${limit} unidade${limit===1?'':'s'} atingido.`);return;}
   if(state.selected===id){cancelPlacement();return;}
   armPlacement(id);notifyMatchTutorialAction('towerSelected');
   let warning='';
@@ -7449,6 +7856,7 @@ if($('#play-enter'))$('#play-enter').onclick=()=>{
   runMapLoading(mapId,diffId,()=>{
     loadSelection(mapId,diffId,modeId);
     setScreen('game');
+    if(lanHost()){lan.send('start',{map:mapId,difficulty:diffId,mode:modeId});broadcastLanSnapshot(true);}
     const area=$('#game-area');
     if(area)area.scrollTop=0;
     const gameScreen=$('#screen-game');
@@ -7459,7 +7867,13 @@ if($('#play-enter'))$('#play-enter').onclick=()=>{
   },modeId);
 };
 
-personalTd={reset,startWave,upgradeTower,upgradeDartPath,upgradeSniperPath,renderHotbar,loadSelection,towerCount,placementType:()=>state.selected,mapId:()=>state.map,towerPrice:(id)=>towerPrice(id,state.map)};
+function startEvent(){
+  if(!lan?.connected||!lan.isHost){renderEventLobby();return;}
+  const mapId='grove',diffId='normal',modeId='boss-event';
+  runMapLoading(mapId,diffId,()=>{loadSelection(mapId,diffId,modeId);setScreen('game');lan.send('start',{map:mapId,difficulty:diffId,mode:modeId});broadcastLanSnapshot(true);},modeId);
+}
+
+personalTd={reset,startWave,startEvent,upgradeTower,upgradeDartPath,upgradeSniperPath,renderHotbar,loadSelection,towerCount:(id)=>state.towers.filter(t=>t.type===id).length,placementType:()=>state.selected,mapId:()=>state.map,towerPrice:(id)=>towerPrice(id,state.map),eventBossState:()=>{const e=[...state.enemies,...state.spawn].find(enemy=>enemy.eventBoss&&!enemy.dead);return e?{name:e.name,round:e.round,encounter:e.encounter,phase:e.bossPhase,hp:e.hp,maxHp:e.maxHp,shieldHp:e.bossShieldHp,shieldMax:e.bossShieldMax,requirement:bossShieldRequirement(e.bossPhase||1).label}:null;}};
 
 configurePath();reset();requestAnimationFrame(loop);
 }
@@ -7468,9 +7882,11 @@ initNavigation();
 initResetSave();
 initMatchTutorial();
 initSettingsExtras();
+initLanLobby();
+initEventLobby();
 renderProfileUi();
 initPersonalTd();
 renderProfileUi();
 setInterval(updateCelestialWheelClock,1000);
 const initialScreen=(location.hash||'#hub').slice(1);
-setScreen(['hub','play','cats','heroes','powers','tutorial'].includes(initialScreen)?initialScreen:'hub',false);
+setScreen(['hub','play','event','cats','heroes','powers','tutorial'].includes(initialScreen)?initialScreen:'hub',false);
