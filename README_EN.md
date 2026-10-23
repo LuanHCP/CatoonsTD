@@ -28,7 +28,7 @@ Catoons TD is a personal software engineering project focused on **progression, 
 
 - 14 maps across 4 progression tiers, including the cross-shaped two-route **Church Festival** Impossible map with elevated bench positions;
 - 3 difficulty levels per map;
-- 16 cat units, including hidden unlocks, the **Demon King Cat**, the exclusive drone-based **Celestial Cat** and the (deliberately) useless **Mister Kitten**;
+- 17 cat units, including hidden unlocks, the **Demon King Cat**, the exclusive drone-based **Celestial Cat**, the support **Litter Box** and the (deliberately) useless **Mister Kitten**;
 - Celestial Wheel with one free spin every 24 hours, coin/XP rewards and a guaranteed Celestial Cat by the 50th unsuccessful spin;
 - multi-path upgrade systems and limited crosspathing;
 - Mastery progression up to level 50 with permanent bonuses, a golden skin and a unique active ability;
@@ -36,9 +36,15 @@ Catoons TD is a personal software engineering project focused on **progression, 
 - 8 behavioral synergies between specific compositions;
 - 5 special enemies with non-trivial mechanics;
 - Campaign and Infinite modes;
+- experimental LAN/VPN co-op for 2–4 players, eight-digit room IDs, individual salmon wallets and twice as many balloons;
+- a separate 60-wave boss event, playable offline solo or with a team, with invasions on waves 20/40/60 and specialized shields;
+- an Insane boss variant with exactly 5× health/shield and 3× salmon-can rewards; pre-boss defense warnings and boss immunity to Vine Cat roots, including mastery;
+- local customizable profiles, permanent achievement medals and a cosmetic banner/avatar store using salmon cans rather than gameplay currency;
+- temporary disconnect recovery for up to 60 seconds, pausing the team while retaining wallets and placed units (no host migration);
+- original illustrated general-lobby background, separate from the gameplay maps and event arena;
 - persistent local progression, save export/import and backward save migration;
 - optional creator support through Pix, with no gameplay rewards;
-- full English and Portuguese localization with an in-game language switch;
+- English and Portuguese with an in-game language switch; the new profile/cosmetics and room-recovery additions currently use Portuguese;
 - guided tutorial, touch-friendly mobile HUD (landscape preferred) and a developer playtest panel (`F8`);
 - collection upgrade sheets with every path, tier, price and effect available before starting a match;
 - Go-based Windows launcher that opens the local web build in Edge/Chrome app mode.

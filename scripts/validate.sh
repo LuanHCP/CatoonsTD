@@ -6,6 +6,10 @@ cd "$ROOT"
 
 echo "[1/5] JavaScript syntax"
 node --check src/game.js
+node --check src/identity.js
+node --check src/multiplayer.js
+node tools/test-event-progression.mjs
+node tools/test-lan-recovery.mjs
 
 echo "[2/5] i18n wrappers glued to keywords (ex.: return\$t)"
 if grep -nE '[A-Za-z0-9_]\$[tT][(`]' src/game.js; then

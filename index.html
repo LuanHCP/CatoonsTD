@@ -16,9 +16,11 @@
         <p>Prepare sua equipe. Proteja o território.</p>
       </div>
       <div class="profile-cluster">
+        <button type="button" id="profile-open" class="profile-open" data-go-screen="profile" aria-label="Abrir meu perfil">Meu perfil</button>
         <div class="profile-wallet">
           <span>🎖️ Nível <b id="profile-level">1</b></span>
           <span>🪙 <b id="profile-coins">0</b></span>
+          <span title="Latas de salmão para cosméticos">🥫 <b id="profile-cans">0</b></span>
           <span>⭐ <b id="profile-stars">0</b>/<b id="profile-stars-total">9</b></span>
         </div>
         <div class="mini-xp">
@@ -32,6 +34,8 @@
       <button type="button" class="active" data-screen="hub">⌂ Central</button>
       <button type="button" data-screen="play">▷ Jogar</button>
       <button type="button" data-screen="event">👑 Evento</button>
+      <button type="button" data-screen="profile">◈ Perfil</button>
+      <button type="button" data-screen="cosmetics">🥫 Cosméticos</button>
       <button type="button" data-screen="cats">🐱 Gatinhos</button>
       <button type="button" data-screen="heroes">🦸 Heróis</button>
       <button type="button" data-screen="powers">⚡ Poderes</button>
@@ -154,8 +158,26 @@
 
     </section>
 
+    <section id="screen-profile" class="screen">
+      <section class="panel identity-panel">
+        <div class="panel-head"><div><span class="eyebrow">SUA HISTÓRIA NA DEFESA</span><h2>Meu perfil</h2><p>Seu nome, seu estilo e as conquistas que você carrega.</p></div><button type="button" data-go-screen="cosmetics" class="primary">Loja de cosméticos →</button></div>
+        <div id="profile-card"></div>
+        <div class="profile-customize"><label for="profile-name-input">Nome do jogador<input id="profile-name-input" maxlength="20" autocomplete="nickname" placeholder="Seu nome"></label><button type="button" id="profile-save-name">Salvar nome</button><button type="button" id="profile-default-banner" class="ghost">Banner padrão</button><button type="button" id="profile-default-avatar" class="ghost">Foto padrão</button></div>
+        <p id="profile-name-status" class="identity-status" role="status"></p>
+        <div class="panel-head"><div><span class="eyebrow">BROCHES DE CONQUISTA</span><h2>Sua coleção de honras</h2><p>Broches são permanentes: representam suas vitórias e não são gastos.</p></div></div>
+        <p id="profile-stats" class="identity-status"></p><div id="profile-medals" class="honor-grid"></div>
+      </section>
+    </section>
+    <section id="screen-cosmetics" class="screen">
+      <section class="panel identity-panel">
+        <div class="panel-head"><div><span class="eyebrow">ESTILO CONQUISTADO EM COMBATE</span><h2>Loja de cosméticos</h2><p>Derrote bosses para ganhar latas. Suas conquistas liberam novos banners e fotos para comprar.</p></div><div class="cosmetic-wallet">🥫 <b id="cosmetic-cans">0</b><small>latas de salmão</small></div></div>
+        <div class="cosmetic-info"><span>◈ Conquiste o broche</span><span>→</span><span>🥫 Compre com latas</span><span>→</span><span>✓ Equipe no perfil</span></div>
+        <p id="cosmetic-status" class="identity-status" role="status">Cosméticos não alteram o poder dos gatinhos.</p><div id="cosmetic-store" class="cosmetic-grid"></div>
+      </section>
+    </section>
     <section id="screen-event" class="screen">
       <section class="panel event-lobby-panel">
+        <div class="event-section-heading"><span class="eyebrow">CENTRAL DE EVENTOS</span><h2>Um desafio. Sua próxima conquista.</h2><p>Escolha a intensidade, prepare sua defesa e conquiste latas, banners e broches.</p></div>
         <div class="event-hero">
           <div class="event-boss-art" aria-hidden="true">
             <div class="event-boss-glow"></div><div class="event-boss-fin fin-left"></div><div class="event-boss-fin fin-right"></div>
@@ -170,6 +192,8 @@
               <span>1️⃣ 💥 Antiblindagem</span><span>2️⃣ 👁️ Detecta Camo</span><span>3️⃣ 🔥 Fogo/Laser</span><span>4️⃣ 🐾 Todos</span>
             </div>
             <p id="event-team-scale" class="event-team-scale">🐾 Solo • vida ×0,66 • 🐟 650 iniciais</p>
+            <div class="event-variant-picker" aria-label="Dificuldade do evento"><button type="button" data-event-variant="normal" class="selected"><b>Normal</b><small>Domine as quatro etapas</small></button><button type="button" data-event-variant="insane"><b>☠ Insano</b><small>5× vida e escudos · 3× latas</small></button></div>
+            <p id="event-prize-preview" class="event-prize-preview"></p>
           </div>
         </div>
         <div class="event-team-layout">
@@ -233,6 +257,8 @@
 
             <div class="canvas-wrap">
               <canvas id="personal-td-canvas" width="1100" height="620" aria-label="Catoons TD"></canvas>
+              <div id="boss-preparation" class="boss-preparation" hidden role="status"></div>
+              <div id="connection-recovery" class="connection-recovery" hidden role="alert"><div><span class="eyebrow">RECUPERANDO EQUIPE</span><h3>Partida pausada</h3><p id="connection-recovery-text"></p><button type="button" id="connection-abandon" class="ghost">Sair da partida</button></div></div>
               <div id="event-boss-hud" class="event-boss-hud" hidden>
                 <div class="event-boss-hud-title"><span id="event-boss-icon">🦈</span><div><small id="event-boss-encounter">CHEFE DIÁRIO</small><b id="event-boss-title">Almirante Espinha</b></div><strong id="event-boss-phase">ETAPA 1/4</strong></div>
                 <div class="event-boss-health"><i id="event-boss-health-fill"></i><span id="event-boss-health-text">0 / 0 HP</span><em></em><em></em><em></em></div>
@@ -599,6 +625,7 @@
     </div>
   </div>
 
+  <script src="src/identity.js"></script>
   <script src="src/vendor/peerjs.min.js"></script>
   <script src="src/multiplayer.js"></script>
   <script src="src/game.js"></script>

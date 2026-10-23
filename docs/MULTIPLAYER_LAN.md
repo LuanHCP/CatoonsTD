@@ -23,6 +23,10 @@ Criar e encontrar salas exige internet, pois o serviço público PeerServer do P
   3. escudo térmico — só recebe dano de fogo ou laser;
   4. escudo final — todos podem causar dano.
 - Barra de boss própria, com vida segmentada, escudo, etapa e requisito de dano visíveis durante a invasão.
+- O anfitrião escolhe **Normal** ou **Insano** antes de iniciar. O Insano multiplica vida e escudos por cinco, além da escala de equipe. Nas rodadas 18/19, 38/39 e 58/59, um aviso mostra a cobertura antiblindagem, camuflada e térmica da defesa.
+- O Gato Cipó não prende bosses ou mini-bosses de nenhum modo, nem com sua habilidade de maestria. Veneno não conta como fogo no escudo térmico.
+- Cada invasão derrotada concede a todos os participantes 🥫 3/5/8 latas no Normal ou 🥫 9/15/24 no Insano. O boss final da campanha concede uma lata; mini-bosses não concedem latas. Os recibos da partida impedem duplicação ao reenviar snapshots ou reconectar.
+- Derrotar uma invasão libera o broche **Caçador de Almirantes** e a compra do banner **Maré Conquistada**. Concluir as três invasões libera o broche da variante; o Insano também libera cosméticos exclusivos para compra.
 - Nova unidade de suporte **Caixinha de Areia**, com limite global de uma por equipe e três caminhos: ataques universais, velocidade/alcance ou mais salmões por estouros e fazendas.
 - O segundo boss aparece no lobby como **Em breve** e ainda não participa da rotação.
 
@@ -38,12 +42,14 @@ Criar e encontrar salas exige internet, pois o serviço público PeerServer do P
 8. Para sair, um convidado usa **Sair da sala**. O anfitrião usa **Fechar sala** para encerrar a sala inteira. As vagas liberadas podem ser preenchidas com o mesmo ID enquanto estiverem no lobby.
 9. Ao voltar da partida pelo menu, o anfitrião traz todos de volta ao lobby e mantém a sala aberta. Entradas durante uma partida em andamento são bloqueadas.
 
-## Observações desta primeira versão
+## Quedas temporárias e limites
 
 - Os dois computadores precisam estar na mesma rede ou conectados por uma VPN que permita comunicação direta entre os participantes.
 - Os dois devem usar exatamente o mesmo pacote do jogo.
-- Se a conexão cair, volte ao lobby e crie uma sala novamente; a reconexão automática ainda não foi adicionada.
-- Nesta primeira versão, a recompensa/progressão permanente da vitória é registrada apenas no computador anfitrião.
+- Se um convidado perder temporariamente o canal, a equipe pausa por até **60 segundos**. Ele tenta reconectar automaticamente à mesma vaga, mantendo salmões, gatinhos e recompensas. Ao voltar, recebe o estado atual e a equipe continua.
+- Sair ou fechar a sala é uma ação explícita e não inicia recuperação. Encerrado o prazo, o anfitrião libera a vaga; não há migração de anfitrião nem recuperação após fechar/recarregar sua página.
+- Latas, broches e conclusões de mapas são registrados no save de cada participante conectado. As moedas e o XP regulares da tela de vitória continuam sendo registrados apenas no anfitrião nesta versão.
+- A quantidade inicial de participantes é mantida para a escala do boss e das ondas durante a partida, mesmo se alguém sair.
 - Compartilhe o ID apenas com quem você quer convidar. Ele dá acesso à sala enquanto ela estiver aberta.
 - Se o serviço público de salas estiver indisponível, o jogo informa o erro; o modo solo continua disponível.
 

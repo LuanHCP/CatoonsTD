@@ -130,6 +130,18 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 
 ## Modelo para reportar bug
 
+### Atualização: lobby, perfil e Insano
+
+Validações automatizadas executadas em 23/10/2026:
+
+- Regras: migração do save, compras, equipamento persistente, recibos únicos, conquistas por dificuldade, quatro escudos e 5× exato de vida/escudo para 1–4 participantes.
+- Interface no Edge: cinco telas em 1366×768, 844×390 e 390×844, sem corte horizontal; criação/fechamento de sala, solo offline e compra/salvamento de cosméticos.
+- Sala com quatro instâncias locais: rejeição do quinto, carteiras individuais, colocação de gatinhos, balões dobrados, queda/reconexão preservando a vaga e retorno ao lobby.
+- Integração com duas instâncias: invasões 20/40/60 eliminadas por ações de teste, 48 latas do Insano recebidas em ambos os saves, broche final, compra e reenvio sem duplicação.
+- Relógio simulado: expiração de vaga após tentativa de reconexão falha, limite de 60 segundos e fechamento explícito.
+
+Ainda exige playtest humano: balanceamento de uma partida completa sem atalhos de teste, desempenho em celulares físicos e reconexão entre computadores distintos por LAN/VPN. A integração automatizada não demonstra que uma composição real vence o Insano.
+
 ```text
 Versão: v0.29.3
 Idioma:

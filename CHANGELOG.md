@@ -1,5 +1,16 @@
 # Changelog
 
+## Atualização do beta — lobby, conquistas e Insano
+
+- Arte original no lobby geral, mantendo a arena do evento separada e sem alterar mapas.
+- Perfil com nome, nível, banner, foto felina e seis broches permanentes; loja de cosméticos com carteira própria de latas.
+- Recompensas de latas por invasão e por boss final da campanha, compartilhadas com os convidados e deduplicadas ao reconectar.
+- Banners por conclusão de todos os mapas em cada dificuldade, pela primeira invasão vencida e pela vitória no Insano.
+- Evento Insano com exatamente 5× de vida/escudo e 3× de latas; avisos de preparação duas rodadas antes das invasões.
+- Cipó e sua maestria não imobilizam nenhum boss ou mini-boss. Escudo térmico exige fogo/laser, não veneno.
+- Recuperação automática de convidados por até 60 segundos, pausa da equipe e restauração da mesma vaga/carteira.
+- Testes automatizados de regras, save, compras, layout, salas, reconexão e entrega de recompensas.
+
 ## v0.29.3 — fichas de upgrades na coleção
 
 - Clicar ou usar Enter/Espaço em um gatinho da coleção agora abre uma sobreposição com a ficha completa da unidade.

@@ -15,6 +15,7 @@ for(let i=0;i<testPlayers;i++)targets.push(await (await fetch(`${endpoint}/json/
 const peers=targets.map(target=>new CdpClient(target.webSocketDebuggerUrl));
 await Promise.all(peers.map(peer=>peer.open()));await Promise.all(peers.map(peer=>peer.call('Runtime.enable')));await delay(700);
 const [host,...guests]=peers;
+for(const guest of guests)await guest.evaluate(`(()=>{const original=Peer.prototype.connect;Peer.prototype.connect=function(...args){const conn=original.apply(this,args);window.__roomTestConnection=conn;return conn;};return true;})()`);
 const roomId=await host.evaluate('CatoonsLan.createRoom()');
 if(!/^\d{8}$/.test(roomId))throw new Error('ID numérico inválido: '+roomId);
 for(let index=0;index<guests.length;index++){
@@ -58,12 +59,18 @@ if(wallets[0]!==expectedStartMoney||wallets.slice(1).some(value=>value!==expecte
 const waveTargets=await host.evaluate(`personalTd.startWave();Number(document.querySelector('#td-count').textContent)`);
 const expectedTargets=testMode==='boss-event'?27:30;
 if(waveTargets!==expectedTargets)throw new Error(`A primeira onda cooperativa deveria ter ${expectedTargets} balões, mas teve ${waveTargets}.`);
+const oldPlayerId=await guests[0].evaluate('CatoonsLan.localPlayerId');
+await guests[0].evaluate('window.__roomTestConnection.close();true');await delay(150);
+if(!await host.evaluate(`CatoonsLan.recovering&&!document.querySelector('#connection-recovery').hidden`))throw new Error('O anfitrião não pausou para recuperar a equipe.');
+for(let attempt=0;attempt<80;attempt++){if(await guests[0].evaluate('CatoonsLan.connected&&!CatoonsLan.recovering')&&await host.evaluate('!CatoonsLan.recovering'))break;await delay(150);}
+const recovery=await guests[0].evaluate(`({id:CatoonsLan.localPlayerId,connected:CatoonsLan.connected,money:Number(document.querySelector('#td-money').textContent),wave:Number(document.querySelector('#td-wave').textContent),towers:personalTd.towerCount('dart'),recovering:CatoonsLan.recovering})`);
+if(recovery.id!==oldPlayerId||!recovery.connected||recovery.recovering||recovery.wave!==1||recovery.money!==wallets[1]||recovery.towers!==testPlayers-1)throw new Error('Reconexão perdeu progresso: '+JSON.stringify(recovery));
 let bossAnnouncement='',bossState=null;
 if(testMode==='boss-event')bossAnnouncement=await host.evaluate(`(()=>{for(let i=1;i<20;i++)personalTd.startWave();return document.querySelector('#td-message').textContent;})()`);
 if(testMode==='boss-event'&&!bossAnnouncement.includes('Almirante Espinha'))throw new Error(`O boss da rodada 20 não apareceu: ${bossAnnouncement}`);
 if(testMode==='boss-event')bossState=await host.evaluate(`personalTd.eventBossState()`);
 if(testMode==='boss-event'&&(!bossState||bossState.round!==20||bossState.phase!==1||!bossState.shieldHp||!String(bossState.requirement).includes('Antiblindagem')))throw new Error(`Estado inicial do boss inválido: ${JSON.stringify(bossState)}`);
-const result={room,roomId,mode:testMode,teamScaleText,matchStarted:true,totalPlaced:await host.evaluate(`personalTd.towerCount('dart')`),wallets,waveTargets,bossAnnouncement,bossState};
+const result={room,roomId,mode:testMode,teamScaleText,matchStarted:true,totalPlaced:await host.evaluate(`personalTd.towerCount('dart')`),wallets,waveTargets,recovery,bossAnnouncement,bossState};
 await host.evaluate(`document.querySelector('#menu-lobby').click();true`);
 await delay(500);
 const returned=await Promise.all(peers.map(peer=>peer.evaluate(`document.body.dataset.screen`)));

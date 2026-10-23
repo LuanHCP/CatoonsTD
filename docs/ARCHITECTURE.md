@@ -41,6 +41,7 @@ Catoons TD é uma aplicação de jogo **client-side**. A build web não exige se
    - herói selecionado;
    - desbloqueios secretos;
    - configurações e estado do tutorial.
+   - identidade local, cosméticos, latas, broches e recibos de recompensa, normalizados em `src/identity.js`.
 
 5. **Desktop (`desktop/launcher.go`)**
    - localiza `index.html` no pacote local;
@@ -76,6 +77,12 @@ sequenceDiagram
 ### Solo offline e salas cooperativas por ID
 
 O modo solo e o save funcionam localmente. A build continua hospedável no GitHub Pages. Para o cooperativo, `src/multiplayer.js` usa PeerJS 1.5.5 com o PeerServer público para sinalização: o anfitrião registra um ID aleatório de oito dígitos e os convidados se conectam pelo mesmo ID. O anfitrião aceita até três convidados, mantém a simulação e distribui snapshots via WebRTC. Não há TURN configurado; os participantes precisam de comunicação direta por LAN/VPN. O save fica associado ao navegador/perfil local, com exportação/importação manual.
+
+O protocolo v4 reserva a vaga de um convidado desconectado por até 60 segundos e verifica um token efêmero para retomar a mesma carteira. A equipe pausa enquanto há vagas em recuperação. Snapshots carregam um ID de partida e recibos de recompensa deduplicados nos saves individuais. O tamanho inicial da equipe permanece fixo para a escala de ondas e boss. Não há migração de anfitrião, persistência de partidas em servidor ou proteção anticheat contra alterações no save local.
+
+O canal usa serialização binária com fracionamento nativo do PeerJS, evitando ultrapassar o limite de mensagens WebRTC em ondas grandes. Quadros periódicos antigos são descartados se o buffer estiver acumulado; mensagens de controle continuam confiáveis.
+
+`src/identity.js` separa o catálogo de cosméticos e broches da simulação. O fundo ilustrado `assets/lobby-general.jpg` é usado no lobby geral, sem substituir os mapas Canvas. Os testes de integração recebem hooks somente pelo servidor loopback de `tools/local-test-server.mjs`; a build distribuída não expõe esses hooks.
 
 ### Estado centralizado da partida
 

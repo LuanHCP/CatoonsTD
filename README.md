@@ -46,6 +46,11 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 - **Campanha, modo Infinito e cooperativo experimental para 2–4 jogadores por LAN/VPN**, com carteiras individuais e o dobro de inimigos.
 - **Salas por ID numérico**, entrada automática e quatro vagas visíveis, em um lobby com seleção clara de modos. [Como conectar](docs/MULTIPLAYER_LAN.md).
 - **Evento diário Maré Blindada**, solo ou com até 4 jogadores, separado da campanha. O Almirante Espinha aparece nas rodadas 20, 40 e 60, com vida e economia ajustadas à equipe, quatro escudos especializados e barra de boss própria. Solo funciona offline.
+- **Boss Insano** com 5× de vida e escudo, além de 3× mais latas. Avisos nas duas rodadas anteriores mostram quais requisitos de dano faltam na defesa. Bosses e mini-bosses são imunes às raízes do Gato Cipó, inclusive à maestria.
+- **Perfil personalizável** com nome, nível, banner, foto e broches permanentes por vitórias no evento e por concluir todos os mapas em cada dificuldade.
+- **Loja de cosméticos**: derrote bosses para ganhar latas de salmão, desbloqueie itens por conquistas e compre/equipe banners e fotos sem vantagens de combate. Moedas, salmões de partida e latas têm carteiras separadas.
+- **Reconexão cooperativa experimental**: quedas temporárias pausam a equipe por até 60 segundos, preservando o jogador, a carteira e o campo. Não há migração de anfitrião.
+- **Lobby geral ilustrado** com arte original otimizada para navegador; os mapas e a arena de eventos mantêm suas próprias artes. [Arte e prompt](docs/LOBBY_ART.md).
 - **Venda por 50% do investimento**, reposicionamento e estatísticas por torre.
 - **Português e inglês**, com troca de idioma no lobby/Configurações.
 - **Interface responsiva para celular**, priorizando o modo deitado e mantendo suporte ao modo retrato.
@@ -108,6 +113,7 @@ CatoonsTD/
 ├─ index.html
 ├─ src/
 │  ├─ game.js
+│  ├─ identity.js
 │  ├─ multiplayer.js
 │  └─ style.css
 ├─ desktop/
