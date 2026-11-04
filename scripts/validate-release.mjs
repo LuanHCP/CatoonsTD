@@ -14,6 +14,7 @@ const expected = `v${version}`;
 const requiredFiles = [
   "index.html",
   "src/game.js",
+  "src/events.js",
   "src/identity.js",
   "src/multiplayer.js",
   "assets/lobby-general.jpg",
@@ -53,6 +54,9 @@ const requiredIds = [
   "screen-cosmetics",
   "boss-preparation",
   "connection-recovery",
+  "result-details",
+  "collection-class-filters",
+  "match-class-filters",
   "play-enter",
   "personal-td-canvas",
   "td-money",

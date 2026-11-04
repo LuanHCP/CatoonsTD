@@ -21,12 +21,12 @@ class Broker extends EventEmitter{
 const window={Peer:Broker,RTCPeerConnection:class{},addEventListener(){}};
 vm.runInNewContext(readFileSync(new URL('../src/multiplayer.js',import.meta.url),'utf8'),{window,crypto,Uint32Array,Date:{now:()=>now},setTimeout:later,clearTimeout:id=>timers.delete(id),console});
 const lan=window.CatoonsLan,creating=lan.createRoom();brokers[0].emit('open');await creating;
-const host=brokers[0],first=new Channel({protocol:4});host.emit('connection',first);first.ready();
+const host=brokers[0],first=new Channel({protocol:5});host.emit('connection',first);first.ready();
 assert.equal(lan.playerCount,2);const welcome=first.sent.find(m=>m.type==='welcome');
 first.bufferSize=3;assert.equal(lan.send('snapshot',{}),false);assert.equal(lan.send('resume',{}),true);first.bufferSize=0;
 lan.setAccepting(false);first.close();assert.equal(lan.recovering,true);assert.equal(lan.playerCount,2);
 advance(10000);
-const failedResume=new Channel({protocol:4,resumeToken:welcome.payload.resumeToken});host.emit('connection',failedResume);failedResume.close();
+const failedResume=new Channel({protocol:5,resumeToken:welcome.payload.resumeToken});host.emit('connection',failedResume);failedResume.close();
 assert.equal(lan.recovering,true);
 advance(49999);assert.equal(lan.playerCount,2);advance(1);assert.equal(lan.playerCount,1);assert.equal(lan.recovering,false);
 lan.disconnect();advance(200);

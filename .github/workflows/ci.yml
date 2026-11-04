@@ -21,6 +21,15 @@ jobs:
       - name: Check JavaScript syntax
         run: node --check src/game.js
 
+      - name: Check event, profile and recovery rules
+        run: |
+          node --check src/events.js
+          node --check src/identity.js
+          node --check src/multiplayer.js
+          node tools/test-eclipse.mjs
+          node tools/test-event-progression.mjs
+          node tools/test-lan-recovery.mjs
+
       - name: Validate release structure and HTML5 assets
         run: node scripts/validate-release.mjs
 

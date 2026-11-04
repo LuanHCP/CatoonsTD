@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import {readFileSync} from 'node:fs';
+const context={window:{}};for(const path of ['src/events.js','src/identity.js'])vm.runInNewContext(readFileSync(path,'utf8'),context);
+const rules=context.window.CatoonsEvents,identity=context.window.CatoonsIdentity;
+assert.equal(Object.keys(rules.mapping).length,17);assert.equal(Object.keys(rules.classes).length,4);
+for(const id of Object.values(rules.mapping))assert(rules.classes[id]);
+assert.equal(rules.categoryOf('frost'),'standard');assert.equal(rules.categoryOf('vine'),'magic');assert.equal(rules.categoryOf('laser'),'tech');assert.equal(rules.categoryOf('salmon'),'support');
+const before=rules.dailyBoss(new Date('2026-11-04T02:59:59Z')),after=rules.dailyBoss(new Date('2026-11-04T03:00:00Z'));
+assert.notEqual(before.id,after.id);assert.equal(after.dateKey,'2026-11-04');assert.equal(after.id,rules.dailyBoss(new Date('2026-11-05T02:59:59Z')).id);
+const point=()=>({x:100,y:100});
+for(let phase=1;phase<=4;phase++){
+  const type=['dart','vine','laser','salmon'][phase-1],boss={raidBoss:'eclipse',bossPhase:phase,maxHp:1000,hp:1000*(1-(phase-1)*.25)-20,d:0,auraRadius:150,auraWarning:3};
+  const units=[{type,x:100,y:100},{type,x:251,y:100},{type:phase===1?'vine':'dart',x:100,y:100}];
+  assert.equal(rules.aura(boss,units,2,point).targets.length,0);
+  assert.equal(rules.aura(boss,units,1,point).healed,0);
+  assert.equal(rules.aura(boss,units,1,point).targets.length,1);
+  assert.equal(units[0].bossHealingFed,2.5);assert.equal(units[1].bossHealingFed,undefined);
+  rules.aura(boss,units,100,point);assert.equal(boss.hp,1000*(1-(phase-1)*.25));assert.equal(boss.bossPhase,phase);
+  units[0].x=400;assert.equal(rules.aura(boss,units,1,point).targets.length,0);
+  boss.dead=true;assert.equal(rules.aura(boss,units,1,point).healed,0);
+}
+const capBoss={raidBoss:'eclipse',bossPhase:1,maxHp:1000,hp:500,auraWarning:0};
+const many=Array.from({length:10},()=>({type:'dart',x:100,y:100}));assert.equal(rules.aura(capBoss,many,1,point).healed,10);
+const report=rules.report([{id:1,type:'dart',owner:'p2',damageDealt:50,incomeGenerated:2,sold:true},{id:2,type:'salmon',owner:'p2',incomeGenerated:18,bossHealingFed:5}],{type:'king',owner:'host',damageDealt:30},5);
+assert.equal(report.players.find(p=>p.owner==='p2').damage,50);assert.equal(report.players.find(p=>p.owner==='p2').income,20);assert.equal(report.rows.find(r=>r.id===1).sold,true);assert.equal(report.bossHealing,5);
+const p={maps:{},coins:100};identity.normalize(p,{});
+identity.grant(p,{id:'e1',eclipseKill:true,cans:48});assert(p.honors.medals.includes('eclipseSlayer'));assert(!p.honors.medals.includes('bossSlayer'));
+identity.grant(p,{id:'e2',eclipseWin:true,eclipsePureWin:true,eclipseInsaneWin:true});
+for(const id of ['eclipseVictor','eclipsePure','eclipseInsane'])assert(p.honors.medals.includes(id));
+assert.equal(identity.grant(p,{id:'e2',eclipseWin:true}),false);assert.equal(p.honors.eclipseWins,1);
+assert.equal(identity.buy(p,'bannerEclipse').ok,true);assert.equal(identity.buy(p,'avatarEclipse').ok,true);assert.equal(p.salmonCans,13);
+const saved=JSON.parse(JSON.stringify(p));identity.normalize(p,saved);assert.equal(p.identity.banner,'bannerEclipse');assert.equal(p.honors.eclipsePureWins,1);
+console.log('OK: all categories, São Paulo daily boundary, four local auras, 3s warning, healing cap, stage ceiling, sold-unit report and distinct persistent Eclipse rewards.');

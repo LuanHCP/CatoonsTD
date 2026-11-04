@@ -8,6 +8,7 @@ const call=(method,params={})=>new Promise((resolve,reject)=>{const key=++id;pen
 const evaluate=async expression=>{const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw new Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 await call('Runtime.enable');await wait(600);
+await evaluate(`EventRules.dailyBoss=()=>({...EventRules.bosses.spine,dateKey:'2026-11-03'});true`);
 mkdirSync('release/preview',{recursive:true});
 const sizes=[[1366,768],[844,390],[390,844]];
 const result=[];

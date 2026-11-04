@@ -30,22 +30,47 @@ function extract(name){
 }
 const state={matchPlayers:1,eventVariant:'normal',towers:[],hero:null,enemies:[],pulses:[],masterySession:{}};
 const no=()=>{},rewards=[];
-const combat=vm.createContext({state,lan:{playerCount:1},types:{vine:{name:'Cipó'}},profile:{coins:0},$t:x=>x,$T:(strings,...values)=>strings.reduce((sum,s,i)=>sum+s+(values[i]??''),''),
+const combat=vm.createContext({state,lan:{playerCount:1},types:{vine:{name:'Cipó',rootDuration:2,rootCount:3,rate:6,bossSlowFactor:.65}},profile:{coins:0},$t:x=>x,$T:(strings,...values)=>strings.reduce((sum,s,i)=>sum+s+(values[i]??''),''),
   currentMap:()=>({speedMultiplier:.92,rewardMultiplier:1.08}),currentDifficulty:()=>({speed:1.12,waveReward:.86,coinMultiplier:1.35}),
   strongestRegularDurability:()=>11.123,isSpecialEnemy:()=>false,pointAt:()=>({x:0,y:0}),spawnDamageNumber:no,spawnImpactFx:no,spawnFloatText:no,recordMastery:no,synergyActive:()=>false,sfx:no,
   playMusicTheme:no,addWallet:no,saveProfile:no,setMsg:no,grantHeroXp:no,summonShadowBalloon:no,recordProgressReward:reward=>rewards.push(reward),
+  effectActive:()=>false,hasLineOfSight:()=>true,vinePaths:t=>t.paths,vinePrimaryPath:()=>0,
   masteryState:()=>({level:50}),selectedTower:()=>({type:'vine'}),towerStats:()=>({}),MASTERY_ABILITIES:{vine:{name:'Floresta Prisional',icon:'X',cooldown:70}},updateUpgradePanel:no,updateStats:no,W:1100,H:620});
-for(const name of ['isThermalSource','bossShieldRequirement','damageEnemy','makeDailyBoss','canControlTarget','activateMasteryAbility'])vm.runInContext(extract(name),combat);
+for(const name of ['isThermalSource','bossShieldRequirement','damageEnemy','makeDailyBoss','canControlTarget','controlTargets','applyVineControl','tickVineControl','enemyMovementFactor','vineBaseStats','activateMasteryAbility'])vm.runInContext(extract(name),combat);
 for(const players of [1,2,3,4]){
   state.matchPlayers=players;state.eventVariant='normal';
   combat.eventPlayerCount=n=>n;combat.eventTeamScale=n=>1+(n-2)*.34;
   const normal=combat.makeDailyBoss(20);state.eventVariant='insane';const insane=combat.makeDailyBoss(20);
   assert.equal(insane.maxHp,normal.maxHp*5);assert.equal(insane.bossShieldMax,normal.bossShieldMax*5);
 }
-assert.equal(combat.canControlTarget({type:'vine'},{kind:'boss',camo:false},{}),false);
+assert.equal(combat.canControlTarget({type:'vine'},{kind:'boss',camo:false},{}),true);
+assert.equal(combat.canControlTarget({type:'vine'},{kind:'boss',miniBoss:true,camo:false},{}),true);
+assert.equal(combat.canControlTarget({type:'vine'},{kind:'boss',camo:true},{}),false);
+assert.equal(combat.canControlTarget({type:'vine'},{kind:'boss',camo:true},{detectsCamo:true}),true);
 assert.equal(combat.canControlTarget({type:'vine'},{kind:'normal',camo:false},{}),true);
+for(let tier=0;tier<=5;tier++)assert.equal(combat.vineBaseStats({paths:[tier,0,0]}).bossSlowFactor,Number((.65-.05*tier).toFixed(2)));
+for(const kind of ['boss','normal']){
+  const target={kind,rootTimer:0};combat.applyVineControl(target,{rootDuration:2,bossSlowFactor:.65});
+  assert.equal(target.rootTimer,kind==='boss'?0:2);
+  if(kind==='boss'){
+    assert.equal(combat.enemyMovementFactor(target),.65);
+    target.slowTimer=2;target.slowFactor=.5;assert.equal(combat.enemyMovementFactor(target),.5);
+    target.slowFactor=.8;assert.equal(combat.enemyMovementFactor(target),.65);
+    target.slowTimer=0;target.eventBoss=true;target.bossShieldHp=10;assert.equal(combat.enemyMovementFactor(target),.16);
+    target.bossShieldHp=0;combat.effectActive=id=>id==='blizzard';assert.equal(combat.enemyMovementFactor(target),.35);combat.effectActive=()=>false;
+    for(let i=0;i<100;i++)combat.applyVineControl(target,{rootDuration:2,bossSlowFactor:.65});
+    assert.equal(target.vineSlows.length,1);assert.equal(combat.enemyMovementFactor(target),.65);
+    combat.tickVineControl(target,2);assert.equal(combat.enemyMovementFactor(target),1);
+  }
+}
+state.enemies=[{kind:'boss',d:4},{kind:'normal',d:2},{kind:'boss',d:9,dead:true},{kind:'boss',d:10,camo:true}];
+assert.deepEqual(Array.from(combat.controlTargets({type:'vine',x:0,y:0},{range:145,rootCount:3})).map(e=>e.d),[4,2]);
 state.enemies=[{kind:'boss',dead:false,rootTimer:0},{kind:'normal',dead:false,rootTimer:0}];
 combat.activateMasteryAbility();assert.equal(state.enemies[0].rootTimer,0);assert.equal(state.enemies[1].rootTimer,4);
+const boss=state.enemies[0];assert.equal(boss.vineSlowTimer,4);assert.equal(combat.enemyMovementFactor(boss),.35);
+combat.tickVineControl(boss,2);combat.applyVineControl(boss,{rootDuration:4,bossSlowFactor:.65});combat.tickVineControl(boss,2);
+assert.equal(combat.enemyMovementFactor(boss),.65,'Basic cast must not prolong mastery strength');
+combat.tickVineControl(boss,2);assert.equal(combat.enemyMovementFactor(boss),1);
 const enemy={id:1,kind:'boss',eventBoss:true,encounter:1,hp:100,maxHp:100,bossPhase:1,bossShieldHp:10,bossShieldMax:10,d:0,reward:100,name:'Almirante'};
 assert.equal(combat.damageEnemy(enemy,100,{}),false);assert.equal(enemy.hp,100);
 combat.damageEnemy(enemy,10,{breaksArmor:true});assert.equal(enemy.bossShieldHp,0);
@@ -55,4 +80,4 @@ combat.damageEnemy(enemy,999,{detectsCamo:true});combat.damageEnemy(enemy,999,{}
 assert.equal(combat.damageEnemy(enemy,999,{sourceType:'ninja',burn:{damage:2}}),false);
 combat.damageEnemy(enemy,999,{sourceType:'laser'});combat.damageEnemy(enemy,999,{});assert.equal(enemy.hp,25);assert.equal(enemy.bossPhase,4);
 combat.damageEnemy(enemy,999,{});combat.damageEnemy(enemy,999,{});assert.equal(enemy.dead,true);assert.equal(rewards.at(-1).cans,9);
-console.log('OK: migration, unique rewards, unlock/purchase/equip/persistence, four shield phases, fire vs poison, vine immunity and exact Insane 5x for 1–4 players.');
+console.log('OK: migration, unique rewards, cosmetics, four shields, fire vs poison, bounded Vine boss slow, independent expiry, no frost/shield stacking and exact Insane 5x for 1–4 players.');

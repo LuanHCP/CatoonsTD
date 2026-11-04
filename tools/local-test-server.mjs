@@ -9,11 +9,11 @@ http.createServer((request,response)=>{
     // Test-only hooks exist in this loopback server, never in the distributed game.
     if(requestUrl.pathname==='/__test/game.js'){
       response.writeHead(200,{'Content-Type':mime['.js'],'Cache-Control':'no-store'});
-      response.end(readFileSync(join(root,'src/game.js'),'utf8').replace('personalTd={reset,','window.__CatoonsTest={state,damageEnemy,makeDailyBoss,update,canControlTarget,lanSnapshot};\npersonalTd={reset,'));return;
+      response.end(readFileSync(join(root,'src/game.js'),'utf8').replace('personalTd={reset,','window.__CatoonsTest={state,damageEnemy,makeDailyBoss,update,canControlTarget,lanSnapshot,pointAt,activateMasteryAbility,applyEclipseAuras,sellSelectedTower,moveRepositionedTower,processFarmIncome,litterTeamBonuses,showResult,completeBossEvent};\npersonalTd={reset,'));return;
     }
     if(requestUrl.pathname==='/'&&requestUrl.searchParams.has('testHooks')){
       response.writeHead(200,{'Content-Type':mime['.html'],'Cache-Control':'no-store'});
-      response.end(readFileSync(join(root,'index.html'),'utf8').replace('src="src/game.js"','src="/__test/game.js"'));return;
+      response.end(readFileSync(join(root,'index.html'),'utf8').replace(/src="src\/game\.js(?:\?[^"]*)?"/,'src="/__test/game.js"'));return;
     }
     const relative=decodeURIComponent(new URL(request.url,'http://localhost').pathname).replace(/^\/+/, '')||'index.html';
     const file=normalize(join(root,relative));if(!file.startsWith(root))throw new Error('invalid path');

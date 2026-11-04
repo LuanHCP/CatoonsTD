@@ -1,6 +1,6 @@
 # Checklist de Beta / Playtest
 
-## Objetivo — v0.29.3
+## Objetivo — v0.30.0
 
 Validar se os sistemas atuais funcionam juntos antes de adicionar novas mecânicas grandes.
 
@@ -130,7 +130,19 @@ Teste recomendado: modo Infinito em 3× com muitas torres e inimigos.
 
 ## Modelo para reportar bug
 
+### v0.30.0 — verificação em 04/11/2026
+
+- Regras puras: os 17 gatinhos têm categoria, a rotação troca na meia-noite de Brasília e as quatro auras respeitam categoria, alcance de 150, aviso de 3s, teto de quatro contribuintes e limite de cura da etapa.
+- Edge isolado: filtro da coleção, atordoamento local, troca de categoria, cura, interrupção de suporte/fazenda, reposicionamento, histórico de vendidos, eventos Normal/Insano, medalhas e compras exclusivas. Nove layouts adicionais (Evento, Gatinhos, Cosméticos em 1366×768, 844×390 e 390×844), sem corte horizontal.
+- Quatro instâncias locais: entrada do Eclipse sincronizada, rejeição do quinto, carteiras separadas, colocação de gatos, ondas dobradas e reconexão preservando vaga/carteira/campo.
+- Duas instâncias: três invasões do Eclipse Insano eliminadas por ações de teste, 48 latas e conquistas nos dois saves, reconexão sem duplicação e compra dos cosméticos. A simulação acelerada não comprova balanceamento de uma partida humana completa.
+- Regressões de regras do Almirante, perfis antigos, Cipó/Gelo e recuperação de 60 segundos mantidas. As missões diárias não fazem parte desta versão.
+
+Ainda é necessário playtest de balanceamento sem atalhos e teste entre computadores/celulares físicos diferentes. As instâncias cooperativas automatizadas rodam no mesmo computador.
+
 ### Atualização: lobby, perfil e Insano
+
+Verificação adicional em 27/10/2026: o Cipó agora desacelera bosses em vez de ser completamente ignorado. Testes de regras cobrem os seis tiers de lentidão, seleção de bosses/mini-bosses e camuflados, não-acúmulo com Gelo/escudo e expiração independente da maestria. No Edge, o ataque real moveu um boss de velocidade 100 por 32,5 unidades em 0,5s (Cipó 35%); com Gelo 50%, moveu 12,5 unidades em 0,25s, sem multiplicar as reduções. Maestria manteve o boss móvel, com lentidão de 65% por 4s e efeito incluído no snapshot.
 
 Validações automatizadas executadas em 23/10/2026:
 
@@ -143,7 +155,7 @@ Validações automatizadas executadas em 23/10/2026:
 Ainda exige playtest humano: balanceamento de uma partida completa sem atalhos de teste, desempenho em celulares físicos e reconexão entre computadores distintos por LAN/VPN. A integração automatizada não demonstra que uma composição real vence o Insano.
 
 ```text
-Versão: v0.29.3
+Versão: v0.30.0
 Idioma:
 Mapa:
 Tier:

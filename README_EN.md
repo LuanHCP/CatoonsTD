@@ -8,7 +8,7 @@
 
 > **Web/desktop Tower Defense built with HTML, CSS and JavaScript, using AI as an engineering copilot.**
 
-**Status:** Public Beta · **Build:** v0.29.3
+**Status:** Public Beta · **Build:** v0.30.0
 **Platforms:** Modern desktop and mobile browsers · Windows x64 through a lightweight Go launcher
 **Languages:** English and Brazilian Portuguese (auto-detected, switchable in-game)
 
@@ -26,6 +26,11 @@ Catoons TD is a personal software engineering project focused on **progression, 
 
 ## Highlights
 
+- four kitten categories with collection and in-match filters; secret/exclusive unlock status is independent of category;
+- two bosses alternating daily at midnight in São Paulo: Armored Tide and the new **Devouring Eclipse**, whose four local auras stun a marked category and heal within the current health segment, with a 3s warning;
+- distinct Eclipse medals, banners/avatar and a complete-event no-healing achievement;
+- team and per-unit damage/production reports on victory and defeat, including sold units and boss healing, synchronized to guests;
+
 - 14 maps across 4 progression tiers, including the cross-shaped two-route **Church Festival** Impossible map with elevated bench positions;
 - 3 difficulty levels per map;
 - 17 cat units, including hidden unlocks, the **Demon King Cat**, the exclusive drone-based **Celestial Cat**, the support **Litter Box** and the (deliberately) useless **Mister Kitten**;
@@ -38,7 +43,7 @@ Catoons TD is a personal software engineering project focused on **progression, 
 - Campaign and Infinite modes;
 - experimental LAN/VPN co-op for 2–4 players, eight-digit room IDs, individual salmon wallets and twice as many balloons;
 - a separate 60-wave boss event, playable offline solo or with a team, with invasions on waves 20/40/60 and specialized shields;
-- an Insane boss variant with exactly 5× health/shield and 3× salmon-can rewards; pre-boss defense warnings and boss immunity to Vine Cat roots, including mastery;
+- an Insane boss variant with exactly 5× health/shield and 3× salmon-can rewards; pre-boss defense warnings and Vine Cat boss slows (35% base, up to 60% with Deep Roots, 65% for 4s through mastery), never a full root; Vine and Frost slows do not multiply, with the strongest active effect winning;
 - local customizable profiles, permanent achievement medals and a cosmetic banner/avatar store using salmon cans rather than gameplay currency;
 - temporary disconnect recovery for up to 60 seconds, pausing the team while retaining wallets and placed units (no host migration);
 - original illustrated general-lobby background, separate from the gameplay maps and event arena;

@@ -6,7 +6,7 @@
 
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-**Status:** Beta público · **Build:** v0.29.3
+**Status:** Beta público · **Build:** v0.30.0
 **Plataformas:** Navegador moderno em computador e celular · Windows x64 via launcher local
 **Idiomas:** Português (Brasil) e English — detectado pelo navegador, com troca manual no jogo
 
@@ -32,6 +32,11 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 
 ## ✨ Destaques do projeto
 
+- **Categorias dos 17 gatinhos**: Padrão, Mágico, Tecnológico e Suporte, com símbolos, cores e filtros na coleção e na partida. Segredo/exclusividade continuam sendo condições de desbloqueio.
+- **Dois bosses em rotação diária**, alternados à meia-noite de Brasília. O **Eclipse Devorador** atordoa a categoria marcada somente dentro de sua aura e se cura com esses gatos. Cada etapa avisa por 3s; reposicionar/vender interrompe o efeito, e a cura não restaura etapas vencidas. Heróis não entram nas categorias.
+- **Conquistas e cosméticos do Eclipse**: broches, banners e foto lunar, incluindo **Banquete Negado** por vencer sem nenhuma cura nas três invasões.
+- **Resumo de vitória/derrota** com dano e produção por jogador/gatinho, vida recuperada pelo boss e histórico dos gatos vendidos. Disponível também aos convidados.
+
 - **14 mapas** organizados em 4 tiers: 6 Iniciantes, 4 Médios, 2 Difíceis e 2 Impossíveis. Em **Festa na Igreja**, duas rotas formam uma cruz e os bancos funcionam como posições elevadas.
 - **3 dificuldades por mapa**: Fácil, Normal e Difícil.
 - **17 gatinhos**, incluindo personagens secretos, o **Gatinho Rei Demônio**, o exclusivo **Gato Celestial**, a unidade de suporte **Caixinha de Areia** e o inútil (de propósito) **Gatinho Mister**.
@@ -46,7 +51,7 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 - **Campanha, modo Infinito e cooperativo experimental para 2–4 jogadores por LAN/VPN**, com carteiras individuais e o dobro de inimigos.
 - **Salas por ID numérico**, entrada automática e quatro vagas visíveis, em um lobby com seleção clara de modos. [Como conectar](docs/MULTIPLAYER_LAN.md).
 - **Evento diário Maré Blindada**, solo ou com até 4 jogadores, separado da campanha. O Almirante Espinha aparece nas rodadas 20, 40 e 60, com vida e economia ajustadas à equipe, quatro escudos especializados e barra de boss própria. Solo funciona offline.
-- **Boss Insano** com 5× de vida e escudo, além de 3× mais latas. Avisos nas duas rodadas anteriores mostram quais requisitos de dano faltam na defesa. Bosses e mini-bosses são imunes às raízes do Gato Cipó, inclusive à maestria.
+- **Boss Insano** com 5× de vida e escudo, além de 3× mais latas. Avisos nas duas rodadas anteriores mostram quais requisitos de dano faltam na defesa. O Cipó desacelera bosses e mini-bosses sem imobilizá-los: 35% na base, até 60% em Raízes Profundas e 65% por 4s com maestria. Não multiplica sua lentidão com a do Gelo: vale o efeito mais forte.
 - **Perfil personalizável** com nome, nível, banner, foto e broches permanentes por vitórias no evento e por concluir todos os mapas em cada dificuldade.
 - **Loja de cosméticos**: derrote bosses para ganhar latas de salmão, desbloqueie itens por conquistas e compre/equipe banners e fotos sem vantagens de combate. Moedas, salmões de partida e latas têm carteiras separadas.
 - **Reconexão cooperativa experimental**: quedas temporárias pausam a equipe por até 60 segundos, preservando o jogador, a carteira e o campo. Não há migração de anfitrião.
@@ -113,6 +118,7 @@ CatoonsTD/
 ├─ index.html
 ├─ src/
 │  ├─ game.js
+│  ├─ events.js
 │  ├─ identity.js
 │  ├─ multiplayer.js
 │  └─ style.css

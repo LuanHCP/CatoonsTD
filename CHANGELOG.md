@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.30.0 — categorias, Eclipse Devorador e relatórios
+
+- Publicado o ajuste do Cipó: desacelera bosses sem prendê-los e não multiplica seu efeito com Gelo.
+- 17 gatinhos distribuídos em Padrão, Mágico, Tecnológico e Suporte, com badges e filtros na coleção e na partida.
+- Eclipse Devorador em rotação diária com Almirante Espinha, com invasões 20/40/60 e variantes Normal/Insano. Novos visuais Canvas/CSS, aura de alcance visível e aviso de 3s por categoria.
+- Atordoamento e cura só para a categoria dentro da aura; cura limitada à etapa atual, sem restaurar segmentos vencidos. Suportes e fazendas afetados interrompem seus efeitos; reposicionamento e venda continuam disponíveis.
+- Quatro broches e quatro cosméticos exclusivos do Eclipse, incluindo vitória completa sem cura. Recompensas sincronizadas e deduplicadas para convidados.
+- Relatório de vitória/derrota por jogador e unidade, preservando gatos vendidos, produção e cura do boss.
+- Protocolo cooperativo v5, cache de scripts versionado e testes de regras/integração/layout. Missões diárias ficam para uma atualização futura.
+
+## 27/10/2026 — Cipó contra bosses
+
+- O Cipó volta a selecionar bosses e mini-bosses, respeitando alcance, linha de visão e detecção de camuflados.
+- Em vez de prisão, aplica lentidão de 35% na base, até 60% pelo caminho Raízes Profundas. A maestria aplica 65% por 4 segundos; inimigos comuns continuam presos normalmente.
+- Lentidão de Cipós não se multiplica entre unidades nem com Gelo, poderes ou o escudo lento do Almirante: vale a redução mais forte. Efeitos fortes expiram independentemente, sem serem prolongados por ataques mais fracos.
+- Descrição, ficha da coleção, preview de upgrades, painel em partida e efeito visual verde atualizados.
+
 ## Atualização do beta — lobby, conquistas e Insano
 
 - Arte original no lobby geral, mantendo a arena do evento separada e sem alterar mapas.

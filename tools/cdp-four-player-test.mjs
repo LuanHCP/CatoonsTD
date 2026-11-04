@@ -2,6 +2,7 @@ const endpoint=process.argv[2]||'http://127.0.0.1:9223';
 const gameUrl=process.argv[3]||'file:///C:/Users/67-103761/Downloads/Catoons/CatoonsTD-git/index.html';
 const testMode=process.argv[4]||'campaign';
 const testPlayers=Math.max(2,Math.min(4,Number(process.argv[5])||4));
+const testBoss=process.argv[6]==='eclipse'?'eclipse':'spine';
 class CdpClient{
   constructor(url){this.socket=new WebSocket(url);this.id=0;this.pending=new Map();this.socket.addEventListener('message',event=>{const message=JSON.parse(event.data),callback=this.pending.get(message.id);if(!callback)return;this.pending.delete(message.id);message.error?callback.reject(new Error(message.error.message)):callback.resolve(message.result);});}
   async open(){if(this.socket.readyState!==WebSocket.OPEN)await new Promise((resolve,reject)=>{this.socket.addEventListener('open',resolve,{once:true});this.socket.addEventListener('error',reject,{once:true});});}
@@ -15,6 +16,7 @@ for(let i=0;i<testPlayers;i++)targets.push(await (await fetch(`${endpoint}/json/
 const peers=targets.map(target=>new CdpClient(target.webSocketDebuggerUrl));
 await Promise.all(peers.map(peer=>peer.open()));await Promise.all(peers.map(peer=>peer.call('Runtime.enable')));await delay(700);
 const [host,...guests]=peers;
+for(const peer of peers)await peer.evaluate(`EventRules.dailyBoss=()=>({...EventRules.bosses.${testBoss},dateKey:'2026-11-04'});true`);
 for(const guest of guests)await guest.evaluate(`(()=>{const original=Peer.prototype.connect;Peer.prototype.connect=function(...args){const conn=original.apply(this,args);window.__roomTestConnection=conn;return conn;};return true;})()`);
 const roomId=await host.evaluate('CatoonsLan.createRoom()');
 if(!/^\d{8}$/.test(roomId))throw new Error('ID numérico inválido: '+roomId);
@@ -67,9 +69,9 @@ const recovery=await guests[0].evaluate(`({id:CatoonsLan.localPlayerId,connected
 if(recovery.id!==oldPlayerId||!recovery.connected||recovery.recovering||recovery.wave!==1||recovery.money!==wallets[1]||recovery.towers!==testPlayers-1)throw new Error('Reconexão perdeu progresso: '+JSON.stringify(recovery));
 let bossAnnouncement='',bossState=null;
 if(testMode==='boss-event')bossAnnouncement=await host.evaluate(`(()=>{for(let i=1;i<20;i++)personalTd.startWave();return document.querySelector('#td-message').textContent;})()`);
-if(testMode==='boss-event'&&!bossAnnouncement.includes('Almirante Espinha'))throw new Error(`O boss da rodada 20 não apareceu: ${bossAnnouncement}`);
+if(testMode==='boss-event'&&!bossAnnouncement.includes(testBoss==='eclipse'?'Eclipse Devorador':'Almirante Espinha'))throw new Error(`O boss da rodada 20 não apareceu: ${bossAnnouncement}`);
 if(testMode==='boss-event')bossState=await host.evaluate(`personalTd.eventBossState()`);
-if(testMode==='boss-event'&&(!bossState||bossState.round!==20||bossState.phase!==1||!bossState.shieldHp||!String(bossState.requirement).includes('Antiblindagem')))throw new Error(`Estado inicial do boss inválido: ${JSON.stringify(bossState)}`);
+if(testMode==='boss-event'&&(!bossState||bossState.round!==20||bossState.phase!==1||(testBoss==='spine'&&(!bossState.shieldHp||!String(bossState.requirement).includes('Antiblindagem')))||(testBoss==='eclipse'&&bossState.shieldHp!==0)))throw new Error(`Estado inicial do boss inválido: ${JSON.stringify(bossState)}`);
 const result={room,roomId,mode:testMode,teamScaleText,matchStarted:true,totalPlaced:await host.evaluate(`personalTd.towerCount('dart')`),wallets,waveTargets,recovery,bossAnnouncement,bossState};
 await host.evaluate(`document.querySelector('#menu-lobby').click();true`);
 await delay(500);

@@ -1,7 +1,7 @@
 'use strict';
 // PeerServer presents peers. WebRTC carries the match; resume tokens reserve a slot for 60s.
 (() => {
-  const MAX_PLAYERS=4,PROTOCOL=4,PREFIX='catoons-v4-',TIMEOUT=22000,GRACE=60000;
+  const MAX_PLAYERS=4,PROTOCOL=5,PREFIX='catoons-v5-',TIMEOUT=22000,GRACE=60000;
   const listeners={message:new Set(),status:new Set()},peers=new Map();
   let broker=null,guest=null,role='solo',status='offline',detail='',roomId='',localPlayerId='solo',roster=['host'],accepting=true,generation=0,cancelPending=null;
   let resumeToken='',retryTimer=null,retryDeadline=0,brokerRetry=null,remoteAway=[],roomInMatch=false;

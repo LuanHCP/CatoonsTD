@@ -2,6 +2,10 @@
 // Profile cosmetics and achievement rewards are independent of match simulation.
 (() => {
   const medals=[
+    {id:'eclipseSlayer',name:'Caçador do Eclipse',icon:'moon',description:'Derrote uma invasão do Eclipse Devorador.'},
+    {id:'eclipseVictor',name:'Fim do Banquete',icon:'moon',description:'Conclua as três invasões do Eclipse Devorador.'},
+    {id:'eclipseInsane',name:'Luz Impossível',icon:'crown',description:'Conclua o Eclipse Devorador no Insano.'},
+    {id:'eclipsePure',name:'Banquete Negado',icon:'star',description:'Vença as três invasões do Eclipse sem ele recuperar vida em nenhuma delas.'},
     {id:'bossSlayer',name:'Caçador de Almirantes',icon:'anchor',description:'Derrote uma invasão do Almirante Espinha.'},
     {id:'eventVictor',name:'Guardião da Maré',icon:'shield',description:'Vença as três invasões do evento Normal.'},
     {id:'insaneVictor',name:'Lenda Abissal',icon:'crown',description:'Conclua o evento Insano até a rodada 60.'},
@@ -10,6 +14,10 @@
     {id:'campaignHard',name:'Mestre da Defesa',icon:'crown',description:'Conclua todos os mapas na dificuldade Difícil.'}
   ];
   const items=[
+    {id:'bannerEclipse',kind:'banner',name:'Noite Conquistada',theme:'eclipse',price:20,requires:'eclipseSlayer'},
+    {id:'avatarEclipse',kind:'avatar',name:'Guardião Lunar',theme:'eclipse',price:15,requires:'eclipseVictor'},
+    {id:'bannerPure',kind:'banner',name:'Banquete Negado',theme:'pure',price:35,requires:'eclipsePure'},
+    {id:'bannerEclipseInsane',kind:'banner',name:'Eclipse Soberano',theme:'eclipseRoyal',price:60,requires:'eclipseInsane'},
     {id:'bannerStarter',kind:'banner',name:'Primeira Missão',theme:'starter',price:0},
     {id:'bannerTide',kind:'banner',name:'Maré Conquistada',theme:'tide',price:20,requires:'bossSlayer'},
     {id:'bannerEasy',kind:'banner',name:'Bosque Dourado',theme:'dawn',price:18,requires:'campaignEasy'},
@@ -30,6 +38,7 @@
     for(const id of Array.isArray(src.owned)?src.owned:[])if(byId(id)&&!p.identity.owned.includes(id))p.identity.owned.push(id);
     for(const kind of ['banner','avatar'])if(byId(src[kind])?.kind===kind&&p.identity.owned.includes(src[kind]))p.identity[kind]=src[kind];
     p.honors={bossKills:finite(progress.bossKills),eventWins:finite(progress.eventWins),insaneWins:finite(progress.insaneWins),medals:medals.filter(m=>Array.isArray(progress.medals)&&progress.medals.includes(m.id)).map(m=>m.id),seenRewards:(Array.isArray(progress.seenRewards)?progress.seenRewards:[]).filter(id=>typeof id==='string').slice(-240)};
+    for(const key of ['eclipseKills','eclipseWins','eclipseInsaneWins','eclipsePureWins'])p.honors[key]=finite(progress[key]);
     sync(p);
   }
   function sync(p){
@@ -38,6 +47,7 @@
     if(p.honors.bossKills)award('bossSlayer');
     if(p.honors.eventWins)award('eventVictor');
     if(p.honors.insaneWins)award('insaneVictor');
+    for(const [key,id] of [['eclipseKills','eclipseSlayer'],['eclipseWins','eclipseVictor'],['eclipseInsaneWins','eclipseInsane'],['eclipsePureWins','eclipsePure']])if(p.honors[key])award(id);
     for(const [difficulty,id] of [['easy','campaignEasy'],['normal','campaignNormal'],['hard','campaignHard']]){
       const maps=Object.values(p.maps||{});if(maps.length&&maps.every(map=>map.cleared?.[difficulty]))award(id);
     }
@@ -49,6 +59,7 @@
     if(reward.bossKill)p.honors.bossKills++;
     if(reward.eventWin)p.honors.eventWins++;
     if(reward.insaneWin)p.honors.insaneWins++;
+    for(const [flag,key] of [['eclipseKill','eclipseKills'],['eclipseWin','eclipseWins'],['eclipseInsaneWin','eclipseInsaneWins'],['eclipsePureWin','eclipsePureWins']])if(reward[flag])p.honors[key]++;
     if(reward.mapClear&&p.maps[reward.mapClear]&&['easy','normal','hard'].includes(reward.difficulty))p.maps[reward.mapClear].cleared[reward.difficulty]=true;
     sync(p);return true;
   }
@@ -60,9 +71,11 @@
   }
   function mark(icon){
     const paths={anchor:'M32 9v41M23 17h18M12 34c0 23 40 23 40 0M7 38l5-6 5 6M47 38l5-6 5 6',shield:'M32 8 51 16v15c0 12-10 20-19 25-9-5-19-13-19-25V16Z',crown:'M11 43 8 19l14 12 10-20 10 20 14-12-3 24ZM12 51h40',star:'m32 8 7 16 18 2-14 12 4 18-15-9-15 9 4-18L7 26l18-2Z'};
+    paths.moon='M42 9A24 24 0 1 0 55 42 22 22 0 0 1 42 9ZM48 15v10m-5-5h10';
     return '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="'+paths[icon]+'" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   }
   function avatar(theme='recruit'){
+    if(theme==='eclipse')return '<svg data-eclipse="true" viewBox="0 0 96 96" role="img" aria-label="Guardião Lunar"><path d="M18 48 18 15l26 19h10l24-19v34" fill="#695087" stroke="#e6c9ff" stroke-width="3"/><ellipse cx="48" cy="58" rx="33" ry="30" fill="#9981bc"/><path d="M30 54h7m22 0h7" stroke="#fff0b1" stroke-width="6" stroke-linecap="round"/><path d="m43 66 5 5 5-5" fill="#ead7ee"/><path d="M54 14a12 12 0 1 0 8 19 11 11 0 0 1-8-19" fill="#fff0b1"/></svg>';
     const color={recruit:'#efbb78',pilot:'#c5def5',admiral:'#a9e8df',royal:'#ccadf7'}[theme]||'#efbb78';
     const extra=theme==='pilot'?'<path d="M18 41h60v13H18Z" fill="#1a4b69"/><path d="M26 44h18v7H26m26-7h18v7H52" stroke="#7af6ee" stroke-width="5"/>':theme==='admiral'?'<path d="M17 32 24 18h48l7 14Z" fill="#163749" stroke="#f7d086" stroke-width="3"/><path d="M28 30h40" stroke="#f7d086" stroke-width="4"/>':theme==='royal'?'<path d="m23 29-4-18 17 11L48 7l12 15 17-11-4 18Z" fill="#f1c96c" stroke="#8757c5" stroke-width="3"/>':'';
     return '<svg viewBox="0 0 96 96" role="img" aria-label="Foto de perfil felina"><path d="M20 42 19 16l24 15m10 0 24-15-1 26" fill="'+color+'" stroke="#173040" stroke-width="4"/><path d="M16 53C16 15 80 15 80 53v8c0 34-64 34-64 0Z" fill="'+color+'" stroke="#173040" stroke-width="4"/><ellipse cx="48" cy="69" rx="20" ry="14" fill="#fff5db"/><path d="m42 63 6 6 6-6" fill="#c9617c"/><path d="M32 52v4m32-4v4" stroke="#183044" stroke-width="7" stroke-linecap="round"/><path d="M48 69v6m0-2-7 4m7-4 7 4" stroke="#183044" stroke-width="2" fill="none"/>'+extra+'</svg>';
@@ -79,7 +92,7 @@
     for(const id of ['profile-cans','cosmetic-cans'])if(q(id))q(id).textContent=p.salmonCans;
     const input=q('profile-name-input');if(input&&document.activeElement!==input)input.value=p.identity.name;
     if(q('profile-medals'))q('profile-medals').innerHTML=medals.map(m=>{const earned=p.honors.medals.includes(m.id),difficulty={campaignEasy:'easy',campaignNormal:'normal',campaignHard:'hard'}[m.id],progress=difficulty?Object.values(p.maps).filter(map=>map.cleared[difficulty]).length+'/'+Object.keys(p.maps).length+' mapas':earned?'Conquistado':'Ainda não conquistado';return '<article class="honor-medal '+(earned?'earned':'locked')+'"><span>'+mark(m.icon)+'</span><div><b>'+m.name+'</b><p>'+m.description+'</p><small>'+progress+'</small></div></article>';}).join('');
-    if(q('profile-stats'))q('profile-stats').textContent=p.honors.bossKills+' invasões derrotadas · '+p.honors.eventWins+' eventos Normal vencidos · '+p.honors.insaneWins+' eventos Insano vencidos';
+    if(q('profile-stats'))q('profile-stats').textContent=(p.honors.bossKills+p.honors.eclipseKills)+' invasões derrotadas · '+p.honors.eclipseWins+' Eclipses vencidos · '+p.honors.eclipsePureWins+' sem cura · '+p.honors.insaneWins+' Almirantes Insano vencidos';
     if(q('cosmetic-store'))q('cosmetic-store').innerHTML=items.filter(item=>item.price>0).map(item=>{
       const owned=p.identity.owned.includes(item.id),equipped=p.identity[item.kind]===item.id,unlocked=!item.requires||p.honors.medals.includes(item.requires),requirement=medals.find(m=>m.id===item.requires);
       const preview=item.kind==='banner'?'<div class="store-banner banner-'+item.theme+'">'+mark(item.theme==='abyss'?'crown':item.theme==='tide'?'anchor':'star')+'</div>':'<div class="store-avatar">'+avatar(item.theme)+'</div>';

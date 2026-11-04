@@ -24,11 +24,16 @@ Criar e encontrar salas exige internet, pois o serviço público PeerServer do P
   4. escudo final — todos podem causar dano.
 - Barra de boss própria, com vida segmentada, escudo, etapa e requisito de dano visíveis durante a invasão.
 - O anfitrião escolhe **Normal** ou **Insano** antes de iniciar. O Insano multiplica vida e escudos por cinco, além da escala de equipe. Nas rodadas 18/19, 38/39 e 58/59, um aviso mostra a cobertura antiblindagem, camuflada e térmica da defesa.
-- O Gato Cipó não prende bosses ou mini-bosses de nenhum modo, nem com sua habilidade de maestria. Veneno não conta como fogo no escudo térmico.
+- O Gato Cipó prende inimigos comuns, mas aplica apenas lentidão nos bosses e mini-bosses: 35% na base, +5 pontos percentuais por tier de Raízes Profundas (até 60%) e 65% por 4s na maestria. Cipós não somam sua lentidão entre si nem a multiplicam com Gelo/escudo: prevalece a redução mais forte. Cada força tem sua própria duração; ataques fracos não prolongam a força da maestria. Veneno não conta como fogo no escudo térmico.
 - Cada invasão derrotada concede a todos os participantes 🥫 3/5/8 latas no Normal ou 🥫 9/15/24 no Insano. O boss final da campanha concede uma lata; mini-bosses não concedem latas. Os recibos da partida impedem duplicação ao reenviar snapshots ou reconectar.
 - Derrotar uma invasão libera o broche **Caçador de Almirantes** e a compra do banner **Maré Conquistada**. Concluir as três invasões libera o broche da variante; o Insano também libera cosméticos exclusivos para compra.
 - Nova unidade de suporte **Caixinha de Areia**, com limite global de uma por equipe e três caminhos: ataques universais, velocidade/alcance ou mais salmões por estouros e fazendas.
-- O segundo boss aparece no lobby como **Em breve** e ainda não participa da rotação.
+- **Eclipse Devorador** e Almirante alternam diariamente à meia-noite de **America/Sao_Paulo**, pelo relógio do dispositivo. O anfitrião define o chefe da sala; partidas em andamento não trocam de chefe.
+- O Eclipse tem 25% mais vida-base que o Almirante, mas não tem escudos. As quatro etapas marcam **Padrão → Mágico → Tecnológico → Suporte**. Após um aviso de 3 segundos, gatos dessa categoria a até 150 unidades ficam atordoados; cada um permite recuperar 0,25% da vida máxima por segundo, limitado a quatro gatos (1%/s). A cura nunca ultrapassa o topo da etapa atual.
+- Reposicionar (grátis) ou vender um gato afetado interrompe sua contribuição. Fazendas atordoadas não produzem e suportes atordoados deixam de conceder bônus. Heróis não pertencem às categorias e não são afetados.
+- O Eclipse concede suas próprias conquistas e cosméticos. **Banquete Negado** exige concluir as três invasões sem recuperação de vida em nenhuma delas. Latas e conquistas são entregues a todos os participantes; os desbloqueios do Almirante não são concedidos por derrotar o Eclipse.
+- O resultado mostra dano e produção de fazendas/habilidades por jogador e unidade, incluindo gatos vendidos, além da cura do boss e da cura alimentada por cada gato. Dano inclui vida/escudos realmente removidos; produção não inclui salmões por estouros.
+- A v0.30.0 usa protocolo de sala v5: todos precisam atualizar o jogo. Salas de versões anteriores têm outro namespace de IDs e não podem se misturar.
 
 ## Como conectar
 
