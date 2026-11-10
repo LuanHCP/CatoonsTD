@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#081017">
   <title>Catoons TD</title>
-  <link rel="stylesheet" href="src/style.css?v=0.30.0">
+  <link rel="stylesheet" href="src/style.css?v=0.32.0">
 </head>
 <body>
   <main class="game-shell">
     <header class="hero">
       <div>
-        <span class="eyebrow">NAVEGADOR • v0.30.0 BETA</span>
+        <span class="eyebrow">NAVEGADOR • v0.32.0 BETA</span>
         <h1>Catoons TD</h1>
         <p>Prepare sua equipe. Proteja o território.</p>
       </div>
@@ -33,13 +33,14 @@
     <nav class="main-tabs" aria-label="Lobbies">
       <button type="button" class="active" data-screen="hub">⌂ Central</button>
       <button type="button" data-screen="play">▷ Jogar</button>
+      <button type="button" data-screen="missions">📋 Missões</button>
       <button type="button" data-screen="event">👑 Evento</button>
       <button type="button" data-screen="profile">◈ Perfil</button>
       <button type="button" data-screen="cosmetics">🥫 Cosméticos</button>
       <button type="button" data-screen="cats">🐱 Gatinhos</button>
       <button type="button" data-screen="heroes">🦸 Heróis</button>
       <button type="button" data-screen="powers">⚡ Poderes</button>
-      <button type="button" data-screen="tutorial">📖 Tutorial</button>
+      <button type="button" data-screen="tutorial">📖 Almanaque</button>
       <button type="button" id="hub-settings-btn" class="settings-tab" title="Configurações">⚙️ Configurações</button>
       <button type="button" id="hub-language-btn" class="settings-tab" title="Idioma / Language">🌐 EN</button>
     </nav>
@@ -66,12 +67,14 @@
       </section>
 
 
+      <section id="solo-checkpoints" class="checkpoint-list" aria-label="Partidas salvas" hidden></section>
       <section class="mission-grid" aria-label="Escolha um modo de jogo">
         <button type="button" class="mission-card campaign-mission" data-select-mode="campaign"><span class="mission-number">01 / EXPLORAR</span><span class="mission-art mission-route" aria-hidden="true">↗</span><b>Campanha</b><p>Escolha um mapa, monte a defesa e conquiste estrelas.</p><span class="mission-meta">SOLO OU EQUIPE <i>Jogar →</i></span></button>
         <button type="button" class="mission-card infinite-mission" data-select-mode="infinite"><span class="mission-number">02 / SOBREVIVER</span><span class="mission-art" aria-hidden="true">∞</span><b>Infinito</b><p>Ondas sem fim. Até onde sua defesa consegue chegar?</p><span class="mission-meta">SOLO OU EQUIPE <i>Jogar →</i></span></button>
-        <button type="button" class="mission-card boss-mission" data-go-screen="event"><span class="mission-number">03 / ENFRENTAR</span><span class="mission-art" aria-hidden="true">◈</span><b>Boss diário</b><p>Enfrente o Almirante nas rodadas 20, 40 e 60, sozinho ou em equipe.</p><span class="mission-meta">SOLO OU EQUIPE · 1–4 <i>Entrar →</i></span></button>
+        <button type="button" class="mission-card boss-mission" data-go-screen="event"><span class="mission-number">03 / ENFRENTAR</span><span class="mission-art" aria-hidden="true">◈</span><b>Boss diário</b><p>Enfrente o boss da rotação nas rodadas 20, 40 e 60, sozinho ou em equipe.</p><span class="mission-meta">SOLO OU EQUIPE · 1–4 <i>Entrar →</i></span></button>
       </section>
       <section class="lobby-grid collection-shortcuts">
+        <button class="lobby-card" type="button" data-go-screen="training"><span class="lobby-icon">🧪</span><span><b>Modo treino</b><small>Experimente defesas e inimigos</small></span></button>
         <button class="lobby-card cats-card" type="button" data-go-screen="cats"><span class="lobby-icon">🐱</span><span><b>Gatinhos</b><small>Conheça e evolua sua coleção</small></span></button>
         <button class="lobby-card heroes-card" type="button" data-go-screen="heroes"><span class="lobby-icon">🦸</span><span><b>Heróis</b><small>Escolha o líder da defesa</small></span></button>
         <button class="lobby-card powers-card" type="button" data-go-screen="powers"><span class="lobby-icon">⚡</span><span><b>Poderes</b><small>Prepare sua mochila</small></span></button>
@@ -162,6 +165,26 @@
       <section class="panel identity-panel">
         <div class="panel-head"><div><span class="eyebrow">SUA HISTÓRIA NA DEFESA</span><h2>Meu perfil</h2><p>Seu nome, seu estilo e as conquistas que você carrega.</p></div><button type="button" data-go-screen="cosmetics" class="primary">Loja de cosméticos →</button></div>
         <div id="profile-card"></div>
+        <section id="cloud-account" class="cloud-account" aria-labelledby="cloud-title">
+          <div>
+            <h3 id="cloud-title">Save na nuvem</h3>
+            <p id="cloud-status" role="status">Jogue como visitante ou entre com Google para sincronizar seu progresso.</p>
+            <p id="cloud-user" hidden></p>
+          </div>
+          <div class="cloud-actions">
+            <button type="button" id="cloud-sign-in" class="primary" hidden>Entrar com Google</button>
+            <button type="button" id="cloud-sync" class="ghost" hidden>Sincronizar agora</button>
+            <button type="button" id="cloud-sign-out" class="ghost" hidden>Sair da conta</button>
+            <button type="button" id="cloud-backup" class="ghost" hidden>Baixar cópia anterior</button>
+          </div>
+          <div id="cloud-choice" class="cloud-choice" hidden>
+            <p id="cloud-choice-text"></p>
+            <div class="cloud-options">
+              <div><b>Progresso deste aparelho</b><p id="cloud-local-summary"></p><button type="button" id="cloud-use-local" class="primary">Vincular este progresso</button></div>
+              <div id="cloud-other-option" hidden><b>Progresso da nuvem</b><p id="cloud-remote-summary"></p><button type="button" id="cloud-use-remote" class="ghost">Usar o progresso da nuvem</button></div>
+            </div>
+          </div>
+        </section>
         <div class="profile-customize"><label for="profile-name-input">Nome do jogador<input id="profile-name-input" maxlength="20" autocomplete="nickname" placeholder="Seu nome"></label><button type="button" id="profile-save-name">Salvar nome</button><button type="button" id="profile-default-banner" class="ghost">Banner padrão</button><button type="button" id="profile-default-avatar" class="ghost">Foto padrão</button></div>
         <p id="profile-name-status" class="identity-status" role="status"></p>
         <div class="panel-head"><div><span class="eyebrow">BROCHES DE CONQUISTA</span><h2>Sua coleção de honras</h2><p>Broches são permanentes: representam suas vitórias e não são gastos.</p></div></div>
@@ -253,6 +276,11 @@
             <div id="next-wave-alert" class="next-wave-alert" role="status" aria-live="polite">
               <span class="next-wave-icon">🔎</span>
               <div><b>Rodada 1</b><small>Carregando previsão...</small></div>
+            </div>
+            <div id="training-controls" class="training-controls" hidden>
+              <select id="training-enemy" aria-label="Inimigo do treino"></select>
+              <select id="training-pack" aria-label="Quantidade ou invasão"></select>
+              <button type="button" id="training-clear" class="ghost">Limpar alvos</button>
             </div>
 
             <div class="canvas-wrap">
@@ -457,7 +485,29 @@
       </section>
     </section>
 
+    <section id="screen-missions" class="screen">
+      <section class="panel fieldwork-panel">
+        <div class="panel-head"><div><span class="eyebrow">PROGRESSO SOLO</span><h2>Missões diárias</h2><p>As missões mudam à meia-noite de Brasília. As moedas entram automaticamente ao concluir.</p></div></div>
+        <div id="daily-missions" class="fieldwork-grid"></div>
+        <div id="weekly-mission" class="fieldwork-card"></div>
+      </section>
+    </section>
+    <section id="screen-training" class="screen">
+      <section class="panel fieldwork-panel">
+        <div class="panel-head"><div><span class="eyebrow">LABORATÓRIO DE DEFESA</span><h2>Modo treino</h2><p>Teste gatinhos desbloqueados com 100.000 salmões de treino. O treino usa poderes de teste e fica separado do progresso.</p></div></div>
+        <div class="training-setup">
+          <label for="training-map">Mapa<select id="training-map"></select></label>
+          <button type="button" id="training-enter" class="primary">Entrar no treino</button>
+        </div>
+        <p id="training-room-note" role="status"></p>
+      </section>
+    </section>
     <section id="screen-tutorial" class="screen">
+      <section class="panel tutorial-panel">
+        <div class="panel-head"><div><span class="eyebrow">ALMANAQUE</span><h2>Inimigos e bosses</h2><p>Encontre cada inimigo em uma partida para liberar a ficha com suas resistências e estratégias.</p></div><span id="almanac-count" class="level-chip"></span></div>
+        <div id="tutorial-tiers" class="tier-legend"></div>
+        <div id="tutorial-balloons" class="cat-collection tutorial-grid"></div>
+      </section>
       <section class="panel tutorial-panel">
         <div class="panel-head">
           <div>
@@ -469,17 +519,6 @@
         <div id="tutorial-towers" class="cat-collection tutorial-grid"></div>
       </section>
 
-      <section class="panel tutorial-panel">
-        <div class="panel-head">
-          <div>
-            <span class="eyebrow">GUIA RÁPIDO</span>
-            <h2>Balões</h2>
-            <p>Todo balão comum segue a mesma escala de cor: quanto mais escura, mais resistente. É a mesma cor que define quantas vidas você perde se ele escapar (Vermelho = 1 até Preto = 6). Alguns também têm um comportamento especial além da cor.</p>
-          </div>
-        </div>
-        <div id="tutorial-tiers" class="tier-legend"></div>
-        <div id="tutorial-balloons" class="cat-collection tutorial-grid"></div>
-      </section>
     </section>
   </main>
 
@@ -531,9 +570,9 @@
           <input type="file" id="menu-import-save-input" accept="application/json,.json" hidden>
         </div>
         <section class="beta-notice" aria-label="Informações do beta">
-          <b>🧪 Beta v0.30.0</b>
+          <b>🧪 Beta v0.32.0</b>
           <p>O progresso fica salvo somente neste navegador. Exporte seu save regularmente para não perder a evolução ao limpar os dados do navegador ou trocar de computador.</p>
-          <a class="ghost beta-feedback-button" href="https://github.com/LuanHCP/CatoonsTD/issues/new?template=bug_report.md&amp;title=%5BBETA%20v0.30.0%5D%20" target="_blank" rel="noopener noreferrer">🐞 Enviar feedback ou relatar bug</a>
+          <a class="ghost beta-feedback-button" href="https://github.com/LuanHCP/CatoonsTD/issues/new?template=bug_report.md&amp;title=%5BBETA%20v0.32.0%5D%20" target="_blank" rel="noopener noreferrer">🐞 Enviar feedback ou relatar bug</a>
         </section>
         <small id="menu-save-io-status" class="modal-hint" hidden></small>
       </div>
@@ -550,7 +589,7 @@
       <details class="enemy-guide credits-details">
         <summary>🎬 Créditos</summary>
         <div class="credits-body">
-          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.30.0</span></p>
+          <p class="credits-game"><b>🐱 Catoons TD</b> <span id="credits-version">v0.32.0</span></p>
           <p>Criado por <b>Luan</b>.</p>
           <p>Trilha sonora, efeitos sonoros e toda a arte das torres, heróis e mapas são originais, feitos direto no jogo.</p>
           <p class="credits-thanks">Obrigado por jogar! 🐾</p>
@@ -559,6 +598,7 @@
       <div class="modal-actions vertical">
         <button type="button" id="menu-resume" class="primary match-only-action">▶ Continuar</button>
         <button type="button" id="menu-restart" class="match-only-action">↻ Reiniciar fase</button>
+        <button type="button" id="menu-save-lobby" class="ghost match-only-action" hidden>💾 Salvar e voltar à central</button>
         <button type="button" id="menu-lobby" class="danger-button match-only-action">⌂ Voltar para o lobby</button>
         <button type="button" id="menu-close" class="settings-only-action">✕ Fechar</button>
       </div>
@@ -628,10 +668,12 @@
     </div>
   </div>
 
-  <script src="src/events.js?v=0.30.0"></script>
-  <script src="src/identity.js?v=0.30.0"></script>
+  <script src="src/events.js?v=0.32.0"></script>
+  <script src="src/fieldwork.js?v=0.32.0"></script>
+  <script src="src/identity.js?v=0.32.0"></script>
+  <script src="src/cloud-save.js?v=0.32.0"></script>
   <script src="src/vendor/peerjs.min.js"></script>
-  <script src="src/multiplayer.js?v=0.30.0"></script>
-  <script src="src/game.js?v=0.30.0"></script>
+  <script src="src/multiplayer.js?v=0.32.0"></script>
+  <script src="src/game.js?v=0.32.0"></script>
 </body>
 </html>

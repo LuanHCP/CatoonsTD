@@ -9,7 +9,7 @@ http.createServer((request,response)=>{
     // Test-only hooks exist in this loopback server, never in the distributed game.
     if(requestUrl.pathname==='/__test/game.js'){
       response.writeHead(200,{'Content-Type':mime['.js'],'Cache-Control':'no-store'});
-      response.end(readFileSync(join(root,'src/game.js'),'utf8').replace('personalTd={reset,','window.__CatoonsTest={state,damageEnemy,makeDailyBoss,update,canControlTarget,lanSnapshot,pointAt,activateMasteryAbility,applyEclipseAuras,sellSelectedTower,moveRepositionedTower,processFarmIncome,litterTeamBonuses,showResult,completeBossEvent};\npersonalTd={reset,'));return;
+      response.end(readFileSync(join(root,'src/game.js'),'utf8').replace('personalTd={reset,','window.__CatoonsTest={state,damageEnemy,makeDailyBoss,update,canControlTarget,lanSnapshot,pointAt,activateMasteryAbility,applyEclipseAuras,sellSelectedTower,moveRepositionedTower,processFarmIncome,litterTeamBonuses,showResult,completeBossEvent,placeTower,usePower};\npersonalTd={reset,'));return;
     }
     if(requestUrl.pathname==='/'&&requestUrl.searchParams.has('testHooks')){
       response.writeHead(200,{'Content-Type':mime['.html'],'Cache-Control':'no-store'});

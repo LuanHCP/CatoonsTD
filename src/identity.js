@@ -2,6 +2,7 @@
 // Profile cosmetics and achievement rewards are independent of match simulation.
 (() => {
   const medals=[
+    {id:'weeklyDefender',name:'Patrulha da Semana',icon:'shield',description:'Conclua 10 missões diárias em uma mesma semana.'},
     {id:'eclipseSlayer',name:'Caçador do Eclipse',icon:'moon',description:'Derrote uma invasão do Eclipse Devorador.'},
     {id:'eclipseVictor',name:'Fim do Banquete',icon:'moon',description:'Conclua as três invasões do Eclipse Devorador.'},
     {id:'eclipseInsane',name:'Luz Impossível',icon:'crown',description:'Conclua o Eclipse Devorador no Insano.'},

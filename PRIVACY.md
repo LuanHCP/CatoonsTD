@@ -1,13 +1,14 @@
 # Privacidade — Catoons TD
 
-**Última atualização:** 23 de outubro de 2026
+**Última atualização:** 10 de novembro de 2026
 
-Catoons TD não exige cadastro, não utiliza ferramentas de análise e não envia o progresso do jogador para um servidor próprio.
+O cadastro no Catoons TD é opcional. O modo visitante guarda o progresso no navegador.
 
 ## Dados salvos
 
 - O progresso e as configurações ficam no armazenamento local (`localStorage`) do navegador.
-- O nome escolhido, banners, fotos felinas, broches, latas de salmão e recibos de recompensa também ficam nesse save local. Não há login Google ou sincronização em nuvem nesta build.
+- Ao usar o login opcional, o Firebase Authentication identifica a conta Google. O jogo usa o identificador da conta para carregar e guardar o perfil no Cloud Firestore. As regras do banco permitem que cada conta acesse o próprio save.
+- O save da conta inclui o nome de jogador, desbloqueios, XP, moedas, inventário, cosméticos, broches e progresso de mapas e missões. Configurações do aparelho e checkpoints de partidas solo ficam no armazenamento local.
 - O jogador pode exportar e importar manualmente um arquivo de save em **Configurações**.
 - Limpar os dados do navegador ou jogar em outro dispositivo pode apagar ou não apresentar o progresso local.
 

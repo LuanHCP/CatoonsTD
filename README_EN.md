@@ -8,11 +8,15 @@
 
 > **Web/desktop Tower Defense built with HTML, CSS and JavaScript, using AI as an engineering copilot.**
 
-**Status:** Public Beta · **Build:** v0.30.0
+**Status:** Public Beta · **Build:** v0.32.0
 **Platforms:** Modern desktop and mobile browsers · Windows x64 through a lightweight Go launcher
 **Languages:** English and Brazilian Portuguese (auto-detected, switchable in-game)
 
 Catoons TD is a personal software engineering project focused on **progression, team composition, combat readability and iterative product development**. It evolved from a small prototype into a game with map tiers, difficulty levels, upgrade paths, heroes, mastery, hidden units, synergies, special enemies, powers and an infinite mode.
+
+Daily solo missions, weekly rewards, a discoverable enemy almanac and a training mode are available from the hub. Solo campaign and boss event matches each have their own local checkpoint between rounds.
+
+On GitHub Pages, **Profile → Sign in with Google** can link a guest save and sync account progress across devices. Device settings and solo checkpoints are stored locally.
 
 ## Screenshots
 

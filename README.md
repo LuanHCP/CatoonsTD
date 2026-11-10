@@ -6,7 +6,7 @@
 
 > **Tower Defense web/desktop desenvolvido de forma iterativa com JavaScript, HTML e CSS, usando IA como copiloto de engenharia.**
 
-**Status:** Beta público · **Build:** v0.30.0
+**Status:** Beta público · **Build:** v0.32.0
 **Plataformas:** Navegador moderno em computador e celular · Windows x64 via launcher local
 **Idiomas:** Português (Brasil) e English — detectado pelo navegador, com troca manual no jogo
 
@@ -31,6 +31,9 @@ Para testar localmente, você também pode abrir `index.html` em Edge/Chrome. Pa
 | ![Maestria](screenshots/pt/04-mastery.jpg) | |
 
 ## ✨ Destaques do projeto
+
+- **Missões e treino**. Três missões solo rotativas, recompensa semanal, almanaque de inimigos e um campo de treino sem efeitos no perfil.
+- **Retomada solo**. Campanha e evento têm checkpoints separados entre rodadas. Abra **Continuar partida** na central para retomar.
 
 - **Categorias dos 17 gatinhos**: Padrão, Mágico, Tecnológico e Suporte, com símbolos, cores e filtros na coleção e na partida. Segredo/exclusividade continuam sendo condições de desbloqueio.
 - **Dois bosses em rotação diária**, alternados à meia-noite de Brasília. O **Eclipse Devorador** atordoa a categoria marcada somente dentro de sua aura e se cura com esses gatos. Cada etapa avisa por 3s; reposicionar/vender interrompe o efeito, e a cura não restaura etapas vencidas. Heróis não entram nas categorias.
@@ -94,7 +97,9 @@ flowchart LR
     B --> UI
 ```
 
-A build é **client-side**, com save em `localStorage` e exportação/importação manual. O modo solo funciona offline; as salas cooperativas usam o PeerServer público para conectar pelo ID, e WebRTC para transmitir a partida diretamente entre os jogadores na LAN/VPN.
+A build funciona no navegador. O modo visitante usa `localStorage` e permite exportar e importar o save. No GitHub Pages, **Perfil → Entrar com Google** vincula o progresso ao Firebase e permite retomá-lo em outro aparelho. O jogo mantém uma cópia local da conta para jogar offline e sincroniza no lobby. Checkpoints solo ficam no aparelho.
+
+As salas cooperativas usam o PeerServer público para conectar pelo ID e WebRTC para transmitir a partida diretamente entre os jogadores na LAN/VPN.
 
 Mais detalhes: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 

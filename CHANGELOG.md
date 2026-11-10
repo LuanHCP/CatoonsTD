@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.32.0 — login opcional e progresso na nuvem
+
+- Login com Google pelo Perfil no GitHub Pages.
+- Vinculação do progresso de visitante e sincronização privada da conta entre aparelhos.
+- Escolha entre versões divergentes, com a cópia anterior disponível para exportação.
+
+## v0.31.0 — missões, almanaque, treino e retomada solo
+
+- Três missões solo por dia com moedas automáticas. Completar 10 na semana rende 60 moedas e libera o broche Patrulha da Semana na primeira vez.
+- Fichas liberadas ao encontrar inimigos e bosses, com dicas antes dos primeiros camuflados e blindados.
+- Treino em qualquer mapa com salmões e poderes próprios, incluindo as três invasões de cada boss.
+- Checkpoints locais entre rodadas, com um espaço para campanha e outro para evento solo.
+
 ## v0.30.0 — categorias, Eclipse Devorador e relatórios
 
 - Publicado o ajuste do Cipó: desacelera bosses sem prendê-los e não multiplica seu efeito com Gelo.

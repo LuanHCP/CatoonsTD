@@ -1,5 +1,6 @@
 'use strict';
 const EventRules=window.CatoonsEvents;
+const Fieldwork=window.CatoonsFieldwork;
 let collectionClass='all',matchClass='all';
 // ===== i18n (v0.29.0) =====
 // Idioma: escolha salva > idioma do navegador (pt* = português) > inglês.
@@ -13,6 +14,108 @@ const I18N_LANG=(()=>{
   return /^pt/i.test(nav)?'pt':'en';
 })();
 const I18N_EN={
+  "Save na nuvem":"Cloud save",
+  "Entrar com Google":"Sign in with Google",
+  "Sincronizar agora":"Sync now",
+  "Sair da conta":"Sign out",
+  "Baixar cópia anterior":"Download previous copy",
+  "Progresso deste aparelho":"Progress on this device",
+  "Progresso da nuvem":"Cloud progress",
+  "Vincular este progresso":"Link this progress",
+  "Usar o progresso deste aparelho":"Use progress from this device",
+  "Usar o progresso da nuvem":"Use cloud progress",
+  "Tentar conectar":"Try connecting",
+  "Jogue como visitante ou entre com Google para sincronizar seu progresso.":"Play as a guest or sign in with Google to sync your progress.",
+  "Abra o jogo no GitHub Pages para entrar com Google.":"Open the game on GitHub Pages to sign in with Google.",
+  "Carregando o login com Google…":"Loading Google sign-in…",
+  "Conclua o login na janela do Google.":"Finish signing in in the Google window.",
+  "Sincronizando com a nuvem…":"Syncing with the cloud…",
+  "Progresso sincronizado.":"Progress synced.",
+  "Progresso salvo neste aparelho. A sincronização continua quando a conexão voltar ou ao abrir o perfil.":"Progress is saved on this device. Sync resumes when the connection returns or you open your profile.",
+  "O navegador não conseguiu guardar a cópia local.":"The browser could not store the local copy.",
+  "O Firebase recusou o acesso ao save.":"Firebase denied access to the save.",
+  "Não foi possível conectar ao Firebase. Tente novamente.":"Could not connect to Firebase. Try again.",
+  "Permita a abertura da janela do Google neste site e tente novamente.":"Allow the Google pop-up for this site and try again.",
+  "Login com Google interrompido. Tente novamente.":"Google sign-in was interrupted. Try again.",
+  "Não foi possível sair da conta. Tente novamente.":"Could not sign out. Try again.",
+  "Escolha o progresso que deseja vincular.":"Choose which progress to link.",
+  "Há dois saves diferentes. Escolha qual usar.":"Two saves differ. Choose which one to use.",
+  "Vincule o progresso deste aparelho à conta Google. A cópia de visitante fica disponível neste navegador.":"Link this device’s progress to your Google account. The guest copy stays available in this browser.",
+  "A versão escolhida passa a ser o save da conta. A outra fica disponível para download neste aparelho.":"Your choice becomes the account save. The other copy is available to download on this device.",
+  "Conta conectada":"Signed in",
+  "Saia da conta para apagar o progresso de visitante.":"Sign out to reset guest progress.",
+  "Importar este arquivo substitui o progresso desta conta neste aparelho e envia a alteração ao sincronizar. Continuar?":"Importing this file replaces this account’s local progress and sends the change when syncing. Continue?",
+  "📋 Missões":"📋 Missions",
+  "📖 Almanaque":"📖 Almanac",
+  "PROGRESSO SOLO":"SOLO PROGRESS",
+  "Missões diárias":"Daily missions",
+  "As missões mudam à meia-noite de Brasília. As moedas entram automaticamente ao concluir.":"Missions rotate at midnight Brasília time. Coins are awarded automatically on completion.",
+  "Conclua rodadas":"Clear rounds",
+  "Estoure balões":"Pop balloons",
+  "Rompa blindagens":"Break armor layers",
+  "Estoure balões camuflados":"Pop camouflaged balloons",
+  "Vença um mapa da campanha":"Win a campaign map",
+  "Derrote uma invasão do evento ou um chefão da campanha":"Defeat an event invasion or a campaign boss",
+  "Vença na campanha com duas categorias de gatinhos em campo":"Win a campaign map with two cat classes on the field",
+  "✓ Recebido":"✓ Received",
+  "Patrulha da Semana":"Weekly Patrol",
+  "Conclua 10 missões entre segunda e domingo. O primeiro resgate também libera o broche no perfil.":"Finish 10 missions from Monday to Sunday. The first completion also unlocks the profile medal.",
+  "Progresso semanal":"Weekly progress",
+  "Prêmio semanal":"Weekly reward",
+  "✓ Concluído":"✓ Completed",
+  "ALMANAQUE":"ALMANAC",
+  "Inimigos e bosses":"Enemies and bosses",
+  "Encontre cada inimigo em uma partida para liberar a ficha com suas resistências e estratégias.":"Encounter each enemy in a match to unlock its strengths and counter strategies.",
+  "fichas":"entries",
+  "Encontre em uma partida para liberar a ficha.":"Encounter it in a match to unlock this entry.",
+  "Balão comum":"Basic balloon",
+  "A cor indica a resistência do balão e quantas vidas ele tira se escapar.":"The color tells you how tough the balloon is and how many lives it costs if it escapes.",
+  "Gatos Dardo e Bombinha cobrem grupos. Gelinho ajuda a segurar a fila.":"Dart and Bomb cats handle groups. Frost helps slow them down.",
+  "Aparece na última rodada de cada mapa, com 75× a vida do inimigo regular mais resistente.":"Appears in the final round with 75× the health of the toughest regular enemy.",
+  "Concentre dano. O Cipó reduz sua velocidade. Se escapar, a partida acaba.":"Focus damage. Vine slows the boss down. The match ends if it escapes.",
+  "Quatro escudos em sequência: antiblindagem, detecção de camuflados, fogo ou laser, e qualquer dano.":"Four shields in sequence: armor-breaking, camouflage detection, fire or laser, and any damage.",
+  "Prepare Bombinha, Sniper e Laser ou um Mago com fogo. O Cipó ajuda a ganhar tempo entre os escudos.":"Bring Bomb, Sniper and Laser or a fire Wizard. Vine helps buy time between shields.",
+  "A aura atordoa uma categoria por etapa e recupera vida enquanto ela estiver no alcance. A cura é limitada à etapa atual.":"The aura stuns one class per phase and heals while it is in range. Healing is capped at the current phase.",
+  "Padrão → Mágico → Tecnológico → Suporte. Reposicione a categoria marcada durante o aviso de 3 s. Heróis ficam livres da aura.":"Standard → Magic → Tech → Support. Move the marked class during the 3-second warning. Heroes are immune.",
+  "🥷 Primeiros camuflados: prepare um Sniper ou detecção":"🥷 First camo: prepare a Sniper or detection",
+  "🛡️ Primeiros blindados: prepare um Bombinha ou quebra de blindagem":"🛡️ First armor: prepare a Bomb cat or armor-breaking",
+  "Modo treino":"Training mode",
+  "🧪 Modo treino":"🧪 Training mode",
+  "Experimente defesas e inimigos":"Try defenses and enemies",
+  "LABORATÓRIO DE DEFESA":"DEFENSE LAB",
+  "Teste gatinhos desbloqueados com 100.000 salmões de treino. O treino usa poderes de teste e fica separado do progresso.":"Test unlocked cats with 100,000 training salmon. The lab uses test powers and stays separate from progression.",
+  "Entrar no treino":"Enter training",
+  "Inimigo do treino":"Training enemy",
+  "Quantidade ou invasão":"Count or invasion",
+  "1 alvo":"1 target",
+  "10 alvos":"10 targets",
+  "Invasão 20":"Invasion 20",
+  "Invasão 40":"Invasion 40",
+  "Invasão 60":"Invasion 60",
+  "Limpar alvos":"Clear targets",
+  "Chamar alvos de treino":"Spawn training targets",
+  "Chamar alvos":"Spawn targets",
+  "Carga de teste":"Test charge",
+  "Chefão da campanha":"Campaign boss",
+  "Monte sua defesa e selecione os alvos. Use o botão Chamar alvos para começar.":"Build your defense and pick your targets. Use Spawn targets to start.",
+  "Saia da sala cooperativa para entrar no treino.":"Leave the co-op room to enter training.",
+  "Alvos limpos. Sua defesa continua no mapa.":"Targets cleared. Your defense stays on the map.",
+  "🧪 Alvos de treino:":"🧪 Training targets:",
+  "Teste encerrado. Ajuste sua defesa ou chame novos alvos.":"Test finished. Adjust your defense or spawn new targets.",
+  "PARTIDA SOLO SALVA":"SAVED SOLO MATCH",
+  "Partidas salvas":"Saved matches",
+  "▶ Continuar partida":"▶ Continue match",
+  "💾 Salvar e voltar à central":"💾 Save and return to hub",
+  "Começar de novo substitui a partida solo salva deste modo. Continuar?":"Starting over replaces the solo save for this mode. Continue?",
+  "Saia da sala cooperativa para continuar a partida solo.":"Leave the co-op room to continue your solo match.",
+  "Ao retomar, você volta ao intervalo salvo antes do combate. Voltar à central?":"Resuming takes you back to the saved break before combat. Return to the hub?",
+  "Moedas e latas entram quando o campo ficar livre.":"Coins and cans are awarded once the field is clear.",
+  "Próxima rodada:":"Next round:",
+  "💾 Partida retomada. Próxima rodada:":"💾 Match resumed. Next round:",
+  "Volte ao lobby para importar um save.":"Return to the lobby to import a save.",
+  "O navegador não conseguiu guardar a partida.":"The browser could not save the match.",
+  "moedas de missões":"mission coins",
+  "Enfrente o boss da rotação nas rodadas 20, 40 e 60, sozinho ou em equipe.":"Fight the rotating boss on rounds 20, 40 and 60, solo or as a team.",
   "Imobiliza inimigos comuns e reduz em 35% a velocidade de bosses e mini-bosses. Raízes Profundas chega a 60%; a lentidão não se soma entre Cipós.": "Roots regular enemies and slows bosses and mini-bosses by 35%. Deep Roots reaches 60%; multiple Vine Cats do not stack their slows.",
   "Prende +1 alvo por vez. Bosses e mini-bosses recebem lentidão, nunca prisão.": "Controls +1 target at a time. Bosses and mini-bosses are slowed, never rooted.",
   "Cada tier de Raízes Profundas fortalece a lentidão contra bosses em 5 pontos percentuais (até 60%).": "Each Deep Roots tier strengthens the boss slow by 5 percentage points (up to 60%).",
@@ -23,8 +126,8 @@ const I18N_EN={
   "s • bosses: lentidão": "s • boss slow",
   "Não causa dano por padrão: prende inimigos comuns e desacelera bosses sem pará-los. Combine com torres de dano.": "Deals no damage by default: roots regular enemies and slows bosses without stopping them. Combine with damage towers.",
   "O último escudo aceita todos os ataques. O Cipó desacelera bosses sem prendê-los.": "The last shield accepts every attack. Vine Cat slows bosses without rooting them.",
-  "NAVEGADOR • v0.30.0 BETA": "BROWSER • v0.30.0 BETA",
-  "🧪 Beta v0.30.0": "🧪 Beta v0.30.0",
+  "NAVEGADOR • v0.32.0 BETA": "BROWSER • v0.32.0 BETA",
+  "🧪 Beta v0.32.0": "🧪 Beta v0.32.0",
   "FICHA DE UPGRADES": "UPGRADE SHEET",
   "CAMINHO": "PATH",
   "EVOLUÇÃO": "PROGRESSION",
@@ -2143,7 +2246,30 @@ const DEFAULT_PROFILE = {
   infiniteBest:Object.fromEntries(Object.keys(maps).map(id=>[id,{easy:0,normal:0,hard:0}]))
 };
 
-function cloneDefaultProfile(){ const p=JSON.parse(JSON.stringify(DEFAULT_PROFILE));window.CatoonsIdentity.normalize(p);return p; }
+const CHECKPOINT_MODES=['campaign','boss-event'];
+const LOBBY_SCREENS=['hub','play','event','profile','cosmetics','cats','heroes','powers','tutorial','missions','training'];
+const CHECKPOINT_FIELDS=['map','difficulty','mode','eventVariant','eventBossId','matchId','wave','lastClearedWave','lastFarmPaidWave','lives','gameSpeed','nextTowerId','nextEnemyId','hero','towers','soldTowers','bossHealing','progressAwards','effects','masterySession','unitPlacedThisMatch','shadowBloons','airstrikes','bombs'];
+function normalizeCheckpoints(saved){
+  const slots={};
+  for(const mode of CHECKPOINT_MODES){
+    const slot=saved?.[mode];
+    if(slot?.schema!==1||slot.mode!==mode||!Object.hasOwn(maps,slot.map)||!Object.hasOwn(difficulties,slot.difficulty))continue;
+    const rounds=mode==='boss-event'?60:mapRounds(slot.map,slot.difficulty);
+    if(typeof slot.matchId!=='string'||!slot.matchId||!Number.isInteger(slot.wave)||slot.wave<0||slot.wave>=rounds)continue;
+    if(!Number.isFinite(slot.money)||slot.money<0||!Number.isFinite(slot.lives)||slot.lives<=0||!Number.isFinite(slot.savedAt))continue;
+    if(mode==='boss-event'&&(!Object.hasOwn(EventRules.bosses,slot.eventBossId)||!['normal','insane'].includes(slot.eventVariant)))continue;
+    if(!Array.isArray(slot.towers)||!Array.isArray(slot.soldTowers)||!Array.isArray(slot.progressAwards)||!slot.masterySession||!slot.effects)continue;
+    if(slot.towers.some(t=>!t||!Object.hasOwn(types,t.type)||!Number.isFinite(t.x)||!Number.isFinite(t.y)))continue;
+    if(slot.soldTowers.some(t=>!t||!Object.hasOwn(types,t.type))||slot.hero&&!Object.hasOwn(HEROES,slot.hero.type))continue;
+    slots[mode]={schema:1,money:slot.money,savedAt:slot.savedAt,...Object.fromEntries(CHECKPOINT_FIELDS.filter(key=>Object.hasOwn(slot,key)).map(key=>[key,slot[key]]))};
+  }
+  return slots;
+}
+function cloneDefaultProfile(){
+  const p=JSON.parse(JSON.stringify(DEFAULT_PROFILE));window.CatoonsIdentity.normalize(p);
+  p.missions=Fieldwork.normalize();p.discoveries=[];p.checkpoints={};
+  return p;
+}
 function requiredXp(level){ return Math.round(100*Math.pow(1.30,Math.max(0,level-1))); }
 
 function normalizeProfile(saved){
@@ -2220,7 +2346,11 @@ function normalizeProfile(saved){
     const experienced=p.level>1||p.xp>0||totalWinsOf(p)||Object.values(p.mastery).some(m=>m.level>1||m.xp>0);
     p.matchTutorialSeen=experienced;
   }
-  window.CatoonsIdentity.normalize(p,saved);return p;
+  window.CatoonsIdentity.normalize(p,saved);
+  p.missions=Fieldwork.normalize(saved.missions);
+  p.discoveries=Fieldwork.discoveries.filter(id=>Array.isArray(saved.discoveries)&&saved.discoveries.includes(id));
+  p.checkpoints=normalizeCheckpoints(saved.checkpoints);
+  return p;
 }
 function totalWinsOf(p){ return Object.values(p.maps).some(m=>(m.wins||0)>0||Object.values(m.cleared).some(Boolean)); }
 
@@ -2244,7 +2374,15 @@ function loadProfile(){
   return cloneDefaultProfile();
 }
 
-let profile=loadProfile();
+const cloudSupported=location.hostname==='localhost'||location.protocol==='https:'&&location.hostname==='luanhcp.github.io';
+const cloudStorage={
+  getItem:key=>localStorage.getItem(key),
+  setItem:(key,value)=>localStorage.setItem(key,value),
+  removeItem:key=>localStorage.removeItem(key)
+};
+const initialAccount=cloudSupported?window.CatoonsCloud.cached(cloudStorage):null;
+let cloudSaves=null;
+let profile=initialAccount?normalizeProfile(initialAccount.profile):loadProfile();
 let personalTd=null;
 let lobbySelection={map:'grove',difficulty:'easy',mode:'campaign',category:'beginner'};
 let eventVariant='normal';
@@ -2522,11 +2660,15 @@ document.addEventListener('pointerdown',unlockAudioOnce,{once:true});
 document.addEventListener('keydown',unlockAudioOnce,{once:true});
 
 
-function saveProfile(){
+function saveProfile(refresh=true){
   window.CatoonsIdentity.sync(profile);
-  try{localStorage.setItem(SAVE_KEY,JSON.stringify(profile));}
-  catch(err){console.warn('Não foi possível salvar o progresso local.',err);}
-  renderProfileUi();
+  let saved=cloudSaves?.persist(profile);
+  if(saved==null){
+    try{localStorage.setItem(SAVE_KEY,JSON.stringify(profile));saved=true;}
+    catch(err){saved=false;console.warn('Não foi possível salvar o progresso local.',err);}
+  }
+  if(refresh)renderProfileUi();
+  return saved;
 }
 
 function mapStars(id){ return difficultyOrder.filter(d=>profile.maps[id].cleared[d]).length; }
@@ -2589,6 +2731,7 @@ function starMarkup(mapId){
 }
 
 function setScreen(id,pushHistory=true){
+  const previous=document.body.dataset.screen;
   $$('[data-screen]').forEach(btn=>btn.classList.toggle('active',btn.dataset.screen===id));
   $$('.screen').forEach(screen=>screen.classList.toggle('active',screen.id===`screen-${id}`));
   document.body.classList.toggle('in-game',id==='game');
@@ -2604,14 +2747,19 @@ function setScreen(id,pushHistory=true){
   if(id==='heroes') renderHeroCollection();
   if(id==='powers') renderPowerShop();
   if(id==='tutorial') renderTutorial();
+  if(id==='missions') renderMissions();
+  if(id==='training') personalTd?.renderTrainingLobby();
   // A tela "game" já troca a música pro tema do mapa (via reset()/loadSelection); qualquer
   // outra tela volta pro tema de lobby.
   if(id!=='game') playMusicTheme('lobby');
   const active=$(`#screen-${id}`);if(active)active.scrollTop=0;
   if(id==='game')requestAnimationFrame(()=>window.dispatchEvent(new Event('catoons:fit-map')));
+  if(id==='profile')cloudSaves?.refresh();
+  else if(previous==='game'&&id!=='game')cloudSaves?.resume();
 }
 
 function renderHub(){
+  renderCheckpoints();
   const need=requiredXp(profile.level),pct=xpPercent();
   if($('#hub-level')) $('#hub-level').textContent=profile.level;
   if($('#hub-xp-text')) $('#hub-xp-text').textContent=`${profile.xp}/${need} XP`;
@@ -2625,6 +2773,30 @@ function renderHub(){
       <div class="summary-card"><span>Vitórias</span><b>🏆 ${totalWins()}</b></div>
       <div class="summary-card"><span>Moedas</span><b>🪙 ${profile.coins}</b></div>`;
   }
+}
+
+function renderCheckpoints(){
+  const root=$('#solo-checkpoints');if(!root)return;
+  const slots=Object.values(profile.checkpoints);
+  root.hidden=!slots.length;
+  root.innerHTML=slots.map(slot=>{
+    const raid=slot.mode==='boss-event',name=raid?EventRules.bosses[slot.eventBossId].name:maps[slot.map].name;
+    const detail=raid?(slot.eventVariant==='insane'?$t('Insano'):$t('Normal')):difficulties[slot.difficulty].name;
+    return `<article class="checkpoint-card"><div><small>${$t('PARTIDA SOLO SALVA')}</small><h3>${name} · ${detail}</h3><span>${$T`Próxima rodada: ${slot.wave+1}`} · ❤ ${slot.lives} · 🐟 ${Math.floor(slot.money)}</span></div><button type="button" class="primary" data-checkpoint-mode="${slot.mode}">${$t('▶ Continuar partida')}</button></article>`;
+  }).join('');
+}
+
+function renderMissions(){
+  const root=$('#daily-missions'),weekly=$('#weekly-mission');if(!root||!weekly)return;
+  const calendar=Fieldwork.period(),track=Fieldwork.normalize(profile.missions,calendar);
+  root.dataset.day=calendar.dayKey;
+  const labels={rounds:$t('Conclua rodadas'),pops:$t('Estoure balões'),armor:$t('Rompa blindagens'),camo:$t('Estoure balões camuflados'),win:$t('Vença um mapa da campanha'),boss:$t('Derrote uma invasão do evento ou um chefão da campanha'),mixedWin:$t('Vença na campanha com duas categorias de gatinhos em campo')};
+  root.innerHTML=calendar.tasks.map(task=>{
+    const progress=track.progress[task.id],done=progress===task.goal;
+    return `<article class="fieldwork-card${done?' earned':''}"><h3>${labels[task.id]}</h3><progress value="${progress}" max="${task.goal}" aria-label="${labels[task.id]}"></progress><div><span>${progress}/${task.goal}</span><b>${done?$t('✓ Recebido'):'🪙 +'+task.coins}</b></div></article>`;
+  }).join('');
+  weekly.classList.toggle('earned',track.weekly===Fieldwork.weeklyGoal);
+  weekly.innerHTML=`<h3>🏅 ${$t('Patrulha da Semana')}</h3><p>${$t('Conclua 10 missões entre segunda e domingo. O primeiro resgate também libera o broche no perfil.')}</p><progress value="${track.weekly}" max="${Fieldwork.weeklyGoal}" aria-label="${$t('Progresso semanal')}"></progress><div><span>${track.weekly}/${Fieldwork.weeklyGoal}</span><b>${track.weekly===Fieldwork.weeklyGoal?$t('✓ Recebido'):'🪙 +'+Fieldwork.weeklyCoins}</b></div>`;
 }
 
 function infiniteBestFor(mapId,diffId){
@@ -2991,22 +3163,25 @@ const TOWER_TIPS={
   mister:$t('Não conte com ele. Alcance de 5, 1 de dano e, depois de 30 segundos, nenhum.')
 };
 
-const BALLOON_GUIDE=[
-  {icon:'🥷',name:$t('Camuflado'),color:'#547b59',desc:$t('Invisível para a maioria das torres — passa despercebido até ser detectado.'),counter:$t('Detectado por: Sniper (sempre), Dardo (caminho Lanceiro, T2+), Ninja (caminho Sombra Assassina, T1+) e pelo Observador do Sniper (T2+, revela pra toda a defesa).')},
-  {icon:'🛡️',name:$t('Blindado'),color:'#9ba4b4',desc:$t('Tem uma camada extra de blindagem por fora. A maioria dos ataques não avança até ela quebrar.'),counter:$t('Quebra blindagem: Bombinha (sempre), Sniper (caminho Caçador, T4+), Ninja (caminho Sombra Assassina, T5).')},
-  {icon:'🛡️🛡️',name:$t('Blindado Pesado'),color:'#4a525c',desc:$t('A versão reforçada do Blindado — a camada externa aguenta bem mais dano antes de quebrar. Aparece a partir da dificuldade Normal.'),counter:$t('As mesmas fontes que quebram blindagem comum funcionam, só que leva mais tempo pra derrubar a camada.')},
-  {icon:'🥷🛡️',name:$t('Camuflado + Blindado'),color:'#5c7a63',desc:$t('Combina os dois ao mesmo tempo: invisível E blindado.'),counter:$t('Precisa de detecção de Camuflado E de uma fonte que quebre blindagem — nem sempre é a mesma torre.')},
-  {icon:'⚡',name:$t('Rápido'),color:'#ffe066',desc:$t('Menos vida que o normal, mas atravessa a rota bem mais rápido — passa rápido pelo alcance das torres.'),counter:$t('Lentidão (Gelinho, Cipó, Mago) ajuda a mantê-lo no alcance por mais tempo.')},
-  {icon:'➕',name:$t('Regenerador'),color:'#5fd88a',desc:$t('Recupera vida aos poucos quando fica um tempo sem ser atingido.'),counter:$t('Dano constante e rápido (Laser, Dardo, Ninja) não dá espaço pra ele regenerar.')},
-  {icon:'❤️',name:$t('Curandeiro'),color:'#62d887',desc:$t('Regenera 1 camada por segundo dos balões próximos em um raio pequeno.'),counter:$t('Priorize o Curandeiro antes que uma formação inteira comece a recuperar camadas.')},
-  {icon:'🤡',name:$t('Atrapalhão'),color:'#ff9f5d',desc:$t('Pode estourar 1 camada do balão à frente, mas o impacto atordoa gatinhos próximos por 1,2s.'),counter:$t('Evite concentrar toda a defesa colada no mesmo ponto quando ele estiver chegando.')},
-  {icon:'🃏',name:$t('Bobo da Corte'),color:'#ce78ff',desc:$t('Tem apenas 1 de vida. O dano do tiro que o acerta tira salmões da partida.'),counter:$t('O prejuízo é limitado a 500 salmões por acerto. Torres fracas/rápidas podem ser mais econômicas do que um tiro enorme de Sniper.')},
-  {icon:'😇',name:$t('Anjo'),color:'#f4efc7',desc:$t('Dá 1 escudo a um balão próximo. O escudo bloqueia um ataque inteiro, mas reduz em 18% a velocidade do protegido.'),counter:$t('Ataques baratos e rápidos quebram o escudo antes dos seus golpes pesados.')},
-  {icon:'😈',name:$t('Demônio'),color:'#a94455',desc:$t('Rouba até 1 camada de balões próximos e converte isso em vida máxima própria.'),counter:$t('Mate cedo: ele pode crescer até 2× a vida máxima original se ficar cercado de aliados.')},
-  {icon:'⭐',name:'Elite',color:'#ffd36b',desc:$t('Não é bem um tipo novo — é uma versão fortalecida (+45% de vida) de qualquer balão comum ou especial, a partir da rodada 3.'),counter:$t('Fica mais fácil de notar pela barra de vida maior; trate como o tipo base, só que mais resistente.')},
-  {icon:'👹',name:'Mini Boss',color:'#f29b54',desc:$t('Na rodada 15 do Normal e do Difícil surge com 30× a vida do inimigo regular mais resistente disponível até ali.'),counter:$t('É um teste de dano no meio da fase. Se escapar, tira 8 vidas em vez de encerrar a partida inteira.')},
-  {icon:'👑',name:$t('Chefão'),color:'#ffb347',desc:$t('Aparece na última rodada de cada mapa. Tem 75× a vida do inimigo regular mais resistente e anda 30% mais devagar do que antes.'),counter:$t('É um tanque de verdade. Se escapar, tira TODAS as suas vidas restantes na hora.')}
-];
+const BALLOON_GUIDE={
+  normal:{icon:'🎈',name:$t('Balão comum'),color:'#ff7180',desc:$t('A cor indica a resistência do balão e quantas vidas ele tira se escapar.'),counter:$t('Gatos Dardo e Bombinha cobrem grupos. Gelinho ajuda a segurar a fila.')},
+  camo:{icon:'🥷',name:$t('Camuflado'),color:'#547b59',desc:$t('Invisível para a maioria das torres — passa despercebido até ser detectado.'),counter:$t('Detectado por: Sniper (sempre), Dardo (caminho Lanceiro, T2+), Ninja (caminho Sombra Assassina, T1+) e pelo Observador do Sniper (T2+, revela pra toda a defesa).')},
+  armored:{icon:'🛡️',name:$t('Blindado'),color:'#9ba4b4',desc:$t('Tem uma camada extra de blindagem por fora. A maioria dos ataques não avança até ela quebrar.'),counter:$t('Quebra blindagem: Bombinha (sempre), Sniper (caminho Caçador, T4+), Ninja (caminho Sombra Assassina, T5).')},
+  heavyArmored:{icon:'🛡️🛡️',name:$t('Blindado Pesado'),color:'#4a525c',desc:$t('A versão reforçada do Blindado — a camada externa aguenta bem mais dano antes de quebrar. Aparece a partir da dificuldade Normal.'),counter:$t('As mesmas fontes que quebram blindagem comum funcionam, só que leva mais tempo pra derrubar a camada.')},
+  camoArmored:{icon:'🥷🛡️',name:$t('Camuflado + Blindado'),color:'#5c7a63',desc:$t('Combina os dois ao mesmo tempo: invisível E blindado.'),counter:$t('Precisa de detecção de Camuflado E de uma fonte que quebre blindagem — nem sempre é a mesma torre.')},
+  fast:{icon:'⚡',name:$t('Rápido'),color:'#ffe066',desc:$t('Menos vida que o normal, mas atravessa a rota bem mais rápido — passa rápido pelo alcance das torres.'),counter:$t('Lentidão (Gelinho, Cipó, Mago) ajuda a mantê-lo no alcance por mais tempo.')},
+  regen:{icon:'➕',name:$t('Regenerador'),color:'#5fd88a',desc:$t('Recupera vida aos poucos quando fica um tempo sem ser atingido.'),counter:$t('Dano constante e rápido (Laser, Dardo, Ninja) não dá espaço pra ele regenerar.')},
+  healer:{icon:'❤️',name:$t('Curandeiro'),color:'#62d887',desc:$t('Regenera 1 camada por segundo dos balões próximos em um raio pequeno.'),counter:$t('Priorize o Curandeiro antes que uma formação inteira comece a recuperar camadas.')},
+  trickster:{icon:'🤡',name:$t('Atrapalhão'),color:'#ff9f5d',desc:$t('Pode estourar 1 camada do balão à frente, mas o impacto atordoa gatinhos próximos por 1,2s.'),counter:$t('Evite concentrar toda a defesa colada no mesmo ponto quando ele estiver chegando.')},
+  jester:{icon:'🃏',name:$t('Bobo da Corte'),color:'#ce78ff',desc:$t('Tem apenas 1 de vida. O dano do tiro que o acerta tira salmões da partida.'),counter:$t('O prejuízo é limitado a 500 salmões por acerto. Torres fracas/rápidas podem ser mais econômicas do que um tiro enorme de Sniper.')},
+  angel:{icon:'😇',name:$t('Anjo'),color:'#f4efc7',desc:$t('Dá 1 escudo a um balão próximo. O escudo bloqueia um ataque inteiro, mas reduz em 18% a velocidade do protegido.'),counter:$t('Ataques baratos e rápidos quebram o escudo antes dos seus golpes pesados.')},
+  demon:{icon:'😈',name:$t('Demônio'),color:'#a94455',desc:$t('Rouba até 1 camada de balões próximos e converte isso em vida máxima própria.'),counter:$t('Mate cedo: ele pode crescer até 2× a vida máxima original se ficar cercado de aliados.')},
+  elite:{icon:'⭐',name:'Elite',color:'#ffd36b',desc:$t('Não é bem um tipo novo — é uma versão fortalecida (+45% de vida) de qualquer balão comum ou especial, a partir da rodada 3.'),counter:$t('Fica mais fácil de notar pela barra de vida maior; trate como o tipo base, só que mais resistente.')},
+  miniBoss:{icon:'👹',name:'Mini Boss',color:'#f29b54',desc:$t('Na rodada 15 do Normal e do Difícil surge com 30× a vida do inimigo regular mais resistente disponível até ali.'),counter:$t('É um teste de dano no meio da fase. Se escapar, tira 8 vidas em vez de encerrar a partida inteira.')},
+  campaignBoss:{icon:'👑',name:$t('Chefão'),color:'#ffb347',desc:$t('Aparece na última rodada de cada mapa, com 75× a vida do inimigo regular mais resistente.'),counter:$t('Concentre dano. O Cipó reduz sua velocidade. Se escapar, a partida acaba.')},
+  spine:{icon:'🦈',name:EventRules.bosses.spine.name,color:EventRules.bosses.spine.color,desc:$t('Quatro escudos em sequência: antiblindagem, detecção de camuflados, fogo ou laser, e qualquer dano.'),counter:$t('Prepare Bombinha, Sniper e Laser ou um Mago com fogo. O Cipó ajuda a ganhar tempo entre os escudos.')},
+  eclipse:{icon:'🌑',name:EventRules.bosses.eclipse.name,color:EventRules.bosses.eclipse.color,desc:$t('A aura atordoa uma categoria por etapa e recupera vida enquanto ela estiver no alcance. A cura é limitada à etapa atual.'),counter:$t('Padrão → Mágico → Tecnológico → Suporte. Reposicione a categoria marcada durante o aviso de 3 s. Heróis ficam livres da aura.')}
+};
 
 function renderTutorial(){
   const towerRoot=$('#tutorial-towers');
@@ -3029,14 +3204,15 @@ function renderTutorial(){
   }
   const balloonRoot=$('#tutorial-balloons');
   if(balloonRoot){
-    balloonRoot.innerHTML=BALLOON_GUIDE.map(b=>`<article class="balloon-card">
+    $('#almanac-count').textContent=$T`${profile.discoveries.length}/${Fieldwork.discoveries.length} fichas`;
+    balloonRoot.innerHTML=Object.entries(BALLOON_GUIDE).map(([id,b])=>profile.discoveries.includes(id)?`<article class="balloon-card">
       <div class="balloon-head">
         <div class="balloon-avatar">${b.icon}<b style="background:${b.color}"></b></div>
         <h3>${b.name}</h3>
       </div>
       <p class="balloon-desc">${b.desc}</p>
       <div class="balloon-counter">🎯 ${b.counter}</div>
-    </article>`).join('');
+    </article>`:`<article class="balloon-card undiscovered"><div class="balloon-head"><div class="balloon-avatar">🔒</div><h3>${b.name}</h3></div><p>${$t('Encontre em uma partida para liberar a ficha.')}</p></article>`).join('');
   }
 }
 
@@ -3188,11 +3364,13 @@ function initNavigation(){
   $$('[data-select-mode]').forEach(btn=>btn.onclick=()=>{sfx('ui');lobbySelection.mode=btn.dataset.selectMode;setScreen('play');});
   window.addEventListener('popstate',e=>{
     const id=(e.state&&e.state.screen)||(location.hash||'#hub').slice(1);
-    if(['hub','play','event','profile','cosmetics','cats','heroes','powers','game','tutorial'].includes(id))setScreen(id,false);
+    if(document.body.dataset.screen==='game'&&id!=='game')personalTd?.leaveMatch(false);
+    if(LOBBY_SCREENS.includes(id))setScreen(id,false);
   });
 }
 
 function doResetSave(){
+  if(cloudSaves?.owner())return;
   profile=cloneDefaultProfile();
   lobbySelection={map:'grove',difficulty:'easy',mode:'campaign',category:'beginner'};
   saveProfile();
@@ -3222,6 +3400,99 @@ function showSaveIoStatus(text,isError=false){
   clearTimeout(showSaveIoStatus._t);
   showSaveIoStatus._t=setTimeout(()=>{el.hidden=true;},6000);
 }
+
+function downloadProfile(data,filename){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=url;link.download=filename;
+  document.body.appendChild(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+}
+
+function initCloudSaves(){
+  const status=$('#cloud-status'),signIn=$('#cloud-sign-in'),signOut=$('#cloud-sign-out'),sync=$('#cloud-sync');
+  if(!cloudSupported){
+    status.textContent=$t('Abra o jogo no GitHub Pages para entrar com Google.');
+    return;
+  }
+  const accountLabel=$('#cloud-user'),backup=$('#cloud-backup'),choices=$('#cloud-choice');
+  const useLocal=$('#cloud-use-local'),useRemote=$('#cloud-use-remote');
+  const messages={
+    guest:'Jogue como visitante ou entre com Google para sincronizar seu progresso.',
+    loading:'Carregando o login com Google…',
+    'signing-in':'Conclua o login na janela do Google.',
+    syncing:'Sincronizando com a nuvem…',
+    synced:'Progresso sincronizado.',
+    pending:'Progresso salvo neste aparelho. A sincronização continua quando a conexão voltar ou ao abrir o perfil.',
+    storage:'O navegador não conseguiu guardar a cópia local.',
+    denied:'O Firebase recusou o acesso ao save.',
+    unavailable:'Não foi possível conectar ao Firebase. Tente novamente.',
+    unsupported:'Abra o jogo no GitHub Pages para entrar com Google.',
+    popup:'Permita a abertura da janela do Google neste site e tente novamente.',
+    'sign-in-error':'Login com Google interrompido. Tente novamente.',
+    'sign-out-error':'Não foi possível sair da conta. Tente novamente.',
+    link:'Escolha o progresso que deseja vincular.',
+    conflict:'Há dois saves diferentes. Escolha qual usar.'
+  };
+  const summary=p=>{
+    const stars=Object.values(p.maps).reduce((n,map)=>n+Object.values(map.cleared).filter(Boolean).length,0);
+    return `🎖️ ${$t('Nível')} ${p.level} · ${p.xp} XP · ⭐ ${stars} · 🪙 ${p.coins}`;
+  };
+  cloudSaves=window.CatoonsCloud.create({
+    storage:cloudStorage,initial:initialAccount,normalize:normalizeProfile,fresh:cloneDefaultProfile,
+    guest:loadProfile,current:()=>profile,
+    canSwitch:()=>document.body.dataset.screen!=='game'&&!$('#loading-screen')?.classList.contains('visible'),
+    apply:data=>{
+      profile=normalizeProfile(data);applyUiScale(profile.settings.uiScale);
+      if($('#menu-ui-scale'))$('#menu-ui-scale').value=String(profile.settings.uiScale);
+      $('#profile-name-input').value=profile.identity.name;
+      updateMusicVolume();renderProfileUi();
+      if(document.body.dataset.screen==='missions')renderMissions();
+      if(document.body.dataset.screen==='tutorial')renderTutorial();
+    },
+    load:()=>import('./firebase-web.js?v=0.32.0').then(module=>module.service),
+    view:state=>{
+      const {user,active,busy,ready,choice,local}=state;
+      status.textContent=$t(messages[state.status]);
+      accountLabel.hidden=!user;
+      accountLabel.textContent=user?.displayName?`${$t('Conta conectada')} · ${user.displayName}`:$t('Conta conectada');
+      signIn.hidden=Boolean(user||active||!ready);signIn.disabled=busy;
+      signOut.hidden=!user;signOut.disabled=busy;
+      sync.hidden=Boolean((!user&&ready)||state.status==='loading'||choice);
+      sync.disabled=busy;
+      sync.textContent=$t(ready?'Sincronizar agora':'Tentar conectar');
+      backup.hidden=!state.backup;backup.disabled=busy;
+      choices.hidden=!choice;
+      if(choice){
+        const conflict=choice.kind==='conflict';
+        $('#cloud-choice-text').textContent=$t(conflict
+          ?'A versão escolhida passa a ser o save da conta. A outra fica disponível para download neste aparelho.'
+          :'Vincule o progresso deste aparelho à conta Google. A cópia de visitante fica disponível neste navegador.');
+        $('#cloud-other-option').hidden=!conflict;
+        $('#cloud-local-summary').textContent=summary(local);
+        if(conflict)$('#cloud-remote-summary').textContent=summary(choice.other);
+        useLocal.textContent=$t(conflict?'Usar o progresso deste aparelho':'Vincular este progresso');
+        useLocal.disabled=useRemote.disabled=busy;
+      }
+      $('#reset-save').disabled=Boolean(active);
+      $('#reset-save').title=active?$t('Saia da conta para apagar o progresso de visitante.'):'';
+    }
+  });
+  signIn.onclick=()=>cloudSaves.signIn();
+  signOut.onclick=()=>cloudSaves.signOut();
+  sync.onclick=()=>cloudSaves.refresh();
+  useLocal.onclick=()=>cloudSaves.sync('local');
+  useRemote.onclick=()=>cloudSaves.sync('cloud');
+  backup.onclick=()=>{
+    const previous=cloudSaves.backup();
+    if(previous)downloadProfile(previous,'catoons-td-save-anterior.json');
+  };
+  const retry=()=>{if(cloudSaves.owner()||document.body.dataset.screen==='profile')cloudSaves.refresh();};
+  window.addEventListener('online',retry);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)retry();});
+  cloudSaves.show();retry();
+}
+
 function initSettingsExtras(){
   const fsBtn=$('#menu-fullscreen');
   const syncFsLabel=()=>{ if(fsBtn) fsBtn.textContent=document.fullscreenElement?$t('🗗 Sair da tela cheia'):$t('🖥️ Tela cheia'); };
@@ -3260,26 +3531,30 @@ function initSettingsExtras(){
   if(exportBtn) exportBtn.onclick=()=>{
     sfx('ui');
     try{
-      const blob=new Blob([JSON.stringify(profile,null,2)],{type:'application/json'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;a.download=`catoons-td-save-${new Date().toISOString().slice(0,10)}.json`;
-      document.body.appendChild(a);a.click();a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),4000);
+      downloadProfile(profile,`catoons-td-save-${new Date().toISOString().slice(0,10)}.json`);
       showSaveIoStatus($t('✓ Save exportado. Guarde o arquivo .json em um lugar seguro.'));
     }catch(err){ console.warn('Falha ao exportar save.',err); showSaveIoStatus($t('Não foi possível exportar o save.'),true); }
   };
 
   const importInput=$('#menu-import-save-input'),importBtn=$('#menu-import-save');
   if(importBtn&&importInput){
-    importBtn.onclick=()=>{sfx('ui');importInput.click();};
+    importBtn.onclick=()=>{
+      sfx('ui');
+      if(document.body.dataset.screen==='game'){showSaveIoStatus($t('Volte ao lobby para importar um save.'),true);return;}
+      importInput.click();
+    };
     importInput.onchange=()=>{
       const file=importInput.files&&importInput.files[0];
       if(!file) return;
+      const owner=cloudSaves?.owner();
       const reader=new FileReader();
       reader.onload=()=>{
+        if(document.body.dataset.screen==='game'||owner!==cloudSaves?.owner()){importInput.value='';return;}
         try{
           const parsed=JSON.parse(String(reader.result));
+          if(owner&&!confirm($t('Importar este arquivo substitui o progresso desta conta neste aparelho e envia a alteração ao sincronizar. Continuar?'))){
+            importInput.value='';return;
+          }
           profile=normalizeProfile(parsed);
           saveProfile();
           applyUiScale(profile.settings&&profile.settings.uiScale);
@@ -3380,7 +3655,6 @@ function runMapLoading(mapId,diffId,onReady,modeId='campaign'){
   const map=maps[mapId]||maps.grove,diff=difficulties[diffId]||difficulties.easy;
   const preview=$('#loading-preview');
   if(preview) preview.className=`loading-preview preview-${mapId in maps?mapId:'grove'}`;
-  if($('#loading-map-name')) $('#loading-map-name').textContent=map.name;
   if($('#loading-map-name')) $('#loading-map-name').textContent=modeId==='boss-event'?'Arena · '+EventRules.bosses[eventBossId].title:map.name;
   if($('#loading-diff-name')) $('#loading-diff-name').textContent=modeId==='infinite'?$T`∞ Infinito • ${diff.name} • sem rodada final`:modeId==='boss-event'?$t('👑 Evento diário • 60 rodadas • chefes em 20/40/60'):$T`${diff.name} • ${mapRounds(mapId,diffId)} rodadas`;
   if($('#loading-tip')) $('#loading-tip').textContent=loadingTips[Math.floor(Math.random()*loadingTips.length)];
@@ -3487,15 +3761,19 @@ function initPersonalTd(){
     state.paidMilestones=new Set(next.paidMilestones||[]);
     state.shots=[];state.floatTexts=[];state.particles=[];state.impactFx=[];state.muzzleFx=[];
     Object.assign(state,localSelection);
-    let profileChanged=false;for(const reward of next.progressAwards||[])profileChanged=window.CatoonsIdentity.grant(profile,reward)||profileChanged;if(profileChanged)saveProfile();
+    let profileChanged=Fieldwork.discover(profile.discoveries,state.enemies);
+    for(const reward of next.progressAwards||[])profileChanged=window.CatoonsIdentity.grant(profile,reward)||profileChanged;
+    if(profileChanged)saveProfile();
     if(mapChanged)configurePath();
     updateStats();renderUnlocks();renderHeroHud();renderSynergies();updateUpgradePanel();
     if((next.completed||next.defeatShown)&&guestResultMatchId!==next.matchId){guestResultMatchId=next.matchId;showResult(Boolean(next.completed),{coins:0,xp:0});}
   }
-  function recordProgressReward(reward){
+  function recordProgressReward(reward,persist=true){
     const entry={...reward,id:state.matchId+':'+reward.key};delete entry.key;
     if(!state.progressAwards.some(item=>item.id===entry.id))state.progressAwards.push(entry);
-    if(window.CatoonsIdentity.grant(profile,entry))saveProfile();
+    const granted=window.CatoonsIdentity.grant(profile,entry);
+    if(granted&&persist)saveProfile();
+    return granted;
   }
   function selectLanTower(id){state.selectedTower=Number(id)||null;state.selectedHero=false;return selectedTower();}
   function handleLanAction(data,actorId='host'){
@@ -3576,6 +3854,47 @@ function initPersonalTd(){
   function currentDifficulty(){return difficulties[state.difficulty];}
   function isInfinite(){return state.mode==='infinite';}
   function isBossEvent(){return state.mode==='boss-event';}
+  function isTraining(){return state.mode==='training';}
+  function roomBusy(){return Boolean(lan?.isHost||lan?.isGuest||lan?.recovering||['creating','joining'].includes(lan?.status));}
+  function canCheckpoint(){return state.matchPlayers===1&&!roomBusy()&&CHECKPOINT_MODES.includes(state.mode);}
+  function captureCheckpoint(){
+    if(!canCheckpoint()||state.waveActive||state.lives<=0||state.completed)return false;
+    const snapshot=Object.fromEntries(CHECKPOINT_FIELDS.map(key=>[key,state[key]]));
+    profile.checkpoints[state.mode]={...structuredClone(snapshot),schema:1,money:state.money,savedAt:Date.now()};
+    return true;
+  }
+  function clearCheckpoint(){
+    if(profile.checkpoints[state.mode]?.matchId===state.matchId)delete profile.checkpoints[state.mode];
+  }
+  function confirmReplacement(mode){
+    return roomBusy()||!profile.checkpoints[mode]||confirm($t('Começar de novo substitui a partida solo salva deste modo. Continuar?'));
+  }
+  function resumeCheckpoint(mode){
+    if(roomBusy()){alert($t('Saia da sala cooperativa para continuar a partida solo.'));return;}
+    const slot=normalizeCheckpoints(profile.checkpoints)[mode];
+    if(!slot)return;
+    loadSelection(slot.map,slot.difficulty,slot.mode,slot.eventVariant,slot.eventBossId);
+    for(const key of CHECKPOINT_FIELDS)if(Object.hasOwn(slot,key))state[key]=structuredClone(slot[key]);
+    state.money=slot.money;state.missionSettledWave=slot.wave;
+    setScreen('game');renderUnlocks();renderHeroHud();renderEffects();updateStats();
+    setMsg($T`💾 Partida retomada. Próxima rodada: ${state.wave+1}.`);
+  }
+  function countMission(id,amount=1){
+    if(!isTraining()&&state.matchPlayers===1&&!roomBusy())state.missionCounts[id]=(state.missionCounts[id]||0)+amount;
+  }
+  function settleMissionCounts(){
+    const coins=Fieldwork.advance(profile,state.missionCounts);
+    state.missionCounts={};
+    return coins;
+  }
+  function settleCheckpointProgress(){
+    for(const reward of state.pendingBossRewards){
+      if(recordProgressReward(reward,false))profile.coins+=reward.coins;
+    }
+    state.pendingBossRewards=[];
+    for(const [id,amount] of Object.entries(state.pendingPowers))profile.inventory[id]=Math.max(0,profile.inventory[id]-amount);
+    state.pendingPowers={};
+  }
   function matchRounds(){return isBossEvent()?60:mapRounds(state.map,state.difficulty);}
   function currentHeroDef(){return HEROES[profile.selectedHero]||HEROES.king;}
   function towerTypePresent(typeId){return state.towers.some(t=>t.type===typeId&&!t.eclipseStunned);}
@@ -3810,6 +4129,8 @@ function initPersonalTd(){
     hideMatchTutorialOverlay();
     state.menuOpen=true;state.paused=true;syncVolumeUi();
     $$('.match-only-action').forEach(btn=>btn.hidden=false);
+    $('#menu-save-lobby').hidden=!canCheckpoint();
+    $('#menu-lobby').hidden=canCheckpoint();
     $$('.settings-only-action').forEach(btn=>btn.hidden=true);
     if($('#menu-language')){$('#menu-language').disabled=true;}
     if($('#menu-language-hint'))$('#menu-language-hint').style.display='';
@@ -5222,8 +5543,8 @@ function initPersonalTd(){
   function renderHotbar(){
     const root=$('#power-hotbar');if(!root)return;
     root.innerHTML=Object.entries(powers).map(([id,p])=>{
-      const qty=profile.inventory[id]||0,active=effectActive(id);
-      const remaining=active?`${state.effects[id].toFixed(1)}s`:$T`${qty} carga${qty===1?'':'s'}`;
+      const qty=powerQuantity(id),active=effectActive(id);
+      const remaining=active?`${state.effects[id].toFixed(1)}s`:isTraining()?$t('Carga de teste'):$T`${qty} carga${qty===1?'':'s'}`;
       return`<button type="button" class="power-use ${qty>0?'ready':''} ${active?'active':''}" data-use-power="${id}" ${qty<=0||active?'disabled':''} title="${p.description}">
         <span class="icon">${p.icon}</span><b>${p.name}</b><small>${remaining}</small>
       </button>`;
@@ -5287,7 +5608,11 @@ function initPersonalTd(){
 
   function renderNextWavePreview(){
     const root=$('#next-wave-alert');if(!root)return;
+    root.hidden=isTraining();if(isTraining())return;
     const totalRounds=matchRounds(),next=state.wave+1;
+    const key=[state.map,state.difficulty,state.mode,state.eventBossId,state.matchPlayers,state.wave,state.completed].join(':');
+    if(root.dataset.previewKey===key)return;
+    root.dataset.previewKey=key;
     if(!isInfinite()&&(state.completed||next>totalRounds)){
       root.className='next-wave-alert done';
       root.innerHTML=$t('<span class="next-wave-icon">✓</span><div><b>Última rodada chamada</b><small>Termine os inimigos restantes.</small></div>');
@@ -5295,6 +5620,17 @@ function initPersonalTd(){
     }
     const previous=waveFeatureSet(state.wave),upcoming=waveFeatureSet(next),news=[];
     if(!previous.tier||upcoming.tier!==previous.tier)news.push(`🎈 ${upcoming.tier}`);
+    const earlier=new Set();
+    const needsCamo=upcoming.kinds.has('camo')||upcoming.kinds.has('camoArmored');
+    const needsArmor=['armored','heavyArmored','camoArmored'].some(kind=>upcoming.kinds.has(kind));
+    if(needsCamo||needsArmor){
+      for(let round=1;round<=state.wave;round++){
+        for(const kind of waveFeatureSet(round).kinds)earlier.add(kind);
+        if((!needsCamo||earlier.has('camo')||earlier.has('camoArmored'))&&(!needsArmor||['armored','heavyArmored','camoArmored'].some(kind=>earlier.has(kind))))break;
+      }
+    }
+    if(needsCamo&&!earlier.has('camo')&&!earlier.has('camoArmored'))news.push($t('🥷 Primeiros camuflados: prepare um Sniper ou detecção'));
+    if(needsArmor&&!['armored','heavyArmored','camoArmored'].some(kind=>earlier.has(kind)))news.push($t('🛡️ Primeiros blindados: prepare um Bombinha ou quebra de blindagem'));
     for(const kind of upcoming.kinds)if(!previous.kinds.has(kind))news.push(waveKindLabels[kind]||kind);
     if(upcoming.boss)news.push(isBossEvent()?EventRules.bosses[state.eventBossId].icon+' '+EventRules.bosses[state.eventBossId].name:'👑 BOSS');
     const milestone=isInfinite()&&next%10===0;
@@ -5309,7 +5645,7 @@ function initPersonalTd(){
   function renderEventBossHud(){
     const root=$('#event-boss-hud');if(!root)return;
     const boss=[...state.enemies,...state.spawn].find(e=>e.eventBoss&&!e.dead);
-    root.hidden=!isBossEvent()||!boss;if(!boss)return;
+    root.hidden=!boss;if(!boss)return;
     const hpPct=Math.max(0,Math.min(100,(boss.hp||0)/Math.max(1,boss.maxHp||1)*100)),shieldPct=Math.max(0,Math.min(100,(boss.bossShieldHp||0)/Math.max(1,boss.bossShieldMax||1)*100));
     const eclipse=boss.raidBoss==='eclipse',requirement=eclipse?EventRules.classes[EventRules.phaseClass(boss.bossPhase)]:bossShieldRequirement(boss.bossPhase||1);
     if($('#event-boss-icon'))$('#event-boss-icon').textContent=eclipse?'🌑':'🦈';
@@ -5369,13 +5705,13 @@ function initPersonalTd(){
     const moneyEl=$('#td-money');
     if(moneyEl){moneyEl.textContent=Math.floor(state.money);const label=moneyEl.parentElement?.querySelector('small');if(label)label.textContent=lan?.connected?$t('seus salmões'):$t('salmões');}
     if($('#td-wave'))$('#td-wave').textContent=state.wave;
-    if($('#td-wave-max'))$('#td-wave-max').textContent=endless?'∞':totalRounds;
+    if($('#td-wave-max'))$('#td-wave-max').textContent=endless||isTraining()?'∞':totalRounds;
     if($('#td-count'))$('#td-count').textContent=state.enemies.length+state.spawn.length;
     if($('#td-map-meta'))$('#td-map-meta').textContent=endless
       ?$T`${map.description} • ∞ Infinito ${diff.name} • recorde ${infiniteBestFor(state.map,state.difficulty)} • moedas permanentes a cada 10 rodadas.`
       :isBossEvent()?$T`${map.description} • 👑 Evento diário • invasões nas rodadas 20, 40 e 60.`:$T`${map.description} • ${diff.name} • estrelas do mapa ${mapStars(state.map)}/3.`;
     if($('#game-map-title'))$('#game-map-title').textContent=map.name;
-    if($('#game-difficulty-text'))$('#game-difficulty-text').textContent=endless
+    if($('#game-difficulty-text'))$('#game-difficulty-text').textContent=isTraining()?$t('🧪 Modo treino') :endless
       ?$T`∞ Modo Infinito • ${diff.name} • melhor: rodada ${infiniteBestFor(state.map,state.difficulty)}`
       :isBossEvent()?'👑 '+EventRules.bosses[state.eventBossId].title+' · '+(state.eventVariant==='insane'?'INSANO · 5× vida':'Normal')+' · '+(state.matchPlayers>1?'Equipe LAN/VPN':'Solo'):$T`🏁 Campanha • ${diff.name} • ${profile.maps[state.map].cleared[state.difficulty]?$t('⭐ já concluída'):$t('☆ estrela ainda não conquistada')}`;
     const start=$('#td-start');
@@ -5387,7 +5723,9 @@ function initPersonalTd(){
         if(icon&&icon.textContent!==nextIcon)icon.textContent=nextIcon;
         if(labelNode&&labelNode.textContent!==nextLabel)labelNode.textContent=nextLabel;
       };
-      if(!endless&&state.completed){
+      if(isTraining()){
+        start.disabled=state.waveActive;start.title=$t('Chamar alvos de treino');setStartContent('▶',$t('Chamar alvos'));
+      }else if(!endless&&state.completed){
         start.disabled=true;start.title=$t('Mapa concluído');setStartContent('✓',$t('Concluído'));
       }else if(!endless&&state.wave>=totalRounds){
         start.disabled=true;
@@ -5414,12 +5752,13 @@ function initPersonalTd(){
   function reset(){
     const map=currentMap(),diff=currentDifficulty();
     state.matchId=crypto.randomUUID();state.progressAwards=[];state.soldTowers=[];state.bossHealing=0;state.matchPlayers=activeWalletIds().length;state.connectionPaused=false;
-    const startingMoney=isBossEvent()?eventStartMoney(activeWalletIds().length):MATCH_START_MONEY;
+    const startingMoney=isTraining()?100000:isBossEvent()?eventStartMoney(activeWalletIds().length):MATCH_START_MONEY;
     state.playerWallets=Object.fromEntries(activeWalletIds().map(id=>[id,startingMoney]));
     if(!state.playerWallets.host)state.playerWallets.host=startingMoney;
     state.lives=Math.max(1,map.lives+diff.extraLives);
     state.wave=0;state.lastClearedWave=0;state.lastFarmPaidWave=0;state.selected=null;state.selectedTower=null;state.selectedHero=false;state.repositionTower=null;state.hero=null;state.nextTowerId=1;state.nextEnemyId=1;
     state.unitPlacedThisMatch=false;
+    state.missionCounts={};state.missionSettledWave=0;state.pendingBossRewards=[];state.pendingPowers={};
     state.paused=false;state.menuOpen=false;state.defeatShown=false;state.waveActive=false;state.completed=false;state.rewardGranted=false;state.masteryXpGranted=false;state.masterySession=Object.fromEntries(Object.keys(types).map(id=>[id,{used:false,damage:0,pops:0,income:0,actions:0}]));
     state.enemies=[];state.towers=[];state.shots=[];state.spawn=[];state.shadowBloons=[];state.pulses=[];state.lightning=[];state.airstrikes=[];state.bombs=[];state.floatTexts=[];state.particles=[];state.impactFx=[];state.muzzleFx=[];state.screenShake=0;state.particleTimer=0;state.last=0;
     state.pendingClearCash=0;state.pendingWaveXp=0;state.paidMilestones=new Set();
@@ -5428,7 +5767,8 @@ function initPersonalTd(){
     playMusicTheme(state.map);
     if($('#td-pause')){$('#td-pause').textContent='⏸';$('#td-pause').title=$t('Pausar');}
     hideGameModal('#pause-menu');hideGameModal('#result-screen');
-    setMsg(isInfinite()
+    $('#training-controls').hidden=!isTraining();
+    setMsg(isTraining()?$t('Monte sua defesa e selecione os alvos. Use o botão Chamar alvos para começar.'):isInfinite()
       ?$T`${map.name} • ∞ Infinito ${diff.name}. Não existe rodada final: a dificuldade sobe continuamente e cada 10 rodadas concluídas rende moedas permanentes.`
       :isBossEvent()
         ?EventRules.bosses[state.eventBossId].name+' invade nas rodadas 20, 40 e 60. '+(state.eventBossId==='eclipse'?'Retire a categoria marcada da aura para impedir atordoamento e cura.':'Prepare dano para os quatro escudos.')
@@ -5441,27 +5781,32 @@ function initPersonalTd(){
   function loadSelection(mapId,diffId,modeId='campaign',variant=eventVariant,bossId=eventBossId){
     state.map=mapId in maps?mapId:'grove';
     state.difficulty=diffId in difficulties?diffId:'easy';
-    state.mode=modeId==='infinite'?'infinite':modeId==='boss-event'?'boss-event':'campaign';
+    state.mode=['infinite','boss-event','training'].includes(modeId)?modeId:'campaign';
     state.eventVariant=variant==='insane'?'insane':'normal';
     state.eventBossId=bossId==='eclipse'?'eclipse':'spine';
-    if(state.mode!=='boss-event')lobbySelection={map:state.map,difficulty:state.difficulty,mode:state.mode,category:'beginner'};
+    if(!isBossEvent()&&!isTraining())lobbySelection={map:state.map,difficulty:state.difficulty,mode:state.mode,category:'beginner'};
     reset();
   }
 
+  function powerQuantity(id){return isTraining()?1:Math.max(0,(profile.inventory[id]||0)-(state.pendingPowers[id]||0));}
   function usePower(id){
     const p=powers[id];if(!p)return;
-    if((profile.inventory[id]||0)<=0){setMsg($T`Sem cargas de ${p.name}. Compre no lobby Poderes.`);return;}
+    if(powerQuantity(id)<=0){setMsg($T`Sem cargas de ${p.name}. Compre no lobby Poderes.`);return;}
     if(p.duration&&(!state.wave||(!state.enemies.length&&!state.spawn.length))){setMsg($T`${p.name} é temporário. Inicie uma rodada antes de usar.`);return;}
     if(p.duration&&effectActive(id)){setMsg($T`${p.name} já está ativo.`);return;}
     const maxLives=currentMap().lives+currentDifficulty().extraLives;
     if(p.effect==='heal'&&state.lives>=maxLives){setMsg($t('Suas vidas já estão cheias.'));return;}
-    profile.inventory[id]--;
+    if(!isTraining()){
+      if(canCheckpoint()&&state.waveActive)state.pendingPowers[id]=(state.pendingPowers[id]||0)+1;
+      else profile.inventory[id]--;
+    }
     if(p.effect==='attackSpeed')state.effects.frenzy=p.duration;
     if(p.effect==='damage')state.effects.focus=p.duration;
     if(p.effect==='slow')state.effects.blizzard=p.duration;
     if(p.effect==='cash')state.money+=350;
     if(p.effect==='heal')state.lives=Math.min(maxLives,state.lives+6);
-    saveProfile();
+    if(!isTraining()&&!state.waveActive)captureCheckpoint();
+    if(!isTraining()&&!(canCheckpoint()&&state.waveActive))saveProfile();
     sfx('ui');setMsg($T`${p.icon} ${p.name} ativado! ${p.description}`);
     renderHotbar();renderEffects();
     if(state.selectedTower)updateUpgradePanel();
@@ -5471,7 +5816,7 @@ function initPersonalTd(){
   // Vida-base do balão "puro" da rodada, em camadas (estilo Bloons: Vermelho=1 ... Preto=6).
   // O teto de cor depende da dificuldade — Fácil nunca manda Rosa/Preto, Difícil manda todas.
   // A rampa vai de 1 na rodada 1 até o teto na última rodada do mapa/dificuldade atual.
-  function waveHp(wave){
+  function waveHp(wave,totalRounds=matchRounds()){
     if(isInfinite()){
       // No infinito todas as cores acabam aparecendo. Depois da camada Preta,
       // a vida continua crescendo por trás da cor visual para manter a escalada.
@@ -5481,7 +5826,6 @@ function initPersonalTd(){
       const growth=Math.pow(state.difficulty==='hard'?1.095:state.difficulty==='normal'?1.082:1.07,post/5);
       return Number((layered*growth).toFixed(2));
     }
-    const totalRounds=matchRounds();
     const maxTier=state.difficulty==='easy'?4:state.difficulty==='hard'?6:5;
     const progress=totalRounds>1?Math.min(1,(wave-1)/(totalRounds-1)):1;
     return Number((1+progress*(maxTier-1)).toFixed(2));
@@ -5537,8 +5881,8 @@ function initPersonalTd(){
     harbor:$t('Dirigível do Porto'),canyon:$t('Dirigível do Desfiladeiro'),ruins:$t('Dirigível Ancestral'),factory:$t('Dirigível Mecânico'),fork:$t('Dirigível Gêmeo'),storm:$t('Dirigível da Tempestade'),blind:$t('Dirigível das Sombras'),church:$t('Dirigível do Sino Partido')
   };
 
-  function strongestRegularDurability(round){
-    const eliteBase=waveHp(round)*1.45;
+  function strongestRegularDurability(round,totalRounds){
+    const eliteBase=waveHp(round,totalRounds)*1.45;
     // Em Normal/Difícil, o Blindado Pesado elite é o inimigo regular com maior vida total
     // (blindagem + balão interno). No Fácil, o elite normal é o teto.
     return state.difficulty==='easy'?eliteBase:eliteBase*(2.30+1.05);
@@ -5564,7 +5908,7 @@ function initPersonalTd(){
   }
 
   function makeDailyBoss(round){
-    const map=currentMap(),diff=currentDifficulty(),strongest=strongestRegularDurability(round),encounter=Math.max(1,Math.min(3,Math.round(round/20)));
+    const map=isTraining()?EVENT_ARENA_MAP:currentMap(),diff=currentDifficulty(),strongest=strongestRegularDurability(round,60),encounter=Math.max(1,Math.min(3,Math.round(round/20)));
     const players=eventPlayerCount(state.matchPlayers),teamScale=eventTeamScale(players),bossScale=[0,120,185,275][encounter],variantScale=state.eventVariant==='insane'?5:1;
     const eclipse=state.eventBossId==='eclipse',normalHp=Number((strongest*bossScale*teamScale*(eclipse?1.25:1)).toFixed(1)),hp=normalHp*variantScale,shieldMax=eclipse?0:Number((normalHp*(.12+encounter*.025)).toFixed(1))*variantScale;
     const speed=(50+round*2.2)*map.speedMultiplier*diff.speed*.22,reward=Math.round((220+encounter*180)*map.rewardMultiplier*diff.waveReward);
@@ -5584,9 +5928,9 @@ function initPersonalTd(){
     return index%2;
   }
 
-  function makeEnemy(round,index){
-    const map=currentMap(),diff=currentDifficulty(),kind=enemyKind(round,index);
-    const eliteMod=Math.max(5,8-Math.floor(round/6)),elite=index%eliteMod===0&&round>2;
+  function makeEnemy(round,index,trainingKind=null){
+    const map=currentMap(),diff=currentDifficulty(),kind=trainingKind==='elite'?'normal':trainingKind||enemyKind(round,index);
+    const eliteMod=Math.max(5,8-Math.floor(round/6)),elite=trainingKind?trainingKind==='elite':index%eliteMod===0&&round>2;
     // Sem multiplicador de mapa/dificuldade nem variação por índice: a cor da camada
     // (Vermelho..Preto) precisa significar sempre a mesma quantidade de tiros.
     const base=waveHp(round)*(elite?1.45:1);
@@ -5644,7 +5988,53 @@ function initPersonalTd(){
     return{at:index*.36,round,kind,armored:false,camo:kind==='camo',revealed:false,hp,maxHp:hp,elite,speed:baseSpeed,reward,d:0,slowTimer:0,color:kind==='camo'?'#547b59':color};
   }
 
+  const trainingEnemy=$('#training-enemy'),trainingPack=$('#training-pack');
+  const trainingTargets={normal:$t('Balão comum'),...waveKindLabels,elite:'⭐ Elite',miniBoss:$t('Mini Dirigível'),campaignBoss:$t('Chefão da campanha'),spine:'🦈 Almirante Espinha',eclipse:'🌑 Eclipse Devorador'};
+  trainingEnemy.innerHTML=Object.entries(trainingTargets).map(([id,name])=>`<option value="${id}">${name}</option>`).join('');
+  function syncTrainingPack(){
+    const raid=Object.hasOwn(EventRules.bosses,trainingEnemy.value);
+    const boss=raid||['miniBoss','campaignBoss'].includes(trainingEnemy.value);
+    const options=raid?[[20,$t('Invasão 20')],[40,$t('Invasão 40')],[60,$t('Invasão 60')]]:[[1,$t('1 alvo')],...(boss?[]:[[10,$t('10 alvos')]])];
+    const previous=trainingPack.value;
+    trainingPack.replaceChildren(...options.map(([value,label])=>new Option(label,value)));
+    if(options.some(([value])=>String(value)===previous))trainingPack.value=previous;
+  }
+  trainingEnemy.onchange=syncTrainingPack;syncTrainingPack();
+  function renderTrainingLobby(){
+    $('#training-enter').disabled=roomBusy();
+    $('#training-room-note').textContent=roomBusy()?$t('Saia da sala cooperativa para entrar no treino.'):'';
+  }
+  const trainingMap=$('#training-map');
+  trainingMap.innerHTML=Object.entries(maps).map(([id,map])=>`<option value="${id}">${map.name}</option>`).join('');
+  $('#training-enter').onclick=()=>{
+    if(roomBusy())return;
+    const map=trainingMap.value;loadSelection(map,'normal','training');setScreen('game');
+  };
+  function clearTrainingTargets(){
+    state.enemies=[];state.spawn=[];state.shots=[];state.shadowBloons=[];state.airstrikes=[];state.bombs=[];
+    state.waveActive=false;state.lives=currentMap().lives+currentDifficulty().extraLives;
+    for(const tower of state.towers)tower.eclipseStunned=false;
+    playMusicTheme(state.map);updateStats();
+  }
+  $('#training-clear').onclick=()=>{if(isTraining()){clearTrainingTargets();setMsg($t('Alvos limpos. Sua defesa continua no mapa.'));}};
+  function startTrainingTargets(){
+    if(state.waveActive||state.paused)return;
+    const kind=trainingEnemy.value,count=Number(trainingPack.value),round=Math.min(12,matchRounds());
+    if(!Object.hasOwn(trainingTargets,kind))return;
+    state.wave++;state.waveActive=true;
+    if(Object.hasOwn(EventRules.bosses,kind)){
+      state.eventBossId=kind;state.eventVariant='normal';
+      state.spawn=[{...makeDailyBoss(count),path:0}];
+    }else if(kind==='miniBoss'||kind==='campaignBoss'){
+      const boss=kind==='miniBoss'?makeMiniBoss(15):makeBoss(matchRounds());
+      state.spawn=[{...boss,path:0}];
+    }else{
+      state.spawn=Array.from({length:count},(_,i)=>({...makeEnemy(round,i,kind),path:pickEnemyPath(round,i)}));
+    }
+    setMsg($T`🧪 Alvos de treino: ${trainingTargets[kind]}.`);updateStats();
+  }
   function startWave(){
+    if(isTraining()){startTrainingTargets();return;}
     if(state.connectionPaused||lan?.recovering){setMsg('Aguarde a equipe reconectar para continuar.');return;}
     if(requestLanAction('startWave')){setMsg($t('🐾 Rodada solicitada ao anfitrião.'));return;}
     const map=currentMap(),diff=currentDifficulty(),totalRounds=matchRounds(),endless=isInfinite();
@@ -5652,6 +6042,7 @@ function initPersonalTd(){
     if(!endless&&state.completed){setMsg($T`${map.name} já foi concluído. Reinicie ou escolha outra dificuldade.`);return;}
     if(!endless&&state.wave>=totalRounds){setMsg($t('A rodada final já foi chamada. Termine os inimigos restantes.'));return;}
     const overlapping=state.enemies.length||state.spawn.length;
+    if(captureCheckpoint())saveProfile(false);
     state.wave++;state.waveActive=true;notifyMatchTutorialAction('waveStarted');
     const final=!endless&&state.wave===totalRounds,raidBossRound=isBossEvent()&&(state.wave===20||state.wave===40||state.wave===60),count=waveEnemyCount(state.wave);
     const newcomers=Array.from({length:count},(_,i)=>{
@@ -6289,6 +6680,8 @@ function initPersonalTd(){
 
   function breakArmor(enemy,ownerId='host',rewardMultiplier=1){
     const armorReward=enemy.armorReward||0;
+    countMission('armor');
+    enemy.wasCamo=enemy.camo;
     enemy.kind='normal';enemy.armored=false;enemy.camo=false;enemy.armorHp=0;
     enemy.hp=enemy.innerHp;enemy.maxHp=enemy.innerHp;enemy.color=enemy.innerColor||'#ff7180';
     enemy.justUnarmored=performance.now()/1000+.55;
@@ -6478,6 +6871,10 @@ function initPersonalTd(){
     if(enemy.hp<=0&&!enemy.dead){
       const feared=(enemy.fearTimer||0)>0,fearSource=enemy.fearSource;
       enemy.dead=true;
+      if(enemy.kind!=='boss'){
+        countMission('pops');
+        if(enemy.camo||enemy.wasCamo)countMission('camo');
+      }else if(!enemy.miniBoss)countMission('boss');
       if(sourceTower){sourceTower.pops=(sourceTower.pops||0)+1;recordMastery(sourceTower.type,'pops',1);}
       if(sourceHero){sourceHero.pops=(sourceHero.pops||0)+1;grantHeroXp(enemy.kind==='boss'?75:(enemy.elite?5:2));}
       const p=pointAt(enemy.d,enemy.path);
@@ -6487,11 +6884,19 @@ function initPersonalTd(){
         playMusicTheme(state.map);
         const earned=Math.max(1,Math.round(enemy.reward*(source.popRewardMultiplier||1)));addWallet(rewardOwner,earned);
         const cans=enemy.eventBoss?([0,3,5,8][enemy.encounter]||3)*(state.eventVariant==='insane'?3:1):enemy.miniBoss?0:1;
-        if(cans)recordProgressReward({key:'boss-'+enemy.id,cans,bossKill:Boolean(enemy.eventBoss&&enemy.raidBoss!=='eclipse'),eclipseKill:enemy.raidBoss==='eclipse'});
         const bonusCoins=Math.round(20*currentDifficulty().coinMultiplier);
-        profile.coins+=bonusCoins;saveProfile();
-        spawnFloatText(p.x,p.y-18,`👑 +🐟 ${earned} • +🪙${bonusCoins}`,'#ffd36b');
-        setMsg($T`👑 Você derrotou ${enemy.name}! +🐟 ${earned} • +🪙${bonusCoins} • 🥫 +${cans} latas. Veja suas conquistas no Perfil.`);
+        const reward={key:'boss-'+enemy.id,cans,bossKill:Boolean(enemy.eventBoss&&enemy.raidBoss!=='eclipse'),eclipseKill:enemy.raidBoss==='eclipse'};
+        if(isTraining()){
+          spawnFloatText(p.x,p.y-18,`👑 +🐟 ${earned}`,'#ffd36b');
+        }else if(canCheckpoint()&&state.waveActive){
+          state.pendingBossRewards.push({...reward,coins:bonusCoins});
+          setMsg($T`👑 Você derrotou ${enemy.name}! +🐟 ${earned}.`+' '+$t('Moedas e latas entram quando o campo ficar livre.'));
+        }else{
+          if(cans)recordProgressReward(reward,false);
+          profile.coins+=bonusCoins;saveProfile();
+          spawnFloatText(p.x,p.y-18,`👑 +🐟 ${earned} • +🪙${bonusCoins}`,'#ffd36b');
+          setMsg($T`👑 Você derrotou ${enemy.name}! +🐟 ${earned} • +🪙${bonusCoins} • 🥫 +${cans} latas. Veja suas conquistas no Perfil.`);
+        }
       }else{
         sfx('pop');
         const earned=Math.max(1,Math.round(enemy.reward*(source.popRewardMultiplier||1)));addWallet(rewardOwner,earned);
@@ -6549,7 +6954,6 @@ function initPersonalTd(){
     state.pendingClearCash=0;state.pendingWaveXp=0;
     addAllWallets(cash);
     const levels=grantXp(xp);
-    saveProfile();
     return{levels,xp,cash};
   }
 
@@ -6576,10 +6980,14 @@ function initPersonalTd(){
   function completeMap(){
     if(state.rewardGranted)return;
     state.rewardGranted=true;state.completed=true;state.waveActive=false;
+    clearCheckpoint();
+    countMission('win');
+    if(new Set(state.towers.map(t=>EventRules.categoryOf(t.type))).size>=2)countMission('mixedWin');
+    settleMissionCounts();
     const map=currentMap(),diff=currentDifficulty(),data=profile.maps[state.map];
     const newStar=!data.cleared[state.difficulty];
     data.cleared[state.difficulty]=true;data.wins=(data.wins||0)+1;
-    recordProgressReward({key:'map-clear',cans:0,mapClear:state.map,difficulty:state.difficulty});
+    recordProgressReward({key:'map-clear',cans:0,mapClear:state.map,difficulty:state.difficulty},false);
     const coinReward=Math.round(map.clearCoins*diff.coinMultiplier)+(newStar?35:0);
     const xpReward=diff.clearXp;
     profile.coins+=coinReward;
@@ -6596,8 +7004,9 @@ function initPersonalTd(){
   function completeBossEvent(){
     if(state.rewardGranted)return;
     state.rewardGranted=true;state.completed=true;state.waveActive=false;
+    clearCheckpoint();settleMissionCounts();
     const eclipse=state.eventBossId==='eclipse';
-    recordProgressReward({key:'event-clear',cans:0,eventWin:!eclipse&&state.eventVariant==='normal',insaneWin:!eclipse&&state.eventVariant==='insane',eclipseWin:eclipse,eclipseInsaneWin:eclipse&&state.eventVariant==='insane',eclipsePureWin:eclipse&&state.bossHealing<=1e-6});
+    recordProgressReward({key:'event-clear',cans:0,eventWin:!eclipse&&state.eventVariant==='normal',insaneWin:!eclipse&&state.eventVariant==='insane',eclipseWin:eclipse,eclipseInsaneWin:eclipse&&state.eventVariant==='insane',eclipsePureWin:eclipse&&state.bossHealing<=1e-6},false);
     const diff=currentDifficulty(),coinReward=Math.round(180*diff.coinMultiplier),xpReward=Math.round(260*diff.xpMultiplier);
     profile.coins+=coinReward;const levels=grantXp(xpReward);saveProfile();
     const levelText=levels.length?$T` • 🎖️ Subiu para o nível ${profile.level}!`:'';
@@ -6635,6 +7044,7 @@ function initPersonalTd(){
     const ready=state.spawn.filter(s=>s.at<=0);
     state.spawn=state.spawn.filter(s=>s.at>0);
     ready.forEach(s=>state.enemies.push({...s,id:state.nextEnemyId++}));
+    if(ready.length&&!isTraining()&&Fieldwork.discover(profile.discoveries,ready))saveProfile();
 
     updateCamoReveals();
 
@@ -7004,24 +7414,36 @@ function initPersonalTd(){
     state.floatTexts.forEach(f=>{f.y-=24*dt;f.life-=dt;});
     state.floatTexts=state.floatTexts.filter(f=>f.life>0);
 
+    if(isTraining()){
+      if(state.waveActive&&(!state.lives||!state.enemies.length&&!state.spawn.length)){
+        clearTrainingTargets();setMsg($t('Teste encerrado. Ajuste sua defesa ou chame novos alvos.'));
+      }
+      updateStats();return;
+    }
     const farmAwards=processFarmIncome();
     const milestoneAwards=processClearedRounds();
     if(farmAwards.length&&(state.enemies.length||state.spawn.length)){
       const last=farmAwards[farmAwards.length-1],totalFarm=farmAwards.reduce((sum,x)=>sum+x.cash,0);
       setMsg($T`🎣 Pescadores renderam +🐟 ${totalFarm} ao concluir ${farmAwards.length>1?$T`${farmAwards.length} rodadas`:$T`a rodada ${last.wave}`}.`);
     }
-    if(state.waveActive&&!state.enemies.length&&!state.spawn.length){
+    if(state.lives>0&&state.waveActive&&!state.enemies.length&&!state.spawn.length){
       state.waveActive=false;
       const settled=settleCalledWaves();
+      countMission('rounds',state.wave-state.missionSettledWave);state.missionSettledWave=state.wave;
+      settleCheckpointProgress();
       if(!isInfinite()&&state.wave>=matchRounds())isBossEvent()?completeBossEvent():completeMap();
       else{
+        const missionCoins=settleMissionCounts();
+        captureCheckpoint();saveProfile();
         const levelText=settled.levels.length?$T` • 🎖️ Nível ${profile.level}!`:'';
         const milestoneText=milestoneAwards.length?$T` • 🪙 +${milestoneAwards.reduce((sum,x)=>sum+x.coins,0)} moedas permanentes`:'';
         const farmText=farmAwards.length?$T` • 🎣 +🐟 ${farmAwards.reduce((sum,x)=>sum+x.cash,0)} dos Pescadores`:'';
-        setMsg($T`${isInfinite()?'∞ ':''}Campo limpo após a rodada ${state.wave}. +🐟 ${settled.cash} • +${settled.xp} XP${farmText}${milestoneText}${levelText} Você pode chamar a próxima.`);
+        const missionText=missionCoins?$T` • 📋 +${missionCoins} moedas de missões`:'';
+        setMsg($T`${isInfinite()?'∞ ':''}Campo limpo após a rodada ${state.wave}. +🐟 ${settled.cash} • +${settled.xp} XP${farmText}${milestoneText}${levelText}${missionText} Você pode chamar a próxima.`);
       }
     }
     if(state.lives<=0&&!state.defeatShown){
+      clearCheckpoint();settleCheckpointProgress();settleMissionCounts();saveProfile();
       state.defeatShown=true;playMusicTheme(state.map);setMsg(isInfinite()?$T`∞ Fim do Infinito. Você concluiu ${state.lastClearedWave} rodadas.`:$t('Fim de jogo. Reinicie o mapa e tente outra estratégia.'));showResult(false);
       if(!state.unitPlacedThisMatch&&!profile.secretUnlocks?.mister){if(!profile.secretUnlocks)profile.secretUnlocks={};profile.secretUnlocks.mister=true;saveProfile();renderUnlocks();setTimeout(()=>queueSecretReveals(['mister']),600);}
     }
@@ -7884,14 +8306,36 @@ if($('#td-pause'))$('#td-pause').onclick=()=>{
   else{openPauseMenu();setMsg($t('Partida pausada.'));}
 };
 if($('#menu-resume'))$('#menu-resume').onclick=()=>{sfx('ui');closePauseMenu(true);setMsg($T`Jogo rodando em ${state.gameSpeed}×.`);};
-if($('#menu-restart'))$('#menu-restart').onclick=()=>{sfx('ui');closePauseMenu(false);runMapLoading(state.map,state.difficulty,reset,state.mode);};
-function returnToMatchLobby(){
-  const screen=isBossEvent()?'event':'play';
+function restartMatch(){
+  reset();
+  if(captureCheckpoint())saveProfile();
+}
+if($('#menu-restart'))$('#menu-restart').onclick=()=>{
+  if(canCheckpoint()&&!confirmReplacement(state.mode))return;
+  sfx('ui');closePauseMenu(false);runMapLoading(state.map,state.difficulty,restartMatch,state.mode);
+};
+function returnToMatchLobby(navigate=true,destination){
+  const captured=captureCheckpoint();
+  if((captured||destination==='hub'&&canCheckpoint())&&!saveProfile(false)&&destination==='hub'){
+    showSaveIoStatus($t('O navegador não conseguiu guardar a partida.'),true);return;
+  }
+  const screen=destination||(isTraining()?'training':isBossEvent()?'event':'play');
   if(lanHost()){lan.send('return-lobby',{screen});lan.setAccepting(true);}
   else if(lanGuest())lan.disconnect();
-  closePauseMenu(false);hideGameModal('#result-screen');state.paused=true;setScreen(screen);
+  closePauseMenu(false);hideGameModal('#result-screen');state.paused=true;
+  if(navigate)setScreen(screen);
 }
 if($('#menu-lobby'))$('#menu-lobby').onclick=()=>{sfx('ui');returnToMatchLobby();};
+$('#menu-save-lobby').onclick=()=>{
+  if(state.waveActive&&!confirm($t('Ao retomar, você volta ao intervalo salvo antes do combate. Voltar à central?')))return;
+  sfx('ui');returnToMatchLobby(true,'hub');
+};
+$('#solo-checkpoints').onclick=e=>{
+  const button=e.target.closest('[data-checkpoint-mode]');if(button){sfx('ui');resumeCheckpoint(button.dataset.checkpointMode);}
+};
+window.addEventListener('pagehide',()=>{
+  if(document.body.dataset.screen==='game'&&captureCheckpoint())saveProfile(false);
+});
 if($('#menu-close'))$('#menu-close').onclick=()=>{sfx('ui');hideGameModal('#pause-menu');};
 if($('#hub-settings-btn'))$('#hub-settings-btn').onclick=()=>{sfx('ui');openSettingsModal();};
 if($('#menu-support-creator'))$('#menu-support-creator').onclick=()=>{sfx('ui');showGameModal('#support-creator-modal');};
@@ -7922,12 +8366,12 @@ if($('#menu-music'))$('#menu-music').oninput=e=>{
   if(profile.settings.musicVolume<=0)stopMusic();
   else if(!musicState)startMusic();else updateMusicVolume();
 };
-if($('#result-retry'))$('#result-retry').onclick=()=>{sfx('ui');hideGameModal('#result-screen');runMapLoading(state.map,state.difficulty,reset,state.mode);};
+if($('#result-retry'))$('#result-retry').onclick=()=>{sfx('ui');hideGameModal('#result-screen');runMapLoading(state.map,state.difficulty,restartMatch,state.mode);};
 if($('#result-lobby'))$('#result-lobby').onclick=()=>{sfx('ui');returnToMatchLobby();};
 if($('#result-next'))$('#result-next').onclick=e=>{
   const mapId=e.currentTarget.dataset.nextMap,diffId=e.currentTarget.dataset.nextDifficulty;
-  if(!mapId||!diffId)return;
-  sfx('ui');hideGameModal('#result-screen');runMapLoading(mapId,diffId,()=>{loadSelection(mapId,diffId,'campaign');setScreen('game');},'campaign');
+  if(!mapId||!diffId||!confirmReplacement('campaign'))return;
+  sfx('ui');hideGameModal('#result-screen');runMapLoading(mapId,diffId,()=>{loadSelection(mapId,diffId,'campaign');setScreen('game');if(captureCheckpoint())saveProfile();},'campaign');
 };
 window.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&closeCatBuildModal()){e.preventDefault();return;}
@@ -7993,12 +8437,14 @@ if($('#play-enter'))$('#play-enter').onclick=()=>{
   if(lan?.isGuest)return;
   const enterBtn=$('#play-enter');
   if(enterBtn&&enterBtn.dataset.loading==='1')return;
+  const mapId=lobbySelection.map,diffId=lobbySelection.difficulty,modeId=lobbySelection.mode;
+  if(!confirmReplacement(modeId))return;
   if(enterBtn){enterBtn.dataset.loading='1';enterBtn.disabled=true;enterBtn.textContent=$t('🐾 Preparando mapa...');}
   sfx('ui');
-  const mapId=lobbySelection.map,diffId=lobbySelection.difficulty,modeId=lobbySelection.mode;
   runMapLoading(mapId,diffId,()=>{
     loadSelection(mapId,diffId,modeId);
     setScreen('game');
+    if(captureCheckpoint())saveProfile();
     if(lanHost()){lan.setAccepting(false);lan.send('start',{map:mapId,difficulty:diffId,mode:modeId});broadcastLanSnapshot(true);}
     const area=$('#game-area');
     if(area)area.scrollTop=0;
@@ -8013,12 +8459,13 @@ if($('#play-enter'))$('#play-enter').onclick=()=>{
 function startEvent(){
   const button=$('#event-start');if(lan?.isGuest||lan?.recovering||['creating','joining'].includes(lan?.status)||button?.dataset.loading==='1')return;
   if(lan?.isHost&&!lan.connected)lan.disconnect();
+  if(!confirmReplacement('boss-event'))return;
   if(button)button.dataset.loading='1';renderEventLobby();
   const mapId='grove',diffId='normal',modeId='boss-event';
-  runMapLoading(mapId,diffId,()=>{loadSelection(mapId,diffId,modeId,eventVariant,eventBossId);setScreen('game');if(lanHost()){lan.setAccepting(false);lan.send('start',{map:mapId,difficulty:diffId,mode:modeId,variant:state.eventVariant,boss:state.eventBossId});broadcastLanSnapshot(true);}if(button)delete button.dataset.loading;},modeId);
+  runMapLoading(mapId,diffId,()=>{loadSelection(mapId,diffId,modeId,eventVariant,eventBossId);setScreen('game');if(captureCheckpoint())saveProfile();if(lanHost()){lan.setAccepting(false);lan.send('start',{map:mapId,difficulty:diffId,mode:modeId,variant:state.eventVariant,boss:state.eventBossId});broadcastLanSnapshot(true);}if(button)delete button.dataset.loading;},modeId);
 }
 
-personalTd={reset,startWave,startEvent,upgradeTower,upgradeDartPath,upgradeSniperPath,renderHotbar,loadSelection,towerCount:(id)=>state.towers.filter(t=>t.type===id).length,placementType:()=>state.selected,mapId:()=>state.map,towerPrice:(id)=>towerPrice(id,state.map),eventBossState:()=>{const e=[...state.enemies,...state.spawn].find(enemy=>enemy.eventBoss&&!enemy.dead);return e?{name:e.name,round:e.round,encounter:e.encounter,phase:e.bossPhase,hp:e.hp,maxHp:e.maxHp,shieldHp:e.bossShieldHp,shieldMax:e.bossShieldMax,requirement:e.raidBoss==='eclipse'?EventRules.classes[EventRules.phaseClass(e.bossPhase)].name:bossShieldRequirement(e.bossPhase||1).label,auraCount:e.auraCount||0,auraWarning:e.auraWarning||0,healed:e.healedTotal||0}:null;}};
+personalTd={reset,startWave,startEvent,renderTrainingLobby,leaveMatch:returnToMatchLobby,upgradeTower,upgradeDartPath,upgradeSniperPath,renderHotbar,loadSelection,towerCount:(id)=>state.towers.filter(t=>t.type===id).length,placementType:()=>state.selected,mapId:()=>state.map,towerPrice:(id)=>towerPrice(id,state.map),eventBossState:()=>{const e=[...state.enemies,...state.spawn].find(enemy=>enemy.eventBoss&&!enemy.dead);return e?{name:e.name,round:e.round,encounter:e.encounter,phase:e.bossPhase,hp:e.hp,maxHp:e.maxHp,shieldHp:e.bossShieldHp,shieldMax:e.bossShieldMax,requirement:e.raidBoss==='eclipse'?EventRules.classes[EventRules.phaseClass(e.bossPhase)].name:bossShieldRequirement(e.bossPhase||1).label,auraCount:e.auraCount||0,auraWarning:e.auraWarning||0,healed:e.healedTotal||0}:null;}};
 
 configurePath();reset();requestAnimationFrame(loop);
 }
@@ -8031,10 +8478,14 @@ initMatchTutorial();
 initSettingsExtras();
 initLanLobby();
 initEventLobby();
-setInterval(()=>{if(document.body.dataset.screen==='event')renderEventLobby();},30000);
+setInterval(()=>{
+  if(document.body.dataset.screen==='event')renderEventLobby();
+  if(document.body.dataset.screen==='missions'&&$('#daily-missions').dataset.day!==Fieldwork.period().dayKey)renderMissions();
+},30000);
 renderProfileUi();
 initPersonalTd();
 renderProfileUi();
 setInterval(updateCelestialWheelClock,1000);
 const initialScreen=(location.hash||'#hub').slice(1);
-setScreen(['hub','play','event','profile','cosmetics','cats','heroes','powers','tutorial'].includes(initialScreen)?initialScreen:'hub',false);
+setScreen(LOBBY_SCREENS.includes(initialScreen)?initialScreen:'hub',false);
+initCloudSaves();

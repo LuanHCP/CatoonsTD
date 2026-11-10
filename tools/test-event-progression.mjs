@@ -34,6 +34,7 @@ const combat=vm.createContext({state,lan:{playerCount:1},types:{vine:{name:'CipÃ
   currentMap:()=>({speedMultiplier:.92,rewardMultiplier:1.08}),currentDifficulty:()=>({speed:1.12,waveReward:.86,coinMultiplier:1.35}),
   strongestRegularDurability:()=>11.123,isSpecialEnemy:()=>false,pointAt:()=>({x:0,y:0}),spawnDamageNumber:no,spawnImpactFx:no,spawnFloatText:no,recordMastery:no,synergyActive:()=>false,sfx:no,
   playMusicTheme:no,addWallet:no,saveProfile:no,setMsg:no,grantHeroXp:no,summonShadowBalloon:no,recordProgressReward:reward=>rewards.push(reward),
+  countMission:no,isTraining:()=>false,canCheckpoint:()=>false,
   effectActive:()=>false,hasLineOfSight:()=>true,vinePaths:t=>t.paths,vinePrimaryPath:()=>0,
   masteryState:()=>({level:50}),selectedTower:()=>({type:'vine'}),towerStats:()=>({}),MASTERY_ABILITIES:{vine:{name:'Floresta Prisional',icon:'X',cooldown:70}},updateUpgradePanel:no,updateStats:no,W:1100,H:620});
 for(const name of ['isThermalSource','bossShieldRequirement','damageEnemy','makeDailyBoss','canControlTarget','controlTargets','applyVineControl','tickVineControl','enemyMovementFactor','vineBaseStats','activateMasteryAbility'])vm.runInContext(extract(name),combat);
