@@ -53,7 +53,22 @@ try{
   assert(await evaluate(`profile.salmonCans===29&&profile.identity.banner==='bannerEclipse'&&profile.identity.avatar==='avatarEclipse'`),'Compra de cosmético exclusivo falhou.');
   for(const [width,height] of [[1366,768],[844,390],[390,844]]){
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<900});
-    for(const screen of ['event','cats','cosmetics']){await evaluate(`document.querySelector('[data-screen="${screen}"]').click();true`);await wait(180);assert(await evaluate(`(()=>{const s=document.querySelector('.screen.active');return s.scrollWidth<=s.clientWidth+2&&document.querySelector('.game-shell').scrollWidth<=innerWidth;})()`),'Corte de tela '+screen+' '+width);await shot(screen+'-new-'+width);}
+    for(const screen of ['event','cats','cosmetics']){
+      await evaluate(`document.querySelector('[data-screen="${screen}"]').click();true`);await wait(180);
+      assert(await evaluate(`(()=>{const s=document.querySelector('.screen.active');return s.scrollWidth<=s.clientWidth+2&&document.querySelector('.game-shell').scrollWidth<=innerWidth;})()`),'Corte de tela '+screen+' '+width);
+      if(screen==='cats'){
+        assert(await evaluate(`(()=>{
+          const filters=document.querySelector('#collection-class-filters').getBoundingClientRect();
+          const grid=document.querySelector('#cat-collection').getBoundingClientRect();
+          const card=document.querySelector('#cat-collection .mastery-card').getBoundingClientRect();
+          const detail=document.querySelector('#cat-mastery-detail').getBoundingClientRect();
+          return filters.bottom<=grid.top&&Math.abs(filters.left-grid.left)<2&&card.width>=Math.min(220,grid.width)-2
+            &&(innerWidth>1050?detail.left>=grid.right:detail.top>=grid.bottom);
+        })()`),'Posição dos filtros, cards ou detalhes da coleção em '+width);
+        assert(await evaluate(`(()=>{const button=document.querySelector('#collection-class-filters [data-cat-class="magic"]');return button.textContent.includes(I18N_LANG==='en'?'Magic':'Mágico')&&button.getAttribute('aria-pressed')==='true';})()`),'Idioma ou seleção do filtro da coleção');
+      }
+      await shot(screen+'-new-'+width);
+    }
   }
   assert(!errors.length,'Erros no navegador: '+errors);console.log(JSON.stringify({filters,mechanics,victories,cosmetics:true,layouts:9,browserErrors:errors},null,2));
 }finally{if(original)try{await evaluate('profile=normalizeProfile('+original+');saveProfile();true');}catch(_){}try{await call('Page.close');}catch(_){}socket.close();}

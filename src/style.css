@@ -619,7 +619,10 @@ body.in-game .game-panel{width:min(1540px,100%)}
 
 /* v0.14.0 — Maestria dos Gatinhos */
 .cats-mastery-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,.75fr);gap:16px;align-items:start}
-.mastery-collection{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mastery-collection{grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))}
+.cats-panel .level-chip{gap:4px;white-space:nowrap}
+.mastery-card .cat-avatar{flex:none}
+.mastery-card .cat-head>div:last-child{min-width:0;overflow-wrap:anywhere}
 .cat-card.mastery-card{cursor:pointer;min-height:170px;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
 .cat-card.mastery-card:hover{transform:translateY(-2px)}
 .cat-card.mastery-card.selected{border-color:#9fe6fb;box-shadow:0 0 0 2px #70caea22,0 12px 28px #0005}
@@ -641,8 +644,7 @@ body.in-game .game-panel{width:min(1540px,100%)}
 .mastery-ability-button{background:linear-gradient(135deg,#8a6a20,#d6ad3d);border-color:#edcd6b;color:#171105;font-weight:900}
 .mastery-ability-button:disabled{filter:saturate(.2);opacity:.55}
 .mastery-gold-label{color:#f2d47a;font-weight:900}
-@media(max-width:1050px){.cats-mastery-layout{grid-template-columns:1fr}.cat-mastery-detail{position:relative;top:auto}.mastery-collection{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:650px){.mastery-collection{grid-template-columns:1fr}}
+@media(max-width:1050px){.cats-mastery-layout{grid-template-columns:minmax(0,1fr)}.cat-mastery-detail{position:relative;top:auto}}
 
 /* v0.29.3 — ficha de caminhos e valores acessível pela coleção de gatinhos. */
 body.cat-build-open{overflow:hidden}

@@ -14,6 +14,12 @@ const I18N_LANG=(()=>{
   return /^pt/i.test(nav)?'pt':'en';
 })();
 const I18N_EN={
+  "Todos":"All",
+  "Padrão":"Standard",
+  "Mágico":"Magic",
+  "Tecnológico":"Tech",
+  "Filtrar coleção por categoria":"Filter collection by category",
+  "Filtrar gatinhos por categoria":"Filter kittens by category",
   "Save na nuvem":"Cloud save",
   "Entrar com Google":"Sign in with Google",
   "Sincronizar agora":"Sync now",
@@ -126,8 +132,8 @@ const I18N_EN={
   "s • bosses: lentidão": "s • boss slow",
   "Não causa dano por padrão: prende inimigos comuns e desacelera bosses sem pará-los. Combine com torres de dano.": "Deals no damage by default: roots regular enemies and slows bosses without stopping them. Combine with damage towers.",
   "O último escudo aceita todos os ataques. O Cipó desacelera bosses sem prendê-los.": "The last shield accepts every attack. Vine Cat slows bosses without rooting them.",
-  "NAVEGADOR • v0.32.0 BETA": "BROWSER • v0.32.0 BETA",
-  "🧪 Beta v0.32.0": "🧪 Beta v0.32.0",
+  "NAVEGADOR • v0.32.1 BETA": "BROWSER • v0.32.1 BETA",
+  "🧪 Beta v0.32.1": "🧪 Beta v0.32.1",
   "FICHA DE UPGRADES": "UPGRADE SHEET",
   "CAMINHO": "PATH",
   "EVOLUÇÃO": "PROGRESSION",
@@ -2390,8 +2396,19 @@ let eventSchedule=EventRules.dailyBoss(),eventBossId=eventSchedule.id;
 
 function initClassFilters(){
   for(const [id,inMatch] of [['collection-class-filters',false],['match-class-filters',true]]){
-    const root=document.getElementById(id);if(!root)continue;root.innerHTML=EventRules.filters();
-    root.onclick=event=>{const button=event.target.closest('[data-cat-class]');if(!button)return;const key=button.dataset.catClass;if(inMatch){matchClass=key;renderUnlocks();}else{collectionClass=key;renderCatCollection();}root.innerHTML=EventRules.filters(key);};
+    const root=document.getElementById(id);if(!root)continue;
+    root.innerHTML=EventRules.filters('all',$t);
+    root.onclick=event=>{
+      const button=event.target.closest('[data-cat-class]');
+      if(!button)return;
+      const key=button.dataset.catClass;
+      for(const item of root.querySelectorAll('[data-cat-class]')){
+        item.classList.toggle('selected',item===button);
+        item.setAttribute('aria-pressed',String(item===button));
+      }
+      if(inMatch){matchClass=key;renderUnlocks();}
+      else{collectionClass=key;renderCatCollection();}
+    };
   }
 }
 let catCollectionSelection='dart';
@@ -3061,7 +3078,7 @@ function openCatBuildModal(id,trigger){
     ?`<div class="cat-build-rule">${$t('Escolha até 2 caminhos: um pode chegar ao T5 e o caminho secundário fica limitado ao T3.')}${id==='vine'?'<br>'+$t('Cada tier de Raízes Profundas fortalece a lentidão contra bosses em 5 pontos percentuais (até 60%).'):''}</div><div class="cat-build-paths">${paths.map(renderCollectionPath).join('')}</div>`
     :`<div class="cat-build-paths one">${renderCollectionLinear(id)}</div>`;
   root.innerHTML=`<header class="cat-build-hero" style="--cat-color:${t.color}"><div class="cat-build-icon">${t.icon}</div><div><span class="eyebrow">${$t('FICHA DE UPGRADES')}</span><h2 id="cat-build-title">${t.name}</h2><p>${t.role}</p></div></header>
-    ${EventRules.badge(id)}<p class="cat-build-special">${t.special}</p>
+    ${EventRules.badge(id,$t)}<p class="cat-build-special">${t.special}</p>
     <div class="cat-build-base">${collectionBaseStats(id).map(item=>`<span>${item}</span>`).join('')}</div>
     <section class="cat-build-prices"><b>${$t('Preço de colocação por categoria de mapa')}</b><div>${prices}</div></section>${body}`;
   catBuildLastTrigger=trigger||document.activeElement;
@@ -3084,7 +3101,7 @@ function renderCatCollection(){
   root.innerHTML=visibleTypes.map(([id,t])=>{const unlocked=isTowerUnlocked(id),m=masteryState(id),pct=masteryProgressPct(id),max=m.level>=50,need=max?0:requiredMasteryXp(m.level);
     return `<article class="cat-card mastery-card ${unlocked?'':'locked'} ${max?'mastered':''} ${catCollectionSelection===id?'selected':''}" data-mastery-cat="${id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${$T`Abrir caminhos e upgrades de ${t.name}`}" style="--cat-glow:${max?'#f2cf62':t.color}33">
       <div class="cat-head"><div class="cat-avatar">${unlocked?t.icon:'🔒'}</div><div><h3>${t.name}</h3><small>${t.role} • base 🐟 ${Math.round(t.cost*GLOBAL_TOWER_PRICE_MULTIPLIER)}</small></div></div>
-      ${EventRules.badge(id)}<p class="cat-role">${max?$t('<span class="mastery-gold-label">⭐ Maestria Máxima • Skin Dourada</span>'):$T`Maestria ${m.level}/50`} • ${masteryBonusSummary(id).text}</p>
+      ${EventRules.badge(id,$t)}<p class="cat-role">${max?$t('<span class="mastery-gold-label">⭐ Maestria Máxima • Skin Dourada</span>'):$T`Maestria ${m.level}/50`} • ${masteryBonusSummary(id).text}</p>
       <div class="mastery-mini-track"><i style="width:${pct}%"></i></div><div class="mastery-mini-text"><span>${max?'MAX':`${m.xp}/${need} XP`}</span><span>${Math.round(pct)}%</span></div>
       <div class="cat-unlock">${unlocked?$t('✓ Liberado para jogar'):$T`🔒 Libera no nível ${t.unlockLevel} • você está no ${profile.level}`}</div></article>`;}).join('');
   $$('[data-mastery-cat]').forEach(card=>{
@@ -3329,7 +3346,7 @@ function renderUnlocks(){
   $$('.td-tower-picker [data-td-tower]').forEach(btn=>{
     const id=btn.dataset.tdTower,unlocked=isTowerUnlocked(id),t=types[id],price=towerPrice(id,mapId);
     btn.hidden=Boolean((t.secret||t.exclusive)&&!unlocked)||(matchClass!=='all'&&EventRules.categoryOf(id)!==matchClass);
-    if(!btn.querySelector('.cat-class-badge'))btn.insertAdjacentHTML('beforeend',EventRules.badge(id));
+    if(!btn.querySelector('.cat-class-badge'))btn.insertAdjacentHTML('beforeend',EventRules.badge(id,$t));
     const placed=personalTd&&personalTd.towerCount?personalTd.towerCount(id):0;
     const limit=t.limit||TOWER_LIMIT_PER_TYPE,maxed=placed>=limit;
     btn.disabled=!unlocked||maxed;
@@ -3450,7 +3467,7 @@ function initCloudSaves(){
       if(document.body.dataset.screen==='missions')renderMissions();
       if(document.body.dataset.screen==='tutorial')renderTutorial();
     },
-    load:()=>import('./firebase-web.js?v=0.32.0').then(module=>module.service),
+    load:()=>import('./firebase-web.js?v=0.32.1').then(module=>module.service),
     view:state=>{
       const {user,active,busy,ready,choice,local}=state;
       status.textContent=$t(messages[state.status]);

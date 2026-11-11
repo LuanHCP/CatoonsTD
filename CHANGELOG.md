@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.32.1 — layout da coleção de gatinhos
+
+- Filtros acima da coleção e cards com largura adaptada à tela.
+- Categorias traduzidas quando o jogo está em inglês.
+
 ## v0.32.0 — login opcional e progresso na nuvem
 
 - Login com Google pelo Perfil no GitHub Pages.

@@ -12,8 +12,17 @@
     const key=part('year')+'-'+part('month')+'-'+part('day'),day=Math.floor(Date.parse(key+'T00:00:00Z')/86400000);
     return{...bosses[day%2===0?'spine':'eclipse'],dateKey:key};
   }
-  function badge(type){const c=classes[categoryOf(type)];return '<span class="cat-class-badge" style="--class-color:'+c.color+'">'+c.icon+' '+c.name+'</span>';}
-  function filters(selected='all'){return [{id:'all',name:'Todos',icon:'🐾'},...Object.entries(classes).map(([id,c])=>({id,...c}))].map(c=>'<button type="button" data-cat-class="'+c.id+'" aria-pressed="'+(selected===c.id)+'" class="'+(selected===c.id?'selected':'')+'">'+c.icon+' '+c.name+'</button>').join('');}
+  function badge(type,translate=name=>name){
+    const c=classes[categoryOf(type)];
+    return '<span class="cat-class-badge" style="--class-color:'+c.color+'">'+c.icon+' '+escape(translate(c.name))+'</span>';
+  }
+  function filters(selected='all',translate=name=>name){
+    const options=[{id:'all',name:'Todos',icon:'🐾'},...Object.entries(classes).map(([id,c])=>({id,...c}))];
+    return options.map(c=>{
+      const pressed=selected===c.id;
+      return '<button type="button" data-cat-class="'+c.id+'" aria-pressed="'+pressed+'" class="'+(pressed?'selected':'')+'">'+c.icon+' '+escape(translate(c.name))+'</button>';
+    }).join('');
+  }
   function targets(boss,units,pointAt){
     if(boss.dead||boss.raidBoss!=='eclipse')return[];
     const p=pointAt(boss.d,boss.path),category=phaseClass(boss.bossPhase);
