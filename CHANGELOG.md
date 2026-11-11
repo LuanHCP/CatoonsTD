@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.32.2 — Central em janelas menores
+
+- Cabeçalho compacto e rolagem da Central com o menu acessível fora da tela cheia.
+
 ## v0.32.1 — layout da coleção de gatinhos
 
 - Filtros acima da coleção e cards com largura adaptada à tela.

@@ -1,6 +1,6 @@
 # Checklist de Beta / Playtest
 
-## Objetivo — v0.32.1
+## Objetivo — v0.32.2
 
 Validar se os sistemas atuais funcionam juntos antes de adicionar novas mecânicas grandes.
 
@@ -155,7 +155,7 @@ Validações automatizadas executadas em 23/10/2026:
 Ainda exige playtest humano: balanceamento de uma partida completa sem atalhos de teste, desempenho em celulares físicos e reconexão entre computadores distintos por LAN/VPN. A integração automatizada não demonstra que uma composição real vence o Insano.
 
 ```text
-Versão: v0.32.1
+Versão: v0.32.2
 Idioma:
 Mapa:
 Tier:

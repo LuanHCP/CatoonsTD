@@ -1162,7 +1162,13 @@ body[data-screen="play"] .mission-map-panel .map-selection-grid{grid-template-co
 @media(max-width:720px){body[data-screen="play"] .mission-map-panel .map-selection-grid{grid-template-columns:none}.mission-briefing .room-actions{grid-template-columns:1fr}.mission-briefing .difficulty-button small{display:none}.mission-briefing .difficulty-picker{grid-template-columns:repeat(3,minmax(0,1fr))}.mission-briefing .hero-loadout-strip{grid-template-columns:1fr}}
 
 /* Illustrated main lobby. The match maps keep their existing canvas artwork. */
-body[data-screen="hub"]{background:linear-gradient(90deg,#050e21aa,#08172d33 60%,#07112444),url('../assets/lobby-general.jpg') center center/cover no-repeat fixed}
+body[data-screen="hub"]{
+  background:linear-gradient(90deg,#050e21aa,#08172d33 60%,#07112444),url('../assets/lobby-general.jpg') center center/cover no-repeat fixed;
+  overflow-y:auto;
+}
+body[data-screen="hub"] .game-shell{height:auto;min-height:100dvh;overflow:visible}
+body[data-screen="hub"] #screen-hub{overflow:visible}
+body[data-screen="hub"] .main-tabs{position:sticky;top:0;z-index:20}
 body[data-screen="hub"] .hero{padding:8px 2px}
 body[data-screen="hub"] .hero h1{text-shadow:0 3px 20px #000}
 body[data-screen="hub"] .lobby-hero{background:linear-gradient(95deg,#07172be8,#0b2338bb 58%,#15324d22)!important;border-color:#9bd6f144;backdrop-filter:blur(2px);min-height:210px;grid-template-columns:1fr .45fr}
@@ -1240,7 +1246,7 @@ body:not(.in-game) .main-tabs button{flex-shrink:0;white-space:nowrap}
   .boss-preparation{bottom:5px;padding:7px 9px}.boss-preparation>b{font-size:10px}.boss-preparation>div{margin:5px 0;gap:3px}.boss-preparation>div span{font-size:8px;padding:4px}.boss-preparation small{font-size:8px}
   .connection-recovery{padding:8px}.connection-recovery>div{padding:14px}.connection-recovery h3{font-size:18px}.connection-recovery p{font-size:10px;line-height:1.4}
 }
-.hero>.profile-cluster{width:550px;max-width:58%;min-width:0;flex:0 1 550px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.hero>.profile-cluster{width:550px;max-width:58%;min-width:0;flex:0 1 auto;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .hero .profile-open{width:100%;min-width:0}.hero .profile-wallet{min-width:0;max-width:100%;gap:4px}.hero .profile-wallet span{font-size:10px;padding:6px 7px}.hero .mini-xp{width:100%;min-width:0}
 @media(min-width:1001px){body[data-screen="hub"] .lobby-hero{width:58%;min-height:250px;grid-template-columns:1fr;background:#07182bd9!important}body[data-screen="hub"] .hub-mascot{display:none}body[data-screen="hub"] .lobby-copy h2{font-size:34px}}
 @media(max-width:720px){.hero{gap:10px;flex-direction:row;flex-wrap:wrap;align-items:center}.hero>div:first-child{min-width:0}.hero>.profile-cluster{max-width:100%;width:100%;flex:1 1 100%;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hero .profile-open{max-width:210px}.hero .profile-wallet{align-content:center}.hero .profile-cluster .mini-xp{display:none}.profile-open .compact .identity-caption>b{font-size:14px}}

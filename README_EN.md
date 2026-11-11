@@ -8,7 +8,7 @@
 
 > **Web/desktop Tower Defense built with HTML, CSS and JavaScript, using AI as an engineering copilot.**
 
-**Status:** Public Beta · **Build:** v0.32.1
+**Status:** Public Beta · **Build:** v0.32.2
 **Platforms:** Modern desktop and mobile browsers · Windows x64 through a lightweight Go launcher
 **Languages:** English and Brazilian Portuguese (auto-detected, switchable in-game)
 

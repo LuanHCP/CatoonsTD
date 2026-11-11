@@ -132,8 +132,8 @@ const I18N_EN={
   "s • bosses: lentidão": "s • boss slow",
   "Não causa dano por padrão: prende inimigos comuns e desacelera bosses sem pará-los. Combine com torres de dano.": "Deals no damage by default: roots regular enemies and slows bosses without stopping them. Combine with damage towers.",
   "O último escudo aceita todos os ataques. O Cipó desacelera bosses sem prendê-los.": "The last shield accepts every attack. Vine Cat slows bosses without rooting them.",
-  "NAVEGADOR • v0.32.1 BETA": "BROWSER • v0.32.1 BETA",
-  "🧪 Beta v0.32.1": "🧪 Beta v0.32.1",
+  "NAVEGADOR • v0.32.2 BETA": "BROWSER • v0.32.2 BETA",
+  "🧪 Beta v0.32.2": "🧪 Beta v0.32.2",
   "FICHA DE UPGRADES": "UPGRADE SHEET",
   "CAMINHO": "PATH",
   "EVOLUÇÃO": "PROGRESSION",
@@ -3467,7 +3467,7 @@ function initCloudSaves(){
       if(document.body.dataset.screen==='missions')renderMissions();
       if(document.body.dataset.screen==='tutorial')renderTutorial();
     },
-    load:()=>import('./firebase-web.js?v=0.32.1').then(module=>module.service),
+    load:()=>import('./firebase-web.js?v=0.32.2').then(module=>module.service),
     view:state=>{
       const {user,active,busy,ready,choice,local}=state;
       status.textContent=$t(messages[state.status]);

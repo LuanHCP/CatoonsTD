@@ -9,6 +9,17 @@ const evaluate=async expression=>{const r=await call('Runtime.evaluate',{express
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 await call('Runtime.enable');await wait(600);
 await evaluate(`EventRules.dailyBoss=()=>({...EventRules.bosses.spine,dateKey:'2026-11-03'});true`);
+await call('Emulation.setDeviceMetricsOverride',{width:740,height:430,deviceScaleFactor:1.35,mobile:false});
+await evaluate(`setScreen('hub');true`);await wait(250);
+if(!await evaluate(`(()=>{
+  const nav=document.querySelector('.main-tabs').getBoundingClientRect();
+  const button=document.querySelector('[data-screen="play"]').getBoundingClientRect();
+  const hit=document.elementFromPoint(button.x+button.width/2,button.y+button.height/2);
+  return nav.bottom<innerHeight&&Boolean(hit?.closest('[data-screen="play"]'));
+})()`))throw new Error('Menu da Central inacessível em janela pequena.');
+await evaluate(`document.querySelector('#reset-save').scrollIntoView({block:'end'});true`);
+if(!await evaluate(`window.scrollY>0&&document.querySelector('#reset-save').getBoundingClientRect().bottom<=innerHeight+2`))throw new Error('A Central não rola até a última ação.');
+await evaluate(`window.scrollTo(0,0);true`);
 mkdirSync('release/preview',{recursive:true});
 const sizes=[[1366,768],[844,390],[390,844]];
 const result=[];
