@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.32.4 — prévias dos mapas
+
+- Restaura as ilustrações na seleção de mapas e na tela de carregamento.
+- Exibe a prévia simplificada enquanto a arte carrega ou se ela estiver indisponível.
+- Traduz a contagem de mapas na seleção em inglês.
+
 ## v0.32.3 — arte dos mapas e gatinhos
 
 - Encaixe estável do tabuleiro em Campanha, Infinito, Evento e Treino, inclusive em janelas baixas.

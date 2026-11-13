@@ -71,8 +71,24 @@ try{
   }))`);
   assert.deepEqual(loadedCats,Array(22).fill(224));
 
-  await run(`setScreen('play');document.querySelector('[data-map-category="impossible"]').click();`);
+  await run(`setScreen('play');`);
+  for(const [category,count,illustrated] of [['beginner',6,false],['medium',4,true],['hardmaps',2,true],['impossible',2,true]]){
+    await run(`document.querySelector('[data-map-category="${category}"]').click()`);
+    assert.equal(await run('document.querySelectorAll("#map-selection-grid .map-preview").length'),count);
+    if(illustrated){
+      await waitFor(`document.querySelectorAll('#map-selection-grid .map-preview.has-art').length===${count}`);
+      assert(await run(`[...document.querySelectorAll('#map-selection-grid .map-preview-image')].every(img=>
+        img.naturalWidth===1320&&img.getBoundingClientRect().height>0&&getComputedStyle(img).visibility==='visible'
+      )`));
+    }else{
+      assert(await run(`[...document.querySelectorAll('#map-selection-grid .map-preview')].every(preview=>
+        getComputedStyle(preview).backgroundImage!=='none'
+      )`));
+    }
+    if(category==='medium')await screenshot('previas-mapas-v0324');
+  }
   await run(`document.querySelector('[data-map-choice="church"]').click();document.querySelector('#play-enter').click();`);
+  await waitFor(`Boolean(document.querySelector('#loading-preview.has-art .map-preview-image[src$="/church.webp"]'))`);
   await waitFor(`document.body.dataset.screen==='game'&&__CatoonsTest.state.map==='church'`);
   await waitFor(`!document.querySelector('#loading-screen').classList.contains('visible')`);
   for(const map of ['harbor','canyon','ruins','factory','fork','storm','blind','church']){
@@ -140,6 +156,18 @@ try{
   })()`);
   await delay(250);
   await screenshot('gatinhos-em-campo-v0323');
+
+  await run(`setScreen('play');document.querySelector('[data-map-category="medium"]').click();`);
+  await waitFor(`Boolean(document.querySelector('[data-map-choice="harbor"] .map-preview.has-art'))`);
+  const fallback=await run(`new Promise(resolve=>{
+    const preview=document.querySelector('[data-map-choice="harbor"] .map-preview');
+    const img=preview.querySelector('img');
+    preview.classList.remove('has-art');
+    img.addEventListener('error',()=>resolve(getComputedStyle(img).visibility==='hidden'
+      &&getComputedStyle(preview).backgroundImage!=='none'&&getComputedStyle(preview,'::before').display!=='none'),{once:true});
+    img.src='data:image/webp,broken';
+  })`);
+  assert(fallback,'The map card lost its fallback when the image failed');
 
   assert.deepEqual(errors,[]);
   console.log('OK: 8 illustrated maps, 22 unit assets, 6 stable viewport/scale combinations in 4 modes, precise bench placement and wave controls.');

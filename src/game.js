@@ -132,8 +132,8 @@ const I18N_EN={
   "s • bosses: lentidão": "s • boss slow",
   "Não causa dano por padrão: prende inimigos comuns e desacelera bosses sem pará-los. Combine com torres de dano.": "Deals no damage by default: roots regular enemies and slows bosses without stopping them. Combine with damage towers.",
   "O último escudo aceita todos os ataques. O Cipó desacelera bosses sem prendê-los.": "The last shield accepts every attack. Vine Cat slows bosses without rooting them.",
-  "NAVEGADOR • v0.32.3 BETA": "BROWSER • v0.32.3 BETA",
-  "🧪 Beta v0.32.3": "🧪 Beta v0.32.3",
+  "NAVEGADOR • v0.32.4 BETA": "BROWSER • v0.32.4 BETA",
+  "🧪 Beta v0.32.4": "🧪 Beta v0.32.4",
   "FICHA DE UPGRADES": "UPGRADE SHEET",
   "CAMINHO": "PATH",
   "EVOLUÇÃO": "PROGRESSION",
@@ -1723,6 +1723,7 @@ const MAP_CATEGORIES=[
 
 const MAP_ART=new Set(MAP_CATEGORIES.slice(1).flatMap(category=>category.maps));
 const mapArtUrl=id=>`assets/maps/${id}.webp`;
+const mapPreviewArt=id=>MAP_ART.has(id)?`<img class="map-preview-image" src="${mapArtUrl(id)}" alt="" decoding="async" width="1320" height="744">`:'';
 const catArtUrl=id=>`assets/gatinhos/${id}.webp`;
 const artImages=new Map();
 function loadArt(url){
@@ -1747,8 +1748,9 @@ function catSkinArt(id){
 }
 
 document.addEventListener('load',event=>{
-  const portrait=event.target.parentElement;
-  if(portrait?.classList.contains('cat-portrait'))portrait.classList.add('has-art');
+  const image=event.target;
+  const parent=image.parentElement;
+  if(parent&&(parent.classList.contains('cat-portrait')||image.classList?.contains('map-preview-image')))parent.classList.add('has-art');
 },true);
 
 const SECRET_TOWER_RULES={
@@ -2866,7 +2868,7 @@ function renderMapLobby(){
 
   const categoryPicker=$('#map-category-picker');
   if(categoryPicker){
-    categoryPicker.innerHTML=MAP_CATEGORIES.map(c=>`<button type="button" class="map-category-button ${category.id===c.id?'selected':''} ${c.maps.length?'':'coming-soon'}" data-map-category="${c.id}"><span>${c.icon}</span><b>${c.name}</b><small>${c.maps.length?`${c.maps.length} mapa${c.maps.length>1?'s':''}`:$t('em breve')}</small></button>`).join('');
+    categoryPicker.innerHTML=MAP_CATEGORIES.map(c=>`<button type="button" class="map-category-button ${category.id===c.id?'selected':''} ${c.maps.length?'':'coming-soon'}" data-map-category="${c.id}"><span>${c.icon}</span><b>${c.name}</b><small>${c.maps.length?c.maps.length+' '+$t(c.maps.length===1?'mapa':'mapas'):$t('em breve')}</small></button>`).join('');
     $$('[data-map-category]').forEach(btn=>btn.onclick=()=>{
       sfx('ui');
       lobbySelection.category=btn.dataset.mapCategory;
@@ -2877,7 +2879,7 @@ function renderMapLobby(){
   }
   const categoryNote=$('#map-category-note');
   if(categoryNote){
-    categoryNote.innerHTML=$T`<b>${category.icon} Mapas ${category.name}</b><span>${category.description} • 🐾 Gatinhos: ${towerPriceDeltaLabel(category.maps[0]||'grove')}.</span>`;
+    categoryNote.innerHTML=$T`<b>${category.icon} ${category.name}</b><span>${category.description} • 🐾 Gatinhos: ${towerPriceDeltaLabel(category.maps[0]||'grove')}.</span>`;
     categoryNote.classList.toggle('empty-category',!categoryHasMaps);
   }
 
@@ -2891,7 +2893,7 @@ function renderMapLobby(){
         const label=infinite?$T`∞ sem limite • recorde ${infiniteBestFor(id,lobbySelection.difficulty)}`:$T`${mapRounds(id,lobbySelection.difficulty)} rodadas`;
         return `
         <button type="button" class="map-choice ${lobbySelection.map===id?'selected':''}" data-map-choice="${id}">
-          <div class="map-preview preview-${id}${MAP_ART.has(id)?' map-preview-art':''}"${MAP_ART.has(id)?` style="--map-art:url(${mapArtUrl(id)})"`:''}><span class="map-preview-label">${label}</span></div>
+          <div class="map-preview preview-${id}">${mapPreviewArt(id)}<span class="map-preview-label">${label}</span></div>
           <div class="map-choice-body">
             <h3>${map.name}</h3>
             <p>${map.description}</p>
@@ -3703,11 +3705,11 @@ function runMapLoading(mapId,diffId,onReady,modeId='campaign'){
   if(!overlay){onReady();return;}
   const map=maps[mapId]||maps.grove,diff=difficulties[diffId]||difficulties.easy;
   const preview=$('#loading-preview');
-  const art=modeId!=='boss-event'&&MAP_ART.has(mapId);
-  if(art)loadArt(mapArtUrl(mapId));
+  const previewId=modeId==='boss-event'||!Object.hasOwn(maps,mapId)?'grove':mapId;
+  if(MAP_ART.has(previewId))loadArt(mapArtUrl(previewId));
   if(preview){
-    preview.className=`loading-preview preview-${mapId in maps?mapId:'grove'}${art?' map-preview-art':''}`;
-    preview.style.setProperty('--map-art',art?`url(${mapArtUrl(mapId)})`:'none');
+    preview.className=`loading-preview preview-${previewId}`;
+    preview.innerHTML=mapPreviewArt(previewId);
   }
   if($('#loading-map-name')) $('#loading-map-name').textContent=modeId==='boss-event'?'Arena · '+EventRules.bosses[eventBossId].title:map.name;
   if($('#loading-diff-name')) $('#loading-diff-name').textContent=modeId==='infinite'?$T`∞ Infinito • ${diff.name} • sem rodada final`:modeId==='boss-event'?$t('👑 Evento diário • 60 rodadas • chefes em 20/40/60'):$T`${diff.name} • ${mapRounds(mapId,diffId)} rodadas`;
