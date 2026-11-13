@@ -140,8 +140,48 @@ try{
     const t=__CatoonsTest,s=t.state;s.spawn=[];s.enemies=[];t.update(0,0);
     return profile.salmonCans===3&&profile.checkpoints['boss-event'].wave===20;
   })()`),'Boss reward should settle once with the checkpoint');
+  assert.deepEqual(await run(`(()=>{
+    personalTd.loadSelection('church','hard','campaign');setScreen('game');
+    const t=__CatoonsTest,s=t.state;
+    s.lives=12;s.wave=6;personalTd.startWave();personalTd.startWave();
+    const leak=(round,path,kind,hp)=>({round,path,kind,hp,maxHp:hp,d:10000,speed:0,id:s.nextEnemyId++});
+    s.spawn=[];
+    s.enemies=[leak(7,0,'camo',4),leak(8,1,'fast',3),leak(7,1,'normal',1),leak(7,1,'normal',1)];
+    t.update(0,0);
+    return {lives:s.lives,report:profile.checkpoints.campaign.worstLeak};
+  })()`),{lives:3,report:{round:7,lives:6,routes:{0:{lives:4,enemies:{camo:1}},1:{lives:2,enemies:{normal:2}}}}});
+  await reload();
+  await click('[data-checkpoint-mode="campaign"]');await screen('game');
+  await call('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:1,mobile:true});
+  const defeatReport=await run(`(()=>{
+    const t=__CatoonsTest,s=t.state;
+    personalTd.startWave();
+    const enemy=s.spawn[0];enemy.d=10000;enemy.hp=6;
+    s.enemies=[enemy];s.spawn=[];
+    t.update(0,0);
+    const report=document.querySelector('.defeat-report');
+    const card=report.closest('.result-card'),box=card.getBoundingClientRect();
+    return {defeat:s.defeatShown,hostSnapshot:t.lanSnapshot().worstLeak?.round,
+      summary:report.querySelector('p').textContent,
+      right:report.querySelector('li').textContent,
+      bottom:report.querySelector('li:nth-child(2)').textContent,
+      fits:box.width<=innerWidth&&card.scrollWidth<=card.clientWidth+2};
+  })()`);
+  assert.equal(defeatReport.defeat,true);
+  assert.equal(defeatReport.hostSnapshot,7);
+  assert.match(defeatReport.summary,/Rodada 7 · 6 vidas perdidas|Round 7 · 6 lives lost/);
+  assert.match(defeatReport.right,/Saída à direita · 4 vidas perdidas1× Camuflado|Right exit · 4 lives lost1× Camo/);
+  assert.match(defeatReport.bottom,/Saída embaixo · 2 vidas perdidas2× Balão comum|Bottom exit · 2 lives lost2× Basic balloon/);
+  assert.equal(defeatReport.fits,true);
+  assert(await run(`(()=>{
+    const t=__CatoonsTest;
+    t.showResult(true);
+    const victoryHidesReport=!document.querySelector('.defeat-report');
+    personalTd.loadSelection('church','hard','campaign');
+    return victoryHidesReport&&t.state.worstLeak===null;
+  })()`),'Victory or restart displayed a previous defeat report');
   assert.deepEqual(errors,[]);
-  console.log('OK: daily and weekly boundaries, auto-rewards, discovery, checkpoint reload and power settlement, independent slots, training controls at three resolutions and isolated progress.');
+  console.log('OK: missions, discovery, checkpoint and power settlement, training at three resolutions, and route-specific defeat report after overlapping waves and checkpoint reload.');
 }finally{
   socket.close();
   await fetch(endpoint+'/json/close/'+target.id);

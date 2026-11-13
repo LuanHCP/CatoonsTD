@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.32.3 — arte dos mapas e gatinhos
+
+- Encaixe estável do tabuleiro em Campanha, Infinito, Evento e Treino, inclusive em janelas baixas.
+- Oito cenários ilustrados para os mapas Medianos, Difíceis e Impossíveis.
+- Nova arte para os 17 gatinhos e unidades, os quatro heróis e a skin élfica do Mago, incluindo retratos na coleção e sprites em combate.
+- Torres colocadas diretamente nos bancos da Festa na Igreja ganham visão elevada.
+- O relatório de derrota mostra a rodada com mais vidas perdidas e os inimigos que escaparam por cada rota.
+
 ## v0.32.2 — Central em janelas menores
 
 - Cabeçalho compacto e rolagem da Central com o menu acessível fora da tela cheia.

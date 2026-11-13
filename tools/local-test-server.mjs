@@ -2,7 +2,7 @@ import http from 'node:http';
 import {createReadStream,statSync,readFileSync} from 'node:fs';
 import {extname,join,normalize} from 'node:path';
 const root=process.cwd(),port=Number(process.argv[2]||4192);
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.mp3':'audio/mpeg','.wav':'audio/wav'};
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.mp3':'audio/mpeg','.wav':'audio/wav'};
 http.createServer((request,response)=>{
   try{
     const requestUrl=new URL(request.url,'http://localhost');
